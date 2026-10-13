@@ -7,6 +7,7 @@
 <meta name="description" content="Jadi fotografer kami hari ini. Jepret momen favoritmu, semua terkumpul jadi satu album.">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#f4eee3">
+<meta name="color-scheme" content="light">
 <meta property="og:title" content="Kamera Tamu · Afiq & Puteri">
 <meta property="og:description" content="Jadi fotografer kami hari ini ♡">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%231d2847'/%3E%3Cpath d='M5 9a1.5 1.5 0 0 1 1.5-1.5h1.6l1-1.5h5.8l1 1.5h1.6A1.5 1.5 0 0 1 19 9v7.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 16.5z' fill='none' stroke='%23f3d9a8' stroke-width='1.4'/%3E%3Ccircle cx='12' cy='12.6' r='2.9' fill='none' stroke='%23f3d9a8' stroke-width='1.4'/%3E%3C/svg%3E">
@@ -14,269 +15,337 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://lh3.googleusercontent.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Caveat:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
-  /* Kertas undangan krem, tinta navy, aksen emas. Kartu polaroid untuk foto. */
+  /* Design system: UI UX Pro Max "wedding, romance, elegant" (tipografi Great Vibes + Cormorant),
+     palet navy–emas–krem milik undangan Afiq & Puteri (semua pasangan teks lolos WCAG AA). */
   :root{
-    --cream:#f4eee3; --paper:#fffdf8; --navy:#1d2847; --gold:#b08d57; --ink:#26262b;
-    --muted:#7c7568; --line:#e2d9c6; --err:#a3402e; --ok:#3d7a57;
-    --serif:'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-    --hand:'Caveat', 'Bradley Hand', cursive;
-    --sans:system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    /* warna semantik */
+    --c-bg:#f4eee3; --c-surface:#fffdf8; --c-primary:#1d2847; --c-on-primary:#ffffff;
+    --c-text:#26262b; --c-text-muted:#5e584e; --c-accent-text:#7d5d2a; --c-accent-deco:#b08d57;
+    --c-border:#e2d9c6; --c-border-strong:#8c8270; --c-danger:#a3402e; --c-success:#2f6b4a;
+    --c-scrim:rgba(14,16,26,.72); --c-dark:#0c0d14; --c-on-dark:#f3e4c8; --c-on-dark-muted:#b9b9b9;
+    /* tipografi */
+    --f-script:'Great Vibes', 'Snell Roundhand', 'Brush Script MT', cursive;
+    --f-serif:'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    --f-sans:system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    /* skala jarak 4/8 */
+    --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:24px; --s-6:32px; --s-7:48px;
+    /* radius & elevasi */
+    --r-sm:8px; --r-md:12px; --r-lg:20px; --r-pill:999px;
+    --e-1:0 1px 2px rgba(29,40,71,.08); --e-2:0 10px 24px -12px rgba(29,40,71,.45); --e-3:0 24px 48px -20px rgba(0,0,0,.6);
+    /* gerak */
+    --t-fast:150ms; --t-base:220ms; --t-slow:320ms; --ease-out:cubic-bezier(.2,.8,.2,1); --ease-in:cubic-bezier(.4,0,1,1);
+    /* lapisan */
+    --z-nav:10; --z-sheet:40; --z-lb:50; --z-busy:60; --z-flash:70; --z-toast:80;
+    --nav-h:64px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:16px}
-  body{min-height:100vh;background:radial-gradient(1200px 600px at 50% -10%, #fbf7ef 0%, rgba(251,247,239,0) 60%), var(--cream)}
+  html{background:var(--c-bg)}
+  html,body{margin:0;color:var(--c-text);font-family:var(--f-sans);font-size:16px;line-height:1.5}
+  body{min-height:100vh;min-height:100dvh;background:radial-gradient(1200px 600px at 50% -10%, #fbf7ef 0%, rgba(251,247,239,0) 60%), var(--c-bg)}
   [hidden]{display:none !important}
-  .wrap{max-width:460px;margin:0 auto;padding:22px 18px calc(48px + env(safe-area-inset-bottom))}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  button,a,input{font:inherit}
+  button,a{touch-action:manipulation}
+  :focus-visible{outline:3px solid var(--c-primary);outline-offset:2px;border-radius:4px}
+  .ic{width:22px;height:22px;flex:none;fill:currentColor}
+  .ic-sm{width:18px;height:18px}
+
+  .skip{position:absolute;left:var(--s-4);top:-100px;background:var(--c-primary);color:var(--c-on-primary);padding:var(--s-3) var(--s-4);border-radius:var(--r-sm);z-index:var(--z-toast);text-decoration:none}
+  .skip:focus{top:var(--s-4)}
+
+  .wrap{max-width:460px;margin:0 auto;padding:var(--s-5) var(--s-4) calc(var(--nav-h) + var(--s-7) + env(safe-area-inset-bottom))}
   .wrap.wide{max-width:1100px}
-  .eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin:0 0 6px;font-weight:600}
-  h1,h2,h3{font-family:var(--serif);color:var(--navy);font-weight:600;margin:0;line-height:1.05;text-wrap:balance}
-  .head{text-align:center}
-  .head h1{font-size:40px}
-  .date{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:17px;margin:6px 0 0}
+  .head{text-align:center;margin-bottom:var(--s-5)}
+  .eyebrow{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--c-accent-text);margin:0;font-weight:700}
+  .couple{font-family:var(--f-script);font-weight:400;color:var(--c-primary);font-size:clamp(40px,13vw,58px);line-height:1.1;margin:var(--s-1) 0 0;text-wrap:balance}
+  .date{font-family:var(--f-serif);font-style:italic;color:var(--c-text-muted);font-size:18px;margin:0}
+  .divider{width:72px;height:1px;background:var(--c-accent-deco);margin:var(--s-3) auto 0;border:0}
+  h2,h3{font-family:var(--f-serif);color:var(--c-primary);font-weight:600;margin:0;line-height:1.15;text-wrap:balance}
+  h2{font-size:24px}
 
-  .tabs{display:flex;gap:4px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:4px;margin:18px auto 20px;max-width:460px}
-  .tab{flex:1;appearance:none;border:0;background:transparent;border-radius:9px;padding:11px 8px;font:600 15px var(--sans);color:var(--muted);cursor:pointer}
-  .tab[aria-selected="true"]{background:var(--navy);color:#fff}
-  .tab small{font-weight:500;opacity:.8}
-
-  .btn{appearance:none;border:0;border-radius:14px;font:600 16px/1 var(--sans);padding:16px 18px;width:100%;
-       display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;text-decoration:none;transition:transform .08s ease,opacity .2s}
+  /* tombol */
+  .btn{appearance:none;border:0;border-radius:var(--r-md);font-weight:600;font-size:16px;line-height:1.2;min-height:52px;padding:var(--s-3) var(--s-4);width:100%;
+       display:flex;align-items:center;justify-content:center;gap:var(--s-2);cursor:pointer;text-decoration:none;
+       transition:transform var(--t-fast) var(--ease-out), background-color var(--t-base) var(--ease-out), box-shadow var(--t-base) var(--ease-out)}
   .btn:active{transform:scale(.98)}
-  .btn[disabled]{opacity:.45;pointer-events:none}
-  .btn svg{width:20px;height:20px;flex:none}
-  .btn:focus-visible,.tab:focus-visible,.chip:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-  .primary{background:var(--navy);color:#fff;box-shadow:0 8px 20px -10px rgba(29,40,71,.7)}
-  .big{padding:20px 18px;font-size:17px}
-  .ghost{background:var(--paper);color:var(--navy);border:1px solid var(--line)}
-  .outline{background:transparent;color:var(--navy);border:1.5px solid var(--navy)}
-  .row{display:flex;gap:10px;margin-top:10px}
-  .center{text-align:center}
-  .lead{color:#4a463f;line-height:1.55;margin:16px 0 22px;font-size:15px}
-  label{display:block;font-size:13px;color:var(--muted);margin:0 0 6px;text-align:left}
-  input[type=text]{width:100%;padding:15px 14px;border-radius:12px;border:1px solid var(--line);background:var(--paper);
-       font:16px var(--sans);color:var(--ink);outline:none;margin-bottom:12px}
-  input[type=text]:focus{border-color:var(--navy)}
-  .stats{font-size:13px;color:var(--muted);margin-top:14px;min-height:18px}
+  .btn[disabled]{opacity:.45;cursor:not-allowed}
+  .btn-primary{background:var(--c-primary);color:var(--c-on-primary);box-shadow:var(--e-2)}
+  .btn-primary:hover{background:#26335a}
+  .btn-big{min-height:60px;font-size:17px}
+  .btn-ghost{background:var(--c-surface);color:var(--c-primary);border:1px solid var(--c-border-strong)}
+  .btn-ghost:hover{background:#f8f2e6}
+  .row{display:flex;flex-wrap:wrap;gap:var(--s-3);margin-top:var(--s-3)}
+  .row > .btn{flex:1 1 140px;width:auto;min-width:0}
 
-  .stack{position:relative;height:150px;margin:6px auto 4px;width:260px}
-  .pol{position:absolute;width:112px;background:var(--paper);padding:8px 8px 26px;box-shadow:0 10px 24px -14px rgba(0,0,0,.45);border-radius:2px}
+  /* sambutan */
+  .stack{position:relative;height:150px;margin:0 auto var(--s-2);width:260px;max-width:100%}
+  .pol{position:absolute;width:112px;background:var(--c-surface);padding:8px 8px 26px;box-shadow:var(--e-2);border-radius:2px}
   .pol i{display:block;height:92px;border-radius:1px}
-  .pol b{position:absolute;left:0;right:0;bottom:4px;text-align:center;font:500 15px var(--hand);color:var(--navy)}
+  .pol b{position:absolute;left:0;right:0;bottom:3px;text-align:center;font:italic 500 15px var(--f-serif);color:var(--c-primary)}
   .pol:nth-child(1){left:0;top:16px;transform:rotate(-8deg)}
   .pol:nth-child(1) i{background:linear-gradient(135deg,#c9a77a,#6d5a45)}
-  .pol:nth-child(2){left:74px;top:0;transform:rotate(3deg);z-index:2}
+  .pol:nth-child(2){left:calc(50% - 56px);top:0;transform:rotate(3deg);z-index:2}
   .pol:nth-child(2) i{background:linear-gradient(135deg,#2e3c66,#8a7cae)}
-  .pol:nth-child(3){left:148px;top:20px;transform:rotate(9deg)}
+  .pol:nth-child(3){right:0;top:20px;transform:rotate(9deg)}
   .pol:nth-child(3) i{background:linear-gradient(135deg,#d9b48a,#a35d4b)}
+  .lead{color:#3f3b35;margin:var(--s-4) 0 var(--s-5);text-align:center}
+  .field{margin-bottom:var(--s-4)}
+  .field label{display:block;font-weight:600;font-size:15px;color:var(--c-text);margin:0 0 var(--s-2)}
+  .field input{width:100%;min-height:52px;padding:var(--s-3) var(--s-4);border-radius:var(--r-md);border:1.5px solid var(--c-border-strong);background:var(--c-surface);color:var(--c-text);font-size:16px}
+  .field input::placeholder{color:#7a7366}
+  .field input:focus-visible{outline:3px solid var(--c-primary);outline-offset:1px;border-color:var(--c-primary)}
+  .field input[aria-invalid="true"]{border-color:var(--c-danger)}
+  .help{font-size:14px;color:var(--c-text-muted);margin:var(--s-2) 0 0}
+  .field-error{display:flex;gap:var(--s-2);align-items:flex-start;font-size:14px;font-weight:600;color:var(--c-danger);margin:var(--s-2) 0 0}
+  .stats{font-size:14px;color:var(--c-text-muted);margin:var(--s-4) 0 0;text-align:center;min-height:21px}
 
-  .hi{display:flex;justify-content:flex-end;margin:-6px 0 10px}
-  .hi button{background:none;border:0;color:var(--navy);font:500 14px var(--sans);padding:6px 0;cursor:pointer;max-width:80%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px}
-  .counter{display:flex;align-items:center;gap:16px}
-  .num{font-family:var(--serif);font-size:56px;line-height:.9;color:var(--navy);font-weight:600;min-width:64px;text-align:center;font-variant-numeric:tabular-nums}
-  .counter small{display:block;font-size:13px;color:var(--muted);margin-top:4px}
-  .dots{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
-  .dots span{width:10px;height:14px;border-radius:2px;background:var(--navy);opacity:.9}
-  .dots span.used{background:var(--line);opacity:1}
-  .note{font-size:13px;color:var(--muted);text-align:center;margin:12px 0 0;line-height:1.5}
-  .note.warn{color:var(--err)}
-  .section{display:flex;justify-content:space-between;align-items:baseline;margin:28px 0 10px}
-  .section h3{font-size:22px}
-  .section span{font-size:12px;color:var(--muted)}
-  .roll{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  .shot{position:relative;aspect-ratio:1;border-radius:6px;overflow:hidden;background:#e9e1d1;border:0;padding:0}
+  /* kamera */
+  .hello{display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);margin-bottom:var(--s-3);flex-wrap:wrap}
+  .hello p{margin:0;font-size:16px;min-width:0;overflow-wrap:anywhere}
+  .hello strong{color:var(--c-primary)}
+  .link-btn{appearance:none;background:none;border:0;color:var(--c-accent-text);font-weight:600;font-size:15px;min-height:44px;padding:0 var(--s-2);display:inline-flex;align-items:center;gap:6px;cursor:pointer;border-radius:var(--r-sm)}
+  .link-btn:hover{text-decoration:underline}
+  .card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-lg);padding:var(--s-4);margin-bottom:var(--s-4);box-shadow:var(--e-1)}
+  .counter{display:flex;align-items:center;gap:var(--s-4);flex-wrap:wrap}
+  .num{font-family:var(--f-serif);font-size:56px;line-height:.9;color:var(--c-primary);font-weight:600;min-width:64px;text-align:center;font-variant-numeric:tabular-nums}
+  .counter-text{flex:1 1 160px;min-width:0}
+  .counter-text p{margin:0;font-size:14px;color:var(--c-text-muted)}
+  .dots{display:flex;flex-wrap:wrap;gap:4px;margin-top:var(--s-2)}
+  .dots span{width:10px;height:14px;border-radius:2px;background:var(--c-primary)}
+  .dots span.used{background:var(--c-border)}
+  .note{font-size:14px;color:var(--c-text-muted);text-align:center;margin:var(--s-3) 0 0}
+  .note.warn{color:var(--c-danger);font-weight:600}
+  .section-head{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s-3);margin:var(--s-6) 0 var(--s-3)}
+  .section-head span{font-size:14px;color:var(--c-text-muted)}
+  .roll{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-2)}
+  .shot{position:relative;aspect-ratio:1;border-radius:var(--r-sm);overflow:hidden;background:#e9e1d1;border:0;padding:0;cursor:pointer;transition:transform var(--t-fast) var(--ease-out)}
+  .shot:active{transform:scale(.97)}
   .shot img{width:100%;height:100%;object-fit:cover;display:block}
-  .shot .badge{position:absolute;inset:auto 6px 6px auto;font-size:11px;padding:3px 7px;border-radius:20px;background:rgba(29,40,71,.85);color:#fff}
+  .badge{position:absolute;left:6px;right:6px;bottom:6px;display:flex;align-items:center;justify-content:center;gap:4px;font-size:12px;font-weight:600;padding:4px 6px;border-radius:var(--r-pill);background:rgba(29,40,71,.9);color:#fff}
   .shot.up img{opacity:.55}
-  .shot.fail{outline:2px solid var(--err);cursor:pointer}
-  .shot.fail .badge{background:var(--err)}
-  .empty{font-size:13px;color:var(--muted);text-align:center;padding:18px;border:1px dashed var(--line);border-radius:12px;margin:0}
-  .gap{margin-top:24px}
+  .shot.fail{outline:3px solid var(--c-danger);outline-offset:-3px}
+  .shot.fail .badge{background:var(--c-danger)}
+  .spin-sm{width:12px;height:12px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp 1s linear infinite}
+  .empty{font-size:14px;color:var(--c-text-muted);text-align:center;padding:var(--s-4);border:1px dashed var(--c-border-strong);border-radius:var(--r-md);margin:0}
 
   /* album */
-  .album-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:0 auto 14px;max-width:1100px}
-  .album-bar p{margin:0;font-size:13px;color:var(--muted)}
-  .chips{display:flex;gap:6px}
-  .chip{appearance:none;border:1px solid var(--line);background:var(--paper);color:var(--navy);border-radius:20px;padding:7px 13px;font:600 13px var(--sans);cursor:pointer}
-  .chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+  .album-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s-3);margin:0 auto var(--s-4)}
+  .album-bar .meta{min-width:0}
+  .album-bar p{margin:2px 0 0;font-size:14px;color:var(--c-text-muted)}
+  .seg{display:flex;gap:4px;background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-pill);padding:4px}
+  .seg button{appearance:none;border:0;background:transparent;color:var(--c-text-muted);border-radius:var(--r-pill);min-height:44px;min-width:44px;padding:0 var(--s-4);font-weight:600;font-size:14px;cursor:pointer;transition:background-color var(--t-base) var(--ease-out),color var(--t-base) var(--ease-out)}
+  .seg button[aria-pressed="true"]{background:var(--c-primary);color:var(--c-on-primary)}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+  @media(max-width:300px){.grid,.roll{grid-template-columns:repeat(2,1fr)}}
   @media(min-width:700px){.grid{grid-template-columns:repeat(5,1fr);gap:8px}}
   .tile{position:relative;aspect-ratio:1;border:0;padding:0;background:#e6ddcb;border-radius:4px;overflow:hidden;cursor:pointer}
-  .tile img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .3s}
+  .tile img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity var(--t-slow) var(--ease-out)}
   .tile img.ok{opacity:1}
-  .tile.new::after{content:"baru";position:absolute;top:6px;left:6px;font:700 10px var(--sans);letter-spacing:.06em;text-transform:uppercase;background:var(--gold);color:#fff;border-radius:6px;padding:2px 6px}
-  .more{text-align:center;color:var(--muted);font-size:13px;padding:22px;margin:0}
+  .tile:hover img{transform:scale(1.03);transition:transform var(--t-slow) var(--ease-out),opacity var(--t-slow)}
+  .tile.new::after{content:"Baru";position:absolute;top:6px;left:6px;font-size:12px;font-weight:700;letter-spacing:.04em;background:var(--c-primary);color:#fff;border-radius:var(--r-pill);padding:2px 8px}
+  .more{text-align:center;color:var(--c-text-muted);font-size:14px;padding:var(--s-5);margin:0}
 
-  /* lightbox */
-  .lb{position:fixed;inset:0;background:rgba(12,13,20,.95);z-index:20;display:flex;flex-direction:column}
-  .lb-img{flex:1;display:flex;align-items:center;justify-content:center;padding:calc(56px + env(safe-area-inset-top)) 8px 8px;min-height:0}
-  .lb-img img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:0 20px 50px -20px #000}
-  .lb-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px calc(14px + env(safe-area-inset-bottom));color:#eee}
-  .lb-cap{font:500 22px var(--hand);color:#f3e4c8;min-width:0}
-  .lb-cap small{display:block;font:12px var(--sans);color:#aaa}
-  .lb a,.lb button{color:#fff;background:rgba(255,255,255,.12);border:0;border-radius:10px;padding:10px 12px;font:600 13px var(--sans);text-decoration:none;cursor:pointer;flex:none}
-  .lb .x{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px}
-  .lb .nav{position:absolute;top:50%;transform:translateY(-50%);font-size:22px;padding:10px 14px}
-  .lb .prev{left:8px}.lb .next{right:8px}
+  /* navigasi bawah */
+  .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:var(--z-nav);background:rgba(255,253,248,.96);border-top:1px solid var(--c-border);backdrop-filter:saturate(1.2) blur(8px);padding-bottom:env(safe-area-inset-bottom)}
+  .bottom-nav ul{list-style:none;margin:0 auto;padding:0 var(--s-2);display:flex;max-width:460px}
+  .bottom-nav li{flex:1}
+  .bottom-nav a{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:var(--nav-h);color:var(--c-text-muted);text-decoration:none;font-size:13px;font-weight:600;border-radius:var(--r-sm)}
+  .bottom-nav a[aria-current="page"]{color:var(--c-primary)}
+  .bottom-nav a[aria-current="page"]::before{content:"";position:absolute;top:0;left:30%;right:30%;height:3px;border-radius:0 0 3px 3px;background:var(--c-primary)}
+  .bottom-nav .count{position:absolute;top:8px;left:calc(50% + 8px);min-width:22px;height:22px;padding:0 6px;border-radius:var(--r-pill);background:var(--c-accent-text);color:#fff;font-size:12px;line-height:22px;text-align:center;font-variant-numeric:tabular-nums}
 
-  /* sheet pratinjau */
-  .sheet{position:fixed;inset:0;background:rgba(20,22,32,.72);display:flex;align-items:flex-end;justify-content:center;z-index:20;padding:16px;backdrop-filter:blur(3px)}
-  .sheet-card{width:100%;max-width:440px;background:var(--cream);border-radius:22px;padding:18px;animation:up .25s ease}
-  @keyframes up{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
-  .polaroid{background:var(--paper);padding:10px 10px 38px;box-shadow:0 14px 30px -18px rgba(0,0,0,.6);transform:rotate(-1.2deg);margin:4px 6px 16px;position:relative}
-  .polaroid img{width:100%;max-height:52vh;object-fit:contain;display:block;background:#111}
-  .polaroid p{position:absolute;left:0;right:0;bottom:6px;margin:0;text-align:center;font:500 22px var(--hand);color:var(--navy)}
-  .small{font-size:12px;color:var(--muted);text-align:center;margin:10px 0 0}
-  .busy{position:fixed;inset:0;background:rgba(244,238,227,.86);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:30;gap:14px;font-family:var(--serif);font-size:22px;color:var(--navy)}
-  .spin{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--navy);border-radius:50%;animation:sp 1s linear infinite}
+  /* dialog: pratinjau & lightbox */
+  .sheet{position:fixed;inset:0;background:var(--c-scrim);display:flex;align-items:flex-end;justify-content:center;z-index:var(--z-sheet);padding:var(--s-4);padding-bottom:calc(var(--s-4) + env(safe-area-inset-bottom))}
+  .sheet-card{width:100%;max-width:440px;max-height:100%;overflow:auto;background:var(--c-bg);border-radius:var(--r-lg);padding:var(--s-4);animation:up var(--t-slow) var(--ease-out)}
+  @keyframes up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+  .sheet-card h2{font-size:22px;text-align:center;margin-bottom:var(--s-3)}
+  .polaroid{background:var(--c-surface);padding:10px 10px 40px;box-shadow:var(--e-2);transform:rotate(-1.2deg);margin:0 6px var(--s-4);position:relative}
+  .polaroid img{width:100%;max-height:48vh;object-fit:contain;display:block;background:#111}
+  .polaroid p{position:absolute;left:0;right:0;bottom:6px;margin:0;display:flex;align-items:center;justify-content:center;gap:6px;font:italic 500 20px var(--f-serif);color:var(--c-primary)}
+  .small{font-size:14px;color:var(--c-text-muted);text-align:center;margin:var(--s-3) 0 0}
+
+  .lb{position:fixed;inset:0;background:rgba(12,13,20,.96);z-index:var(--z-lb);display:flex;flex-direction:column;color:var(--c-on-dark)}
+  .lb :focus-visible{outline-color:#f3d9a8}
+  .lb-top{display:flex;justify-content:flex-end;padding:calc(var(--s-2) + env(safe-area-inset-top)) var(--s-2) 0}
+  .lb-img{flex:1;display:flex;align-items:center;justify-content:center;padding:var(--s-2);min-height:0;position:relative}
+  .lb-img img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:var(--e-3)}
+  .icon-btn{appearance:none;border:0;width:48px;height:48px;border-radius:var(--r-pill);display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.14);color:#fff;cursor:pointer;transition:background-color var(--t-fast)}
+  .icon-btn:hover{background:rgba(255,255,255,.24)}
+  .lb .nav-prev,.lb .nav-next{position:absolute;top:50%;transform:translateY(-50%)}
+  .lb .nav-prev{left:var(--s-2)} .lb .nav-next{right:var(--s-2)}
+  .lb-bar{display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);padding:var(--s-3) var(--s-4) calc(var(--s-4) + env(safe-area-inset-bottom))}
+  .lb-cap{min-width:0}
+  .lb-cap b{display:flex;align-items:center;gap:6px;font:italic 600 22px var(--f-serif);color:var(--c-on-dark);overflow-wrap:anywhere}
+  .lb-cap small{display:block;font-size:13px;color:var(--c-on-dark-muted)}
+  .lb-open{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 var(--s-4);border-radius:var(--r-pill);background:rgba(255,255,255,.14);color:#fff;text-decoration:none;font-weight:600;font-size:14px;flex:none}
+
+  .busy{position:fixed;inset:0;background:rgba(244,238,227,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:var(--z-busy);gap:var(--s-3);font-family:var(--f-serif);font-size:22px;color:var(--c-primary)}
+  .spin{width:34px;height:34px;border:3px solid var(--c-border);border-top-color:var(--c-primary);border-radius:50%;animation:sp 1s linear infinite}
   @keyframes sp{to{transform:rotate(360deg)}}
-  .flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:40}
-  .flash.go{animation:fl .45s ease}
-  @keyframes fl{0%{opacity:.9}100%{opacity:0}}
-  .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;z-index:50;max-width:90%;text-align:center;box-shadow:0 10px 24px -12px rgba(0,0,0,.6)}
-  input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+  .flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:var(--z-flash)}
+  .flash.go{animation:fl .4s var(--ease-out)}
+  @keyframes fl{0%{opacity:.85}100%{opacity:0}}
+  .toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + var(--s-4) + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;align-items:center;gap:var(--s-2);background:var(--c-primary);color:#fff;padding:var(--s-3) var(--s-4);border-radius:var(--r-md);font-size:15px;z-index:var(--z-toast);width:max-content;max-width:calc(100% - 32px);box-shadow:var(--e-2)}
+  .file-input{position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;left:-100px}
 
   /* slideshow layar venue */
-  .live{position:fixed;inset:0;background:#0d0e14;overflow:hidden;color:#fff}
+  .live{position:fixed;inset:0;background:var(--c-dark);overflow:hidden;color:#fff}
   .layer{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease}
   .layer.on{opacity:1}
   .layer .bg{position:absolute;inset:-40px;background-size:cover;background-position:center;filter:blur(36px) brightness(.45)}
-  .layer img{position:absolute;inset:0;margin:auto;max-width:86%;max-height:86%;object-fit:contain;
-             background:#fffdf8;padding:14px 14px 64px;box-shadow:0 30px 70px -30px #000;transform:rotate(-1deg)}
-  .live-cap{position:absolute;left:4vw;bottom:5vh;font:500 clamp(22px,3vw,44px) var(--hand);color:#f3e4c8;text-shadow:0 2px 10px rgba(0,0,0,.6)}
-  .live-cap .new{font:700 12px var(--sans);background:#c0392b;color:#fff;border-radius:6px;padding:3px 7px;vertical-align:middle;margin-left:8px;letter-spacing:.05em}
+  .layer img{position:absolute;inset:0;margin:auto;max-width:86%;max-height:86%;object-fit:contain;background:#fffdf8;padding:14px 14px 64px;box-shadow:var(--e-3);transform:rotate(-1deg)}
+  .live-cap{position:absolute;left:4vw;bottom:5vh;display:flex;align-items:center;gap:10px;font:italic 600 clamp(22px,3vw,44px) var(--f-serif);color:var(--c-on-dark);text-shadow:0 2px 10px rgba(0,0,0,.6)}
+  .live-cap .new{font:700 12px var(--f-sans);background:#c0392b;color:#fff;border-radius:6px;padding:3px 7px;letter-spacing:.05em}
   .live-head{position:absolute;left:4vw;top:4vh}
-  .live-head h1{color:#fff;font-size:clamp(26px,3.2vw,52px)}
-  .live-head p{margin:6px 0 0;color:#cfc6b6;font-size:clamp(13px,1.2vw,18px)}
-  .live-qr{position:absolute;right:3vw;bottom:4vh;background:#fffdf8;color:var(--navy);border-radius:16px;padding:14px;text-align:center;width:clamp(140px,13vw,220px)}
+  .live-head .couple{color:#fff;font-size:clamp(34px,4vw,64px);text-align:left}
+  .live-head p{margin:4px 0 0;color:#d6cfc2;font-size:clamp(14px,1.2vw,18px)}
+  .live-qr{position:absolute;right:3vw;bottom:4vh;background:#fffdf8;color:var(--c-primary);border-radius:16px;padding:14px;text-align:center;width:clamp(140px,13vw,220px)}
   .live-qr svg{width:100%;height:auto;display:block}
-  .live-qr b{display:block;font:600 clamp(12px,1vw,16px) var(--sans);margin-top:8px}
-  .live-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:clamp(24px,3vw,40px);color:#cfc6b6}
-  .hint{position:absolute;top:2vh;right:2vw;font-size:12px;color:#888;transition:opacity 1s}
-  @media (prefers-reduced-motion: reduce){ *{animation:none !important;transition:none !important} }
+  .live-qr b{display:block;font:600 clamp(12px,1vw,16px) var(--f-sans);margin-top:8px}
+  .live-wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--f-serif);font-size:clamp(24px,3vw,40px);color:#d6cfc2}
+  .hint{position:absolute;top:2vh;right:2vw;font-size:13px;color:#a6a6a6;transition:opacity 1s}
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  }
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Lewati ke konten</a>
 <noscript><p style="padding:24px;text-align:center">Aktifkan JavaScript untuk memakai Kamera Tamu.</p></noscript>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none"><symbol id="i-camera" viewBox="0 0 256 256"><path d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.71,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H80a8,8,0,0,0,6.66-3.56L100.28,48h55.43l13.63,20.44A8,8,0,0,0,176,72h32a8,8,0,0,1,8,8ZM128,88a44,44,0,1,0,44,44A44.05,44.05,0,0,0,128,88Zm0,72a28,28,0,1,1,28-28A28,28,0,0,1,128,160Z"/></symbol><symbol id="i-selfie" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM74.08,197.5a64,64,0,0,1,107.84,0,87.83,87.83,0,0,1-107.84,0ZM96,120a32,32,0,1,1,32,32A32,32,0,0,1,96,120Zm97.76,66.41a79.66,79.66,0,0,0-36.06-28.75,48,48,0,1,0-59.4,0,79.66,79.66,0,0,0-36.06,28.75,88,88,0,1,1,131.52,0Z"/></symbol><symbol id="i-gallery" viewBox="0 0 256 256"><path d="M216,40H72A16,16,0,0,0,56,56V72H40A16,16,0,0,0,24,88V200a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V184h16a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM72,56H216v62.75l-10.07-10.06a16,16,0,0,0-22.63,0l-20,20-44-44a16,16,0,0,0-22.62,0L72,109.37ZM184,200H40V88H56v80a16,16,0,0,0,16,16H184Zm32-32H72V132l36-36,49.66,49.66a8,8,0,0,0,11.31,0L194.63,120,216,141.38V168ZM160,84a12,12,0,1,1,12,12A12,12,0,0,1,160,84Z"/></symbol><symbol id="i-heart" viewBox="0 0 256 256"><path d="M178,40c-20.65,0-38.73,8.88-50,23.89C116.73,48.88,98.65,40,78,40a62.07,62.07,0,0,0-62,62c0,70,103.79,126.66,108.21,129a8,8,0,0,0,7.58,0C136.21,228.66,240,172,240,102A62.07,62.07,0,0,0,178,40ZM128,214.8C109.74,204.16,32,155.69,32,102A46.06,46.06,0,0,1,78,56c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46C224,155.61,146.24,204.15,128,214.8Z"/></symbol><symbol id="i-edit" viewBox="0 0 256 256"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"/></symbol><symbol id="i-close" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></symbol><symbol id="i-prev" viewBox="0 0 256 256"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></symbol><symbol id="i-next" viewBox="0 0 256 256"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></symbol><symbol id="i-open" viewBox="0 0 256 256"><path d="M224,104a8,8,0,0,1-16,0V59.32l-66.33,66.34a8,8,0,0,1-11.32-11.32L196.68,48H152a8,8,0,0,1,0-16h64a8,8,0,0,1,8,8Zm-40,24a8,8,0,0,0-8,8v72H48V80h72a8,8,0,0,0,0-16H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V136A8,8,0,0,0,184,128Z"/></symbol><symbol id="i-album" viewBox="0 0 256 256"><path d="M208,32H80A16,16,0,0,0,64,48V64H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V192h16a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM80,48H208v69.38l-16.7-16.7a16,16,0,0,0-22.62,0L93.37,176H80Zm96,160H48V80H64v96a16,16,0,0,0,16,16h96Zm32-32H116l64-64,28,28v36Zm-88-64A24,24,0,1,0,96,88,24,24,0,0,0,120,112Zm0-32a8,8,0,1,1-8,8A8,8,0,0,1,120,80Z"/></symbol><symbol id="i-ok" viewBox="0 0 256 256"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></symbol><symbol id="i-warn" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></symbol><symbol id="i-retry" viewBox="0 0 256 256"><path d="M224,48V96a8,8,0,0,1-8,8H168a8,8,0,0,1,0-16h28.69L182.06,73.37a79.56,79.56,0,0,0-56.13-23.43h-.45A79.52,79.52,0,0,0,69.59,72.71,8,8,0,0,1,58.41,61.27a96,96,0,0,1,135,.79L208,76.69V48a8,8,0,0,1,16,0ZM186.41,183.29a80,80,0,0,1-112.47-.66L59.31,168H88a8,8,0,0,0,0-16H40a8,8,0,0,0-8,8v48a8,8,0,0,0,16,0V179.31l14.63,14.63A95.43,95.43,0,0,0,130,222.06h.53a95.36,95.36,0,0,0,67.07-27.33,8,8,0,0,0-11.18-11.44Z"/></symbol></svg>
 
 <div id="app">
-  <main class="wrap" id="mainWrap">
+  <div class="wrap" id="mainWrap">
     <header class="head">
       <p class="eyebrow">Kamera Tamu</p>
-      <h1 class="js-couple">Afiq &amp; Puteri</h1>
+      <h1 class="couple js-couple">Afiq &amp; Puteri</h1>
       <p class="date js-date">Minggu, 17 Januari 2027</p>
+      <hr class="divider">
     </header>
 
-    <nav class="tabs" role="tablist" aria-label="Menu">
-      <button class="tab" id="tabCam" role="tab" aria-selected="true" aria-controls="viewCam">Kamera</button>
-      <button class="tab" id="tabAlbum" role="tab" aria-selected="false" aria-controls="viewAlbum">Album <small id="albumCount"></small></button>
-    </nav>
+    <main id="main" tabindex="-1">
+      <!-- ============ KAMERA ============ -->
+      <section id="viewCam" aria-labelledby="camTitle">
+        <h2 id="camTitle" class="sr-only" tabindex="-1">Kamera</h2>
 
-    <!-- ============ KAMERA ============ -->
-    <section id="viewCam" role="tabpanel">
-      <div id="welcome" class="center" hidden>
-        <div class="stack" aria-hidden="true">
-          <div class="pol"><i></i><b>good vibes ♡</b></div>
-          <div class="pol"><i></i><b>best people</b></div>
-          <div class="pol"><i></i><b>little moments</b></div>
+        <div id="welcome" hidden>
+          <div class="stack" aria-hidden="true">
+            <div class="pol"><i></i><b>good vibes</b></div>
+            <div class="pol"><i></i><b>best people</b></div>
+            <div class="pol"><i></i><b>little moments</b></div>
+          </div>
+          <p class="lead">Hari ini kamu jadi fotografer kami. Jepret momen favoritmu: selfie, makanan, foto bareng, momen lucu. Semua langsung terkumpul di satu album.</p>
+          <form id="nameForm" novalidate>
+            <div class="field">
+              <label for="name">Nama kamu</label>
+              <input id="name" name="name" type="text" maxlength="40" autocomplete="name" enterkeyhint="go" placeholder="contoh: Rina (teman kantor)" aria-describedby="nameHelp">
+              <p class="help" id="nameHelp">Nama ini tampil di bawah setiap fotomu.</p>
+              <p class="field-error" id="nameErr" role="alert" hidden><svg class="ic ic-sm" aria-hidden="true"><use href="#i-warn"/></svg><span>Tulis nama minimal 2 huruf, biar kami tahu siapa fotografernya.</span></p>
+            </div>
+            <button id="start" class="btn btn-primary btn-big" type="submit">Mulai Motret</button>
+          </form>
+          <p class="stats" id="stats"></p>
         </div>
-        <p class="lead">Hari ini kamu jadi fotografer kami. Jepret momen favoritmu: selfie, makanan, foto bareng, momen lucu. Semua langsung terkumpul di satu album.</p>
-        <label for="name">Nama kamu</label>
-        <input id="name" type="text" maxlength="40" autocomplete="name" placeholder="contoh: Rina (teman kantor)">
-        <button id="start" class="btn primary big" type="button">Mulai Motret</button>
-        <p class="stats" id="stats"></p>
-      </div>
 
-      <div id="cam" hidden>
-        <div class="hi"><button id="rename" type="button" title="Ganti nama">Hai, <span id="hiName"></span> ✎</button></div>
-        <div class="card counter">
-          <div class="num" id="left">20</div>
-          <div style="flex:1;min-width:0">
-            <small>foto tersisa di roll kamu</small>
-            <div class="dots" id="dots"></div>
+        <div id="cam" hidden>
+          <div class="hello">
+            <p>Hai, <strong id="hiName"></strong></p>
+            <button id="rename" class="link-btn" type="button"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-edit"/></svg>Ganti nama</button>
+          </div>
+
+          <div class="card counter">
+            <div class="num" id="left" aria-hidden="true">20</div>
+            <div class="counter-text">
+              <p id="leftLabel">foto tersisa di roll kamu</p>
+              <div class="dots" id="dots" aria-hidden="true"></div>
+            </div>
+          </div>
+
+          <button id="btnCam" class="btn btn-primary btn-big" type="button">
+            <svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg>Buka Kamera
+          </button>
+          <div class="row">
+            <button id="btnSelfie" class="btn btn-ghost" type="button"><svg class="ic" aria-hidden="true"><use href="#i-selfie"/></svg>Selfie</button>
+            <button id="btnGal" class="btn btn-ghost" type="button"><svg class="ic" aria-hidden="true"><use href="#i-gallery"/></svg>Dari Galeri</button>
+          </div>
+          <p class="note" id="note" aria-live="polite"></p>
+
+          <div class="section-head"><h2 id="rollTitle">Roll kamu</h2><span id="rollCount"></span></div>
+          <div class="roll" id="roll" role="group" aria-labelledby="rollTitle"></div>
+          <p class="empty" id="rollEmpty">Belum ada foto. Jepretan pertamamu muncul di sini.</p>
+        </div>
+      </section>
+
+      <!-- ============ ALBUM ============ -->
+      <section id="viewAlbum" aria-labelledby="albumTitle" hidden>
+        <div class="album-bar">
+          <div class="meta">
+            <h2 id="albumTitle" tabindex="-1">Album bersama</h2>
+            <p id="albumStats" aria-live="polite">Memuat album…</p>
+          </div>
+          <div class="seg" role="group" aria-label="Tampilkan">
+            <button id="fAll" type="button" aria-pressed="true">Semua</button>
+            <button id="fMine" type="button" aria-pressed="false">Foto saya</button>
           </div>
         </div>
+        <div class="grid" id="grid" role="group" aria-labelledby="albumTitle"></div>
+        <p class="more" id="more"></p>
+      </section>
+    </main>
+  </div>
 
-        <button id="btnCam" class="btn primary big" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2.2l1.4-2h6.8l1.4 2H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="4"/></svg>
-          Buka Kamera
-        </button>
-        <div class="row">
-          <button id="btnSelfie" class="btn ghost" type="button">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
-            Selfie
-          </button>
-          <button id="btnGal" class="btn ghost" type="button">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg>
-            Dari Galeri
-          </button>
-        </div>
-        <p class="note" id="note"></p>
-
-        <div class="section"><h3>Roll Kamu</h3><span id="rollCount"></span></div>
-        <div class="roll" id="roll"></div>
-        <p class="empty" id="rollEmpty">Belum ada foto. Jepretan pertamamu muncul di sini.</p>
-
-        <div class="gap"><a class="btn outline" href="#album">Lihat Album Bersama</a></div>
-      </div>
-    </section>
-
-    <!-- ============ ALBUM ============ -->
-    <section id="viewAlbum" role="tabpanel" hidden>
-      <div class="album-bar">
-        <p id="albumStats">Memuat album…</p>
-        <div class="chips">
-          <button class="chip" id="fAll" type="button" aria-pressed="true">Semua</button>
-          <button class="chip" id="fMine" type="button" aria-pressed="false">Foto saya</button>
-        </div>
-      </div>
-      <div class="grid" id="grid"></div>
-      <p class="more" id="more"></p>
-    </section>
-  </main>
+  <nav class="bottom-nav" aria-label="Menu utama">
+    <ul>
+      <li><a href="#kamera" id="navCam" aria-current="page"><svg class="ic" aria-hidden="true"><use href="#i-camera"/></svg>Kamera</a></li>
+      <li><a href="#album" id="navAlbum"><svg class="ic" aria-hidden="true"><use href="#i-album"/></svg>Album<span class="count" id="albumCount" hidden></span></a></li>
+    </ul>
+  </nav>
 </div>
 
 <!-- ============ SLIDESHOW LAYAR (#live) ============ -->
-<section id="viewLive" class="live" hidden>
+<section id="viewLive" class="live" hidden aria-label="Slideshow foto tamu">
   <div class="layer" id="L0"><div class="bg"></div><img alt="" referrerpolicy="no-referrer"></div>
   <div class="layer" id="L1"><div class="bg"></div><img alt="" referrerpolicy="no-referrer"></div>
   <div class="live-wait" id="liveWait">Menunggu jepretan pertama…</div>
-  <div class="live-head"><h1 class="js-couple">Afiq &amp; Puteri</h1><p id="liveStats"></p></div>
-  <div class="live-cap" id="liveCap"></div>
+  <div class="live-head"><p class="couple js-couple">Afiq &amp; Puteri</p><p id="liveStats"></p></div>
+  <div class="live-cap" id="liveCap" aria-live="polite"></div>
   <div class="live-qr"><div id="liveQr"></div><b>Scan &amp; ikut motret</b></div>
-  <div class="hint" id="hint">Tekan F11 untuk layar penuh</div>
+  <div class="hint" id="hint">F11 = layar penuh · Spasi = jeda</div>
 </section>
 
-<input id="inCam" type="file" accept="image/*" capture="environment">
-<input id="inSelfie" type="file" accept="image/*" capture="user">
-<input id="inGal" type="file" accept="image/*">
+<input id="inCam" class="file-input" type="file" accept="image/*" capture="environment" tabindex="-1" aria-hidden="true">
+<input id="inSelfie" class="file-input" type="file" accept="image/*" capture="user" tabindex="-1" aria-hidden="true">
+<input id="inGal" class="file-input" type="file" accept="image/*" tabindex="-1" aria-hidden="true">
 
-<div id="lb" class="lb" hidden>
-  <button class="x" id="lbX" type="button" aria-label="Tutup">✕</button>
-  <button class="nav prev" id="lbPrev" type="button" aria-label="Sebelumnya">‹</button>
-  <button class="nav next" id="lbNext" type="button" aria-label="Berikutnya">›</button>
-  <div class="lb-img"><img id="lbImg" alt="" referrerpolicy="no-referrer"></div>
+<div id="lb" class="lb" role="dialog" aria-modal="true" aria-labelledby="lbTitle" hidden>
+  <div class="lb-top"><button class="icon-btn" id="lbX" type="button" aria-label="Tutup foto"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+  <div class="lb-img">
+    <img id="lbImg" alt="" referrerpolicy="no-referrer">
+    <button class="icon-btn nav-prev" id="lbPrev" type="button" aria-label="Foto sebelumnya"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
+    <button class="icon-btn nav-next" id="lbNext" type="button" aria-label="Foto berikutnya"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
+  </div>
   <div class="lb-bar">
-    <div class="lb-cap" id="lbCap"></div>
-    <a id="lbOpen" href="#" target="_blank" rel="noopener noreferrer">Buka foto</a>
+    <div class="lb-cap"><b id="lbTitle"></b><small id="lbMeta"></small></div>
+    <a class="lb-open" id="lbOpen" href="#" target="_blank" rel="noopener noreferrer"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-open"/></svg>Buka foto</a>
   </div>
 </div>
 
-<div id="sheet" class="sheet" hidden>
+<div id="sheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
   <div class="sheet-card">
-    <div class="polaroid"><img id="pv" alt="Pratinjau foto"><p id="pvCap"></p></div>
+    <h2 id="sheetTitle">Kirim foto ini?</h2>
+    <div class="polaroid"><img id="pv" alt="Pratinjau foto yang akan dikirim"><p><svg class="ic ic-sm" aria-hidden="true"><use href="#i-heart"/></svg><span id="pvCap"></span></p></div>
     <div class="row">
-      <button id="cancel" class="btn ghost" type="button">Batal</button>
-      <button id="send" class="btn primary" type="button">Kirim ke Album</button>
+      <button id="cancel" class="btn btn-ghost" type="button">Ulangi</button>
+      <button id="send" class="btn btn-primary" type="button">Kirim ke Album</button>
     </div>
     <p class="small">Mengirim foto memakai 1 jatah jepretanmu.</p>
   </div>
 </div>
-<div id="busy" class="busy" hidden><div class="spin"></div>Mencuci foto…</div>
-<div id="flash" class="flash"></div>
-<div id="toast" class="toast" hidden role="status"></div>
+<div id="busy" class="busy" role="status" hidden><div class="spin" aria-hidden="true"></div>Mencuci foto…</div>
+<div id="flash" class="flash" aria-hidden="true"></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
 <script>
 /* ================= PENGATURAN ================= */
@@ -295,7 +364,13 @@ const store = {
   set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } }
 };
 const fmtClock = ms => new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }).format(new Date(ms));
-function toast(msg, ms){ const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => t.hidden = true, ms || 3200); }
+const icon = (name, cls) => '<svg class="ic ' + (cls || '') + '" aria-hidden="true"><use href="#i-' + name + '"/></svg>';
+function toast(msg, kind, ms){
+  const t = $('toast');
+  t.innerHTML = icon(kind === 'warn' ? 'warn' : 'ok', 'ic-sm');
+  const s = document.createElement('span'); s.textContent = msg; t.appendChild(s);
+  t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => t.hidden = true, ms || 3500);
+}
 function uid(){
   try { if (crypto.randomUUID) return crypto.randomUUID(); } catch(e){}
   const a = new Uint8Array(16); crypto.getRandomValues(a);
@@ -309,6 +384,36 @@ function setPhoto(img, id, w){
   img.onerror = () => { if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = photoFallback(id, w); } };
   img.src = photoUrl(id, w);
 }
+
+/* ================= DIALOG (fokus terkunci, Esc menutup, fokus kembali) ================= */
+const D = { open: null, last: null, onClose: null };
+const FOCUSABLE = 'button:not([disabled]), a[href], input:not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])';
+function openDialog(el, focusEl, onClose){
+  if (D.open && D.open !== el) closeDialog(true);
+  D.last = document.activeElement; D.open = el; D.onClose = onClose || null;
+  el.hidden = false;
+  $('app').inert = true; $('app').setAttribute('aria-hidden', 'true');
+  (focusEl || el.querySelector(FOCUSABLE)).focus({ preventScroll: true });
+}
+function closeDialog(silent){
+  const el = D.open; if (!el) return;
+  el.hidden = true; D.open = null;
+  $('app').inert = false; $('app').removeAttribute('aria-hidden');
+  const cb = D.onClose; D.onClose = null;
+  if (!silent && cb) cb();
+  if (D.last && document.contains(D.last)) D.last.focus({ preventScroll: true });
+}
+document.addEventListener('keydown', e => {
+  if (!D.open) return;
+  if (e.key === 'Escape') { e.preventDefault(); closeDialog(); return; }
+  if (e.key === 'Tab') {
+    const f = [...D.open.querySelectorAll(FOCUSABLE)].filter(x => x.offsetParent !== null);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+});
 
 /* ================= API (tanpa cookie → aman untuk HP multi-akun Google) ================= */
 async function api(query){
@@ -327,7 +432,7 @@ const KEY = 'kamera_tamu_afiq_puteri';
 const PKEY = KEY + '_antrian';
 const guest = store.get(KEY) || { id: uid(), name: '' };
 store.set(KEY, guest);
-const S = { used: 0, pending: 0, items: [], local: {}, current: null, rollLoaded: false };
+const S = { used: 0, pending: 0, items: [], local: {}, current: null };
 const closed = () => now() > C.closeAt;
 const left = () => Math.max(0, C.maxShots - S.used - S.pending);
 
@@ -339,37 +444,44 @@ function applyConfig(){
 
 /* ================= KAMERA ================= */
 function render(){
-  $('left').textContent = left();
+  const l = left();
+  $('left').textContent = l;
+  $('leftLabel').textContent = l + ' dari ' + C.maxShots + ' foto tersisa di roll kamu';
   const dots = $('dots'); dots.innerHTML = '';
   for (let i = 0; i < C.maxShots; i++){
     const s = document.createElement('span');
     if (i < S.used + S.pending) s.className = 'used';
     dots.appendChild(s);
   }
-  const off = closed() || left() <= 0;
+  const off = closed() || l <= 0;
   ['btnCam','btnSelfie','btnGal'].forEach(id => $(id).disabled = off);
   $('btnGal').hidden = !C.allowGallery;
 
   const note = $('note'); note.classList.remove('warn');
   if (closed()) note.textContent = 'Kamera sudah ditutup. Terima kasih sudah motret! Fotonya bisa dilihat di Album.';
-  else if (left() <= 0 && S.pending === 0) note.textContent = 'Roll kamu sudah habis. Terima kasih sudah jadi fotografer kami ♡';
-  else if (left() <= 3 && left() > 0) { note.textContent = 'Tinggal ' + left() + ' jepretan. Pilih momen terbaik!'; note.classList.add('warn'); }
+  else if (l <= 0 && S.pending === 0) note.textContent = 'Roll kamu sudah habis. Terima kasih sudah jadi fotografer kami.';
+  else if (l <= 3 && l > 0) { note.textContent = 'Tinggal ' + l + ' jepretan. Pilih momen terbaik!'; note.classList.add('warn'); }
   else note.textContent = 'Setiap jepretan otomatis diberi efek film dan langsung masuk album.';
 
   const roll = $('roll'); roll.innerHTML = '';
-  S.items.slice().reverse().forEach(it => {
+  const list = S.items.slice().reverse();
+  list.forEach((it, i) => {
     const d = document.createElement('button');
     d.type = 'button';
     d.className = 'shot' + (it.state === 'up' ? ' up' : it.state === 'fail' ? ' fail' : '');
     const img = document.createElement('img'); img.alt = ''; img.loading = 'lazy';
     if (S.local[it.id]) img.src = S.local[it.id]; else setPhoto(img, it.id, 500);
     d.appendChild(img);
-    if (it.state === 'up' || it.state === 'fail'){
-      const b = document.createElement('span'); b.className = 'badge';
-      b.textContent = it.state === 'up' ? 'mengirim…' : 'gagal · ketuk';
-      d.appendChild(b);
-      if (it.state === 'fail') d.onclick = () => retry(it);
+    if (it.state === 'up'){
+      d.setAttribute('aria-label', 'Foto sedang dikirim');
+      d.insertAdjacentHTML('beforeend', '<span class="badge"><span class="spin-sm" aria-hidden="true"></span>Mengirim</span>');
+      d.disabled = true;
+    } else if (it.state === 'fail'){
+      d.setAttribute('aria-label', 'Foto gagal terkirim. Ketuk untuk kirim ulang');
+      d.insertAdjacentHTML('beforeend', '<span class="badge">' + icon('retry', 'ic-sm') + 'Kirim ulang</span>');
+      d.onclick = () => retry(it);
     } else {
+      d.setAttribute('aria-label', 'Foto ke-' + (list.length - i) + (it.t ? ', pukul ' + fmtClock(it.t) : '') + '. Buka');
       d.onclick = () => { const mine = mineList(); openLb(mine, mine.findIndex(x => x.id === it.id)); };
     }
     roll.appendChild(d);
@@ -416,22 +528,24 @@ function filmLook(ctx, w, h){
   ctx.shadowBlur = 0;
 }
 
-async function onPick(e, source){
+async function onPick(e, source, trigger){
   const f = e.target.files && e.target.files[0];
   e.target.value = '';
   if (!f) return;
-  if (closed()) return toast('Kamera sudah ditutup.');
-  if (left() <= 0) return toast('Roll kamu sudah habis.');
+  if (closed()) return toast('Kamera sudah ditutup.', 'warn');
+  if (left() <= 0) return toast('Roll kamu sudah habis.', 'warn');
   $('busy').hidden = false;
   try {
     const dataUrl = await develop(f);
     S.current = { dataUrl, source };
     $('pv').src = dataUrl;
-    $('pvCap').textContent = '♡ ' + guest.name;
+    $('pvCap').textContent = guest.name;
     $('toast').hidden = true;
-    $('sheet').hidden = false;
+    D.last = trigger;
+    openDialog($('sheet'), $('send'), () => { S.current = null; });
+    D.last = trigger;
   } catch(err) {
-    toast('Foto tidak bisa dibaca. Coba jepret ulang ya.');
+    toast('Foto tidak bisa dibaca. Coba jepret ulang ya.', 'warn');
   } finally { $('busy').hidden = true; }
 }
 
@@ -443,8 +557,10 @@ function savePending(){
 async function send(){
   const cur = S.current; if (!cur) return;
   S.current = null;
-  $('sheet').hidden = true;
+  D.onClose = null; closeDialog(true);
+  $('btnCam').focus({ preventScroll: true });
   const fl = $('flash'); fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go');
+  if (navigator.vibrate) try { navigator.vibrate(10); } catch(e){}
   const it = { id: 'tmp-' + Date.now(), state: 'up', dataUrl: cur.dataUrl, source: cur.source };
   S.local[it.id] = cur.dataUrl;
   S.items.push(it); S.pending++; render();
@@ -469,22 +585,22 @@ async function upload(it){
     it.id = res.id; it.state = 'done'; it.t = Date.now(); delete it.dataUrl;
     S.used = Math.max(S.used + 1, res.used || 0);
     if (res.max) C.maxShots = res.max;
-    toast('Tersimpan di album ♡');
+    toast('Foto tersimpan di album');
     A.dirty = true;
   } else if (res && (res.reason === 'habis' || res.reason === 'tutup')){
     S.items = S.items.filter(x => x !== it); delete S.local[it.id];
     if (res.reason === 'habis') S.used = C.maxShots;
-    toast(res.reason === 'habis' ? 'Roll kamu sudah habis.' : 'Kamera sudah ditutup.');
+    toast(res.reason === 'habis' ? 'Roll kamu sudah habis.' : 'Kamera sudah ditutup.', 'warn');
   } else {
     it.state = 'fail';
-    toast('Gagal mengirim (sinyal?). Ketuk foto bertanda merah untuk coba lagi.', 4500);
+    toast('Foto belum terkirim (sinyal lemah?). Ketuk foto bertanda merah untuk kirim ulang.', 'warn', 5000);
   }
   savePending(); render();
 }
 
 function retry(it){
   if (it.state !== 'fail') return;
-  if (left() <= 0) return toast('Roll kamu sudah habis.');
+  if (left() <= 0) return toast('Roll kamu sudah habis.', 'warn');
   it.state = 'up'; S.pending++; render(); upload(it);
 }
 
@@ -493,7 +609,7 @@ async function loadRoll(){
     const r = await api('api=roll&gid=' + encodeURIComponent(guest.id));
     const pend = S.items.filter(x => x.state !== 'done');
     S.items = r.items.map(x => ({ id: x.id, state: 'done', t: x.t })).concat(pend);
-    S.used = r.used; if (r.max) C.maxShots = r.max; S.rollLoaded = true;
+    S.used = r.used; if (r.max) C.maxShots = r.max;
     render();
   } catch(e) {}
 }
@@ -509,15 +625,15 @@ function showWelcome(){
 }
 
 /* ================= ALBUM ================= */
-const A = { items: [], ids: new Set(), offset: 0, total: 0, guests: 0, loading: false, done: false, filter: 'all', list: [], idx: 0, last: 0, dirty: false };
+const A = { items: [], ids: new Set(), offset: 0, total: 0, guests: 0, loading: false, done: false, filter: 'all', list: [], lbList: [], idx: 0, last: 0, dirty: false };
 
 function mineList(){ return S.items.filter(i => i.state === 'done').slice().reverse().map(i => ({ id: i.id, name: guest.name, t: i.t || 0 })); }
 
-function tile(it, i, isNew){
+function tile(it, isNew){
   const b = document.createElement('button'); b.type = 'button';
   b.className = 'tile' + (isNew ? ' new' : '');
-  b.setAttribute('aria-label', 'Foto oleh ' + it.name);
-  const img = document.createElement('img'); img.alt = ''; img.loading = 'lazy';
+  b.setAttribute('aria-label', 'Foto oleh ' + it.name + (it.t ? ', pukul ' + fmtClock(it.t) : '') + (isNew ? ', baru' : ''));
+  const img = document.createElement('img'); img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
   img.onload = () => img.classList.add('ok');
   setPhoto(img, it.id, 500);
   b.appendChild(img);
@@ -525,17 +641,25 @@ function tile(it, i, isNew){
   return b;
 }
 
+function moreText(){
+  return A.done ? (A.items.length ? 'Semua foto sudah tampil' : 'Belum ada foto. Jadilah yang pertama!') : '';
+}
+
 function renderGrid(){
   const g = $('grid'); g.innerHTML = '';
   A.list = A.filter === 'mine' ? mineList() : A.items;
-  A.list.forEach((it, i) => g.appendChild(tile(it, i, false)));
-  if (A.filter === 'mine') $('more').textContent = A.list.length ? '' : 'Kamu belum mengirim foto. Yuk jepret di tab Kamera.';
-  else $('more').textContent = A.done ? (A.items.length ? '— semua foto sudah tampil —' : 'Belum ada foto. Jadilah yang pertama!') : '';
+  A.list.forEach(it => g.appendChild(tile(it, false)));
+  $('more').textContent = A.filter === 'mine' ? (A.list.length ? '' : 'Kamu belum mengirim foto. Yuk jepret di menu Kamera.') : moreText();
 }
 
 function renderAlbumStats(){
-  $('albumStats').textContent = A.total ? A.total.toLocaleString('id-ID') + ' foto · ' + A.guests + ' fotografer' : 'Belum ada foto';
-  $('albumCount').textContent = A.total ? '(' + A.total.toLocaleString('id-ID') + ')' : '';
+  $('albumStats').textContent = A.total ? A.total.toLocaleString('id-ID') + ' foto dari ' + A.guests + ' fotografer' : 'Belum ada foto';
+  setCount(A.total);
+}
+function setCount(n){
+  const c = $('albumCount');
+  c.hidden = !n; c.textContent = n > 999 ? '999+' : String(n || '');
+  $('navAlbum').setAttribute('aria-label', 'Album' + (n ? ', ' + n + ' foto' : ''));
 }
 
 async function albumMore(){
@@ -543,7 +667,7 @@ async function albumMore(){
   A.loading = true; if (A.filter === 'all') $('more').textContent = 'Memuat foto…';
   try {
     const r = await api('api=album&offset=' + A.offset + '&limit=60');
-    if (r.locked) { $('albumStats').textContent = 'Album dibuka ' + fmtClock(r.revealAt); A.done = true; return; }
+    if (r.locked) { $('albumStats').textContent = 'Album dibuka pukul ' + fmtClock(r.revealAt); A.done = true; return; }
     A.total = r.total; A.guests = r.guests; A.last = Date.now();
     const fresh = r.items.filter(it => !A.ids.has(it.id));
     fresh.forEach(it => { A.ids.add(it.id); A.items.push(it); });
@@ -552,12 +676,12 @@ async function albumMore(){
     renderAlbumStats();
     if (A.filter === 'all') {
       const g = $('grid');
-      fresh.forEach(it => g.appendChild(tile(it, 0, false)));
+      fresh.forEach(it => g.appendChild(tile(it, false)));
       A.list = A.items;
-      $('more').textContent = A.done ? (A.items.length ? '— semua foto sudah tampil —' : 'Belum ada foto. Jadilah yang pertama!') : '';
+      $('more').textContent = moreText();
     }
   } catch(e) {
-    if (A.filter === 'all') $('more').textContent = 'Gagal memuat. Periksa sinyal, lalu buka lagi tab Album.';
+    if (A.filter === 'all') $('more').textContent = 'Album gagal dimuat. Periksa sinyal, lalu buka lagi menu Album.';
   } finally { A.loading = false; }
 }
 
@@ -575,7 +699,7 @@ async function albumRefresh(){
       A.offset += fresh.length;
       if (A.filter === 'all') {
         const g = $('grid');
-        fresh.slice().reverse().forEach(it => g.insertBefore(tile(it, 0, true), g.firstChild));
+        fresh.slice().reverse().forEach(it => g.insertBefore(tile(it, true), g.firstChild));
         A.list = A.items;
       }
     }
@@ -591,31 +715,34 @@ function openAlbum(){
 
 function setFilter(f){
   A.filter = f;
-  $('fAll').setAttribute('aria-pressed', f === 'all');
-  $('fMine').setAttribute('aria-pressed', f === 'mine');
+  $('fAll').setAttribute('aria-pressed', String(f === 'all'));
+  $('fMine').setAttribute('aria-pressed', String(f === 'mine'));
   renderGrid();
 }
 
 /* ================= LIGHTBOX ================= */
-function openLb(list, i){
-  if (!list.length || i < 0) return;
-  A.lbList = list;
+function showLb(i){
+  const list = A.lbList; if (!list.length) return;
   A.idx = (i + list.length) % list.length;
   const it = list[A.idx];
   setPhoto($('lbImg'), it.id, 1600);
-  const cap = $('lbCap'); cap.innerHTML = '';
-  cap.append('♡ ' + it.name);
-  const sm = document.createElement('small');
-  sm.textContent = (it.t ? 'pukul ' + fmtClock(it.t) + ' · ' : '') + (A.idx + 1) + '/' + list.length;
-  cap.appendChild(sm);
+  $('lbImg').alt = 'Foto oleh ' + it.name;
+  $('lbTitle').innerHTML = icon('heart', 'ic-sm');
+  $('lbTitle').append(it.name);
+  $('lbMeta').textContent = (it.t ? 'pukul ' + fmtClock(it.t) + ' · ' : '') + 'foto ' + (A.idx + 1) + ' dari ' + list.length;
   $('lbOpen').href = photoUrl(it.id, 1600);
-  $('lb').hidden = false;
+  $('lbPrev').hidden = $('lbNext').hidden = list.length < 2;
   if (list === A.items && A.idx >= A.items.length - 3) albumMore();
 }
-const closeLb = () => $('lb').hidden = true;
+function openLb(list, i){
+  if (!list.length || i < 0) return;
+  A.lbList = list;
+  showLb(i);
+  if (!D.open) openDialog($('lb'), $('lbX'));
+}
 
 /* ================= SLIDESHOW ================= */
-const L = { pool: [], fresh: [], seen: new Set(), first: true, layer: 0, started: false };
+const L = { pool: [], fresh: [], seen: new Set(), first: true, layer: 0, started: false, paused: false };
 async function livePoll(){
   try {
     const r = await api('api=album&offset=0&limit=80');
@@ -632,6 +759,7 @@ async function livePoll(){
 }
 function preload(src){ return new Promise(res => { const i = new Image(); i.referrerPolicy = 'no-referrer'; i.onload = () => res(true); i.onerror = () => res(false); i.src = src; }); }
 async function liveNext(){
+  if (L.paused) return;
   let it = L.fresh.shift(); const isNew = !!it;
   if (!it && L.pool.length) it = L.pool[Math.floor(Math.random() * L.pool.length)];
   if (!it) return;
@@ -640,10 +768,12 @@ async function liveNext(){
   $('liveWait').hidden = true;
   const nxt = $('L' + (1 - L.layer)), cur = $('L' + L.layer);
   nxt.querySelector('img').src = src;
+  nxt.querySelector('img').alt = 'Foto oleh ' + it.name;
   nxt.querySelector('.bg').style.backgroundImage = 'url("' + src + '")';
   nxt.classList.add('on'); cur.classList.remove('on');
   L.layer = 1 - L.layer;
-  const cap = $('liveCap'); cap.textContent = '♡ difoto oleh ' + it.name;
+  const cap = $('liveCap'); cap.innerHTML = icon('heart');
+  cap.append('difoto oleh ' + it.name);
   if (isNew){ const n = document.createElement('span'); n.className = 'new'; n.textContent = 'BARU'; cap.appendChild(n); }
 }
 function startLive(){
@@ -653,17 +783,23 @@ function startLive(){
   s.onload = () => {
     try {
       const qr = qrcode(0, 'M'); qr.addData(location.origin + location.pathname); qr.make();
-      $('liveQr').innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true });
+      $('liveQr').innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true, alt: 'QR untuk membuka Kamera Tamu' });
     } catch(e) {}
   };
   document.head.appendChild(s);
   setTimeout(() => $('hint').style.opacity = 0, 8000);
+  document.addEventListener('keydown', e => {
+    if (e.code !== 'Space' || $('viewLive').hidden) return;
+    e.preventDefault(); L.paused = !L.paused;
+    $('hint').style.opacity = 1; $('hint').textContent = L.paused ? 'Dijeda · Spasi untuk lanjut' : 'Lanjut';
+  });
   livePoll().then(liveNext);
   setInterval(livePoll, 20000);
   setInterval(liveNext, 7000);
 }
 
 /* ================= NAVIGASI ================= */
+let firstRoute = true;
 function route(){
   const h = location.hash.slice(1);
   const live = h === 'live';
@@ -671,48 +807,55 @@ function route(){
   if (live) return startLive();
   const album = h === 'album';
   $('viewCam').hidden = album; $('viewAlbum').hidden = !album;
-  $('tabCam').setAttribute('aria-selected', String(!album));
-  $('tabAlbum').setAttribute('aria-selected', String(album));
+  if (album) { $('navAlbum').setAttribute('aria-current', 'page'); $('navCam').removeAttribute('aria-current'); }
+  else { $('navCam').setAttribute('aria-current', 'page'); $('navAlbum').removeAttribute('aria-current'); }
   $('mainWrap').classList.toggle('wide', album);
   if (album) openAlbum();
   window.scrollTo(0, 0);
+  if (!firstRoute) (album ? $('albumTitle') : $('camTitle')).focus({ preventScroll: true });
+  firstRoute = false;
 }
 
 /* ================= INIT ================= */
 applyConfig();
-$('tabCam').onclick = () => { location.hash = 'kamera'; };
-$('tabAlbum').onclick = () => { location.hash = 'album'; };
-$('fAll').onclick = () => setFilter('all');
-$('fMine').onclick = () => setFilter('mine');
-$('start').onclick = () => {
-  const n = $('name').value.replace(/\s+/g, ' ').trim();
-  if (n.length < 2) { $('name').focus(); return toast('Tulis namamu dulu ya, biar kami tahu siapa fotografernya.'); }
+$('nameForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const inp = $('name');
+  const n = inp.value.replace(/\s+/g, ' ').trim();
+  if (n.length < 2) {
+    inp.setAttribute('aria-invalid', 'true');
+    inp.setAttribute('aria-describedby', 'nameHelp nameErr');
+    $('nameErr').hidden = false; inp.focus();
+    return;
+  }
+  inp.removeAttribute('aria-invalid'); inp.setAttribute('aria-describedby', 'nameHelp'); $('nameErr').hidden = true;
   guest.name = n; store.set(KEY, guest); showCam();
-};
-$('name').addEventListener('keydown', e => { if (e.key === 'Enter') $('start').click(); });
-$('rename').onclick = showWelcome;
+  $('btnCam').focus({ preventScroll: true });
+});
+$('name').addEventListener('input', () => { if (!$('nameErr').hidden && $('name').value.trim().length >= 2) { $('nameErr').hidden = true; $('name').removeAttribute('aria-invalid'); } });
+$('rename').onclick = () => { showWelcome(); $('name').focus(); };
 $('btnCam').onclick = () => $('inCam').click();
 $('btnSelfie').onclick = () => $('inSelfie').click();
 $('btnGal').onclick = () => $('inGal').click();
-$('inCam').onchange = e => onPick(e, 'kamera');
-$('inSelfie').onchange = e => onPick(e, 'selfie');
-$('inGal').onchange = e => onPick(e, 'galeri');
-$('cancel').onclick = () => { S.current = null; $('sheet').hidden = true; };
+$('inCam').onchange = e => onPick(e, 'kamera', $('btnCam'));
+$('inSelfie').onchange = e => onPick(e, 'selfie', $('btnSelfie'));
+$('inGal').onchange = e => onPick(e, 'galeri', $('btnGal'));
+$('cancel').onclick = () => closeDialog();
 $('send').onclick = send;
-$('lbX').onclick = closeLb;
-$('lbPrev').onclick = () => openLb(A.lbList, A.idx - 1);
-$('lbNext').onclick = () => openLb(A.lbList, A.idx + 1);
-document.addEventListener('keydown', e => {
-  if ($('lb').hidden) return;
-  if (e.key === 'Escape') closeLb();
-  if (e.key === 'ArrowLeft') openLb(A.lbList, A.idx - 1);
-  if (e.key === 'ArrowRight') openLb(A.lbList, A.idx + 1);
+$('fAll').onclick = () => setFilter('all');
+$('fMine').onclick = () => setFilter('mine');
+$('lbX').onclick = () => closeDialog();
+$('lbPrev').onclick = () => showLb(A.idx - 1);
+$('lbNext').onclick = () => showLb(A.idx + 1);
+$('lb').addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft') showLb(A.idx - 1);
+  if (e.key === 'ArrowRight') showLb(A.idx + 1);
 });
 let tx = null;
 $('lb').addEventListener('touchstart', e => tx = e.touches[0].clientX, { passive: true });
 $('lb').addEventListener('touchend', e => {
   if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; tx = null;
-  if (Math.abs(dx) > 50) openLb(A.lbList, A.idx + (dx < 0 ? 1 : -1));
+  if (Math.abs(dx) > 50) showLb(A.idx + (dx < 0 ? 1 : -1));
 });
 new IntersectionObserver(es => { if (es[0].isIntersecting && !$('viewAlbum').hidden && A.filter === 'all') albumMore(); }, { rootMargin: '600px' }).observe($('more'));
 setInterval(() => { if (!$('viewAlbum').hidden && document.visibilityState === 'visible') albumRefresh(); }, 45000);
@@ -740,7 +883,7 @@ api('api=config').then(cfg => {
 loadRoll();
 api('api=stats').then(s => {
   if (s && s.guests > 0) $('stats').textContent = s.guests + ' tamu sudah motret · ' + s.photos.toLocaleString('id-ID') + ' foto terkumpul';
-  if (s && s.photos) { A.total = A.total || s.photos; $('albumCount').textContent = '(' + s.photos.toLocaleString('id-ID') + ')'; }
+  if (s && s.photos && !A.total) setCount(s.photos);
 }).catch(() => {});
 </script>
 </body>
