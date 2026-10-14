@@ -1037,8 +1037,8 @@ function fileName(name, t, strip){
 /** Di HP: lembar bagikan (iPhone → "Simpan Gambar"). Di laptop: unduh file. */
 async function saveBlob(blob, name){
   const file = new File([blob], name, { type: blob.type || 'image/jpeg' });
-  const touch = matchMedia('(pointer: coarse)').matches;
-  if (touch && navigator.canShare && navigator.canShare({ files: [file] })){
+  const mobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (mobile && navigator.canShare && navigator.canShare({ files: [file] })){
     try { await navigator.share({ files: [file] }); return 'shared'; }
     catch(e){
       if (e && e.name === 'AbortError') return 'cancel';
