@@ -548,14 +548,33 @@ document.addEventListener('keydown', e => {
 });
 
 /* ================= API (tanpa cookie → aman untuk HP multi-akun Google) ================= */
+/** fetch dengan batas waktu: permintaan yang menggantung dihentikan supaya bisa dicoba lagi. */
+async function fetchT(url, opt, ms){
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  try { return await fetch(url, Object.assign({ signal: ctl.signal }, opt)); }
+  finally { clearTimeout(t); }
+}
+/** GET ke server. Sinyal putus / server tidak menjawab → dicoba ulang 2x dengan jeda singkat. */
 async function api(query){
-  const r = await fetch(API + '?' + query, { credentials: 'omit', cache: 'no-store' });
-  const j = await r.json();
-  if (j && j.ok === false && j.error) throw new Error(j.error);
-  return j;
+  let lastErr;
+  for (let i = 0; i < 3; i++){
+    try {
+      const r = await fetchT(API + '?' + query, { credentials: 'omit', cache: 'no-store' }, 25000);
+      const j = await r.json();
+      if (j && j.ok === false && j.error) throw Object.assign(new Error(j.error), { server: true });
+      return j;
+    } catch(e) {
+      if (e.server) throw e;                     // jawaban jelas dari server: tidak perlu diulang
+      lastErr = e;
+      if (i < 2) await sleep((1500 << i) * (0.7 + Math.random() * 0.6));
+    }
+  }
+  throw lastErr;
 }
 async function apiPost(body){
-  const r = await fetch(API, { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
+  // batas longgar (2 menit): kiriman foto di sinyal lemah memang lama; yang benar-benar macet dicoba ulang oleh upload()
+  const r = await fetchT(API, { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }, 120000);
   return r.json();
 }
 
@@ -1174,8 +1193,14 @@ async function albumMore(){
       syncMineTiles();
       $('more').textContent = moreText();
     }
+    A.fails = 0;
   } catch(e) {
-    if (A.filter === 'all') $('more').textContent = 'Album gagal dimuat. Periksa sinyal, lalu buka lagi menu Album.';
+    // sinyal/server tersendat: tampilkan apa adanya lalu coba lagi sendiri (5 → 10 → 20 → 30 detik)
+    A.fails = (A.fails || 0) + 1;
+    if (!A.items.length) $('albumStats').textContent = 'Album belum termuat';
+    if (A.filter === 'all') $('more').textContent = 'Sinyal tersendat. Album dimuat ulang otomatis…';
+    clearTimeout(A.retryT);
+    A.retryT = setTimeout(() => { if (!$('viewAlbum').hidden) albumMore(); }, Math.min(30000, 5000 * Math.pow(2, A.fails - 1)));
   } finally { A.loading = false; }
 }
 
@@ -1398,7 +1423,7 @@ setInterval(() => { if (!$('viewAlbum').hidden && document.visibilityState === '
 // kiriman yang gagal dicoba lagi otomatis (tiap menit saat halaman terbuka, dan saat sinyal kembali)
 const retryFailed = n => S.items.filter(i => i.state === 'fail').slice(0, n).forEach(retry);
 setInterval(() => { if (document.visibilityState === 'visible') retryFailed(2); }, 60000);
-window.addEventListener('online', () => retryFailed(5));
+window.addEventListener('online', () => { retryFailed(5); if (!$('viewAlbum').hidden && A.fails) albumMore(); });
 window.addEventListener('hashchange', route);
 
 if (guest.name) showCam(); else showWelcome();
