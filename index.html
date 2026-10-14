@@ -415,11 +415,11 @@
     </div>
   </div>
   <div class="booth-status">
-    <p id="bStatus" aria-live="polite">Siap? Tekan Mulai, lalu bergaya 3 kali.</p>
+    <p id="bStatus" aria-live="polite">Siap? Ketuk tombol di bawah, hitung mundur 3 detik, lalu bergaya.</p>
     <div class="slots" id="bSlots" aria-hidden="true"><span>1</span><span>2</span><span>3</span></div>
   </div>
   <fieldset class="filters"><legend class="sr-only">Filter</legend><div class="chips" id="chipsBooth"></div></fieldset>
-  <button id="boothStart" class="btn btn-shutter btn-big" type="button">Mulai</button>
+  <button id="boothStart" class="btn btn-shutter btn-big" type="button">Jepret foto 1 dari 3</button>
 </div>
 
 <!-- ============ LIGHTBOX ============ -->
@@ -660,7 +660,7 @@ function render(){
   $('mBooth').setAttribute('aria-pressed', String(booth));
   $('camActions').hidden = booth; $('boothActions').hidden = !booth;
   $('modeHelp').textContent = booth
-    ? '3 jepretan otomatis dengan hitungan mundur, jadi 1 lembar strip. Pakai 1 jatah.'
+    ? '3 foto jadi 1 lembar strip. Tiap foto: ketuk, hitung mundur 3 detik, jepret. Pakai 1 jatah.'
     : 'Satu jepretan dari kamera HP. Pilih filternya setelah memotret.';
   const off = closed() || l <= 0;
   ['btnCam','btnSelfie','btnGal','btnBooth'].forEach(id => $(id).disabled = off);
@@ -684,8 +684,8 @@ function render(){
     d.appendChild(img);
     const what = isStrip(it) ? 'Strip' : 'Foto';
     if (it.state === 'up'){
-      d.setAttribute('aria-label', what + ' sedang dikirim');
-      d.insertAdjacentHTML('beforeend', '<span class="badge"><span class="spin-sm" aria-hidden="true"></span>Mengirim</span>');
+      d.setAttribute('aria-label', what + (it.wait ? ' menunggu giliran dikirim' : ' sedang dikirim'));
+      d.insertAdjacentHTML('beforeend', '<span class="badge"><span class="spin-sm" aria-hidden="true"></span>' + (it.wait ? 'Antre' : 'Mengirim') + '</span>');
       d.disabled = true;
     } else if (it.state === 'fail'){
       d.setAttribute('aria-label', what + ' gagal terkirim. Ketuk untuk kirim ulang');
@@ -817,15 +817,21 @@ async function send(){
 async function upload(it){
   savePending();
   const payload = { action: 'upload', guestId: guest.id, name: guest.name, source: it.source, dataUrl: it.dataUrl };
-  const waits = [2000, 4000, 8000, 15000];
+  // Saat ramai server menolak sebagian kiriman; coba lagi dengan jeda makin panjang (± 3 menit total)
+  const waits = [2000, 4000, 8000, 15000, 30000, 45000, 60000];
   let res = null;
+  it.wait = false;
   for (let i = 0; i <= waits.length; i++){
     try {
       const r = await apiPost(payload);
       if (r && (r.ok || r.reason)) { res = r; break; }
     } catch(e) { /* jaringan / server sibuk → coba lagi */ }
-    if (i < waits.length) await sleep(waits[i] + Math.random() * 1500);
+    if (i < waits.length) {
+      if (!it.wait) { it.wait = true; render(); }
+      await sleep(waits[i] * (0.8 + Math.random() * 0.4));
+    }
   }
+  it.wait = false;
   S.pending = Math.max(0, S.pending - 1);
   if (res && res.ok){
     S.local[res.id] = it.dataUrl; delete S.local[it.id];
@@ -840,7 +846,7 @@ async function upload(it){
     toast(res.reason === 'habis' ? 'Roll kamu sudah habis.' : 'Kamera sudah ditutup.', 'warn');
   } else {
     it.state = 'fail';
-    toast('Foto belum terkirim (sinyal lemah?). Ketuk foto bertanda merah untuk kirim ulang.', 'warn', 5000);
+    toast('Server sedang ramai. Foto tetap aman di HP-mu dan dikirim ulang otomatis.', 'warn', 5000);
   }
   savePending(); render();
 }
@@ -851,14 +857,32 @@ function retry(it){
   it.state = 'up'; S.pending++; render(); upload(it);
 }
 
-async function loadRoll(){
-  try {
-    const r = await api('api=roll&gid=' + encodeURIComponent(guest.id));
-    const pend = S.items.filter(x => x.state !== 'done');
-    S.items = r.items.map(x => ({ id: x.id, state: 'done', t: x.t, src: x.src })).concat(pend);
-    S.used = r.used; if (r.max) C.maxShots = r.max;
-    render();
-  } catch(e) {}
+function applyRoll(r){
+  const pend = S.items.filter(x => x.state !== 'done');
+  S.items = r.items.map(x => ({ id: x.id, state: 'done', t: x.t, src: x.src })).concat(pend);
+  S.used = r.used; if (r.max) C.maxShots = r.max;
+  render();
+}
+function applyCfg(cfg){
+  C.couple = cfg.couple || C.couple; C.dateLabel = cfg.dateLabel || C.dateLabel; C.stamp = cfg.stamp || C.stamp;
+  C.maxShots = cfg.maxShots || C.maxShots; C.allowGallery = cfg.allowGallery !== false;
+  C.closeAt = cfg.closeAt || C.closeAt; C.revealAt = cfg.revealAt || 0;
+  if (cfg.now) C.skew = cfg.now - Date.now();
+  applyConfig(); render();
+}
+function applyStats(s){
+  if (s && s.guests > 0) $('stats').textContent = s.guests + ' tamu sudah motret, ' + s.photos.toLocaleString('id-ID') + ' foto terkumpul';
+  if (s && s.photos && !A.total) setCount(s.photos);
+}
+/** Satu panggilan saat halaman dibuka (pengaturan + roll + statistik), dicoba ulang bila server ramai. */
+async function boot(){
+  for (let i = 0; i < 4; i++){
+    try {
+      const r = await api('api=boot&gid=' + encodeURIComponent(guest.id));
+      if (r && r.config) { applyCfg(r.config); if (r.roll) applyRoll(r.roll); applyStats(r.stats); return; }
+    } catch(e) {}
+    await sleep((1500 << i) * (0.7 + Math.random() * 0.6));
+  }
 }
 
 function showCam(){
@@ -876,8 +900,9 @@ function showWelcome(){
 const B = { stream: null, facing: 'user', frames: [], running: false, cancel: false, manual: false, trigger: null };
 
 function boothLabel(){
-  $('boothStart').textContent = B.manual ? 'Ambil foto ' + Math.min(3, B.frames.length + 1) + ' dari 3' : 'Mulai';
+  $('boothStart').textContent = (B.manual ? 'Ambil foto ' : 'Jepret foto ') + Math.min(3, B.frames.length + 1) + ' dari 3';
 }
+const BOOTH_READY = 'Siap? Ketuk tombol di bawah, hitung mundur 3 detik, lalu bergaya.';
 function renderSlots(){
   [...$('bSlots').children].forEach((s, i) => {
     const f = B.frames[i];
@@ -920,7 +945,7 @@ async function startStream(){
     const v = $('bv'); v.srcObject = s; v.classList.toggle('mirror', B.facing === 'user');
     try { await v.play(); } catch(e){}
     $('boothStart').removeAttribute('aria-disabled'); boothLabel();
-    $('bStatus').textContent = 'Siap? Tekan Mulai, lalu bergaya 3 kali.';
+    $('bStatus').textContent = B.frames.length ? 'Ketuk lagi untuk foto ' + (B.frames.length + 1) + '.' : BOOTH_READY;
   } catch(err) {
     const denied = err && (err.name === 'NotAllowedError' || err.name === 'SecurityError');
     setManual(denied
@@ -944,28 +969,30 @@ function openBooth(trigger){
   startStream();
 }
 
+/** Satu ketukan = satu foto: hitung mundur 3-2-1 lalu jepret. Setelah foto ke-3, strip langsung disusun. */
 async function runBooth(){
   if (B.manual) return $('inBooth').click();
   if (B.running || !B.stream || $('boothStart').getAttribute('aria-disabled') === 'true') return;
-  B.running = true; B.cancel = false; B.frames = []; renderSlots();
+  if (B.frames.length >= 3) { B.frames = []; renderSlots(); }
+  const i = B.frames.length;
+  B.running = true; B.cancel = false;
   $('boothStart').setAttribute('aria-disabled', 'true'); $('boothFlip').disabled = true;
-  $('boothStart').textContent = 'Sedang memotret…';
+  $('boothStart').textContent = 'Bersiap…';
+  let done = false;
   try {
-    for (let i = 0; i < 3; i++){
-      $('bStatus').textContent = 'Foto ' + (i + 1) + ' dari 3. Bergaya!';
-      for (let n = 3; n >= 1; n--){ if (B.cancel) return; showCount(n); await sleep(1000); }
-      if (B.cancel || !B.stream) return;
-      showCount(''); flash();
-      const fr = squareCrop($('bv'), 960);
-      if (B.facing === 'user') { const m = document.createElement('canvas'); m.width = m.height = fr.width; const mc = m.getContext('2d'); mc.translate(fr.width, 0); mc.scale(-1, 1); mc.drawImage(fr, 0, 0); B.frames.push(m); }
-      else B.frames.push(fr);
-      renderSlots();
-      await sleep(650);
-    }
-    if (!B.cancel) await finishBooth();
+    $('bStatus').textContent = 'Foto ' + (i + 1) + ' dari 3. Bergaya!';
+    for (let n = 3; n >= 1; n--){ if (B.cancel) return; showCount(n); await sleep(1000); }
+    if (B.cancel || !B.stream) return;
+    showCount(''); flash();
+    const fr = squareCrop($('bv'), 960);
+    if (B.facing === 'user') { const m = document.createElement('canvas'); m.width = m.height = fr.width; const mc = m.getContext('2d'); mc.translate(fr.width, 0); mc.scale(-1, 1); mc.drawImage(fr, 0, 0); B.frames.push(m); }
+    else B.frames.push(fr);
+    renderSlots();
+    if (B.frames.length >= 3) { done = true; await sleep(450); if (!B.cancel) await finishBooth(); }
+    else $('bStatus').textContent = 'Foto ' + (i + 1) + ' masuk. Ketuk lagi untuk foto ' + (i + 2) + '.';
   } finally {
     B.running = false; showCount('');
-    if (!$('booth').hidden) { $('boothStart').removeAttribute('aria-disabled'); $('boothFlip').disabled = false; boothLabel(); }
+    if (!$('booth').hidden && !done) { $('boothStart').removeAttribute('aria-disabled'); $('boothFlip').disabled = false; boothLabel(); }
   }
 }
 
@@ -1084,8 +1111,27 @@ function tile(it, isNew){
   watchStrip(img, it, b);
   setPhoto(img, it.id, isStrip(it) ? 700 : 500);
   b.appendChild(img);
-  b.onclick = () => openLb(A.list, A.list.indexOf(it));
+  b.dataset.id = it.id;
+  b.onclick = () => openLb(A.list, A.list.findIndex(x => x.id === it.id));
   return b;
+}
+
+/* Foto kiriman sendiri yang belum masuk indeks server (jeda ±15–30 dtk) tetap tampil di "Semua". */
+function myRecentMissing(){
+  const cut = Date.now() - 10 * 60 * 1000;
+  return mineList().filter(x => x.t > cut && !A.ids.has(x.id));
+}
+function syncMineTiles(){
+  if (A.filter !== 'all') return;
+  const g = $('grid');
+  g.querySelectorAll('.tile[data-mine]').forEach(el => { if (A.ids.has(el.dataset.id)) el.remove(); });
+  const have = new Set([...g.querySelectorAll('.tile[data-mine]')].map(el => el.dataset.id));
+  const extra = myRecentMissing();
+  extra.slice().reverse().forEach(it => {
+    if (have.has(it.id)) return;
+    const t = tile(it, false); t.dataset.mine = '1'; g.insertBefore(t, g.firstChild);
+  });
+  A.list = extra.concat(A.items);
 }
 
 function moreText(){
@@ -1096,6 +1142,7 @@ function renderGrid(){
   const g = $('grid'); g.innerHTML = '';
   A.list = A.filter === 'mine' ? mineList() : A.items;
   A.list.forEach(it => g.appendChild(tile(it, false)));
+  syncMineTiles();
   $('more').textContent = A.filter === 'mine' ? (A.list.length ? '' : 'Kamu belum mengirim foto. Yuk jepret di menu Kamera.') : moreText();
 }
 
@@ -1124,7 +1171,7 @@ async function albumMore(){
     if (A.filter === 'all') {
       const g = $('grid');
       fresh.forEach(it => g.appendChild(tile(it, false)));
-      A.list = A.items;
+      syncMineTiles();
       $('more').textContent = moreText();
     }
   } catch(e) {
@@ -1147,9 +1194,9 @@ async function albumRefresh(){
       if (A.filter === 'all') {
         const g = $('grid');
         fresh.slice().reverse().forEach(it => g.insertBefore(tile(it, true), g.firstChild));
-        A.list = A.items;
       }
     }
+    syncMineTiles();
     renderAlbumStats();
   } catch(e) {} finally { A.loading = false; }
 }
@@ -1157,7 +1204,7 @@ async function albumRefresh(){
 function openAlbum(){
   if (!A.items.length && !A.done) albumMore();
   else if (A.dirty || Date.now() - A.last > 15000) albumRefresh();
-  if (A.filter === 'mine') renderGrid();
+  if (A.filter === 'mine') renderGrid(); else syncMineTiles();
 }
 
 function setFilter(f){
@@ -1347,7 +1394,11 @@ $('lb').addEventListener('touchend', e => {
   if (Math.abs(dx) > 50) showLb(A.idx + (dx < 0 ? 1 : -1));
 });
 new IntersectionObserver(es => { if (es[0].isIntersecting && !$('viewAlbum').hidden && A.filter === 'all') albumMore(); }, { rootMargin: '600px' }).observe($('more'));
-setInterval(() => { if (!$('viewAlbum').hidden && document.visibilityState === 'visible') albumRefresh(); }, 45000);
+setInterval(() => { if (!$('viewAlbum').hidden && document.visibilityState === 'visible') albumRefresh(); }, 90000);
+// kiriman yang gagal dicoba lagi otomatis (tiap menit saat halaman terbuka, dan saat sinyal kembali)
+const retryFailed = n => S.items.filter(i => i.state === 'fail').slice(0, n).forEach(retry);
+setInterval(() => { if (document.visibilityState === 'visible') retryFailed(2); }, 60000);
+window.addEventListener('online', () => retryFailed(5));
 window.addEventListener('hashchange', route);
 
 if (guest.name) showCam(); else showWelcome();
@@ -1363,18 +1414,7 @@ route();
 });
 render();
 
-api('api=config').then(cfg => {
-  C.couple = cfg.couple || C.couple; C.dateLabel = cfg.dateLabel || C.dateLabel; C.stamp = cfg.stamp || C.stamp;
-  C.maxShots = cfg.maxShots || C.maxShots; C.allowGallery = cfg.allowGallery !== false;
-  C.closeAt = cfg.closeAt || C.closeAt; C.revealAt = cfg.revealAt || 0;
-  if (cfg.now) C.skew = cfg.now - Date.now();
-  applyConfig(); render();
-}).catch(() => {});
-loadRoll();
-api('api=stats').then(s => {
-  if (s && s.guests > 0) $('stats').textContent = s.guests + ' tamu sudah motret, ' + s.photos.toLocaleString('id-ID') + ' foto terkumpul';
-  if (s && s.photos && !A.total) setCount(s.photos);
-}).catch(() => {});
+boot();
 </script>
 </body>
 </html>
