@@ -289,12 +289,37 @@
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
   }
+
+  /* hapus foto, kode acara, halaman panitia */
+  .lb-del{appearance:none;display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 var(--s-4);border-radius:var(--r-pill);background:transparent;border:1.5px solid #e8a595;color:#f6c9bd;font-weight:700;font-size:15px;cursor:pointer}
+  .lb-del[disabled]{opacity:.6;cursor:progress}
+  .field input.code{font-family:var(--f-stamp);font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+  .locked{max-width:420px;margin:var(--s-6) auto;text-align:center;color:var(--c-text-muted)}
+  .locked .btn{margin-top:var(--s-4);text-decoration:none;display:flex;align-items:center;justify-content:center}
+  .btn-sm{min-height:44px;font-size:15px;width:auto;padding:var(--s-2) var(--s-4)}
+  .adm-tools{display:flex;flex-wrap:wrap;gap:var(--s-2);margin:0 0 var(--s-4)}
+  .adm-tools .btn{flex:1 1 180px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:var(--s-2)}
+  .adm-list{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-3)}
+  .adm-item{display:flex;gap:var(--s-3);align-items:center;background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-md);padding:var(--s-3)}
+  .adm-item img{width:72px;height:72px;object-fit:cover;border-radius:var(--r-sm);background:var(--c-border);flex:none}
+  .adm-item .txt{flex:1;min-width:0;font-size:14px;color:var(--c-text-muted)}
+  .adm-item .txt b{display:block;color:var(--c-text);font-size:15px;overflow-wrap:anywhere}
+  .adm-card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-lg);padding:var(--s-4);margin:0 0 var(--s-4)}
+  .adm-card h3{margin:0 0 var(--s-2);font-size:17px;color:var(--c-primary)}
+  .adm-card p{margin:0 0 var(--s-3);font-size:14px;color:var(--c-text-muted)}
+  .kode{font-family:var(--f-stamp);font-weight:700;font-size:20px;letter-spacing:.08em;color:var(--c-primary);overflow-wrap:anywhere;margin:0 0 var(--s-2)}
+  .adm-row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2)}
+  .pan{display:grid;gap:var(--s-2);padding:var(--s-3) 0;border-top:1px solid var(--c-border)}
+  .pan input[type=text]{min-height:44px;padding:0 var(--s-3);border-radius:var(--r-sm);border:1.5px solid var(--c-border-strong);background:#fff;font-size:15px;width:100%}
+  .pan .tog{display:inline-flex;align-items:center;gap:6px;font-size:14px;min-height:44px;margin-right:var(--s-2)}
+  .pan .tog input{width:20px;height:20px}
+  .pan.off .kode{opacity:.4;text-decoration:line-through}
 </style>
 </head>
 <body>
 <a class="skip" href="#main">Lewati ke konten</a>
 <noscript><p style="padding:24px;text-align:center">Aktifkan JavaScript untuk memakai Kamera Tamu.</p></noscript>
-<svg xmlns="http://www.w3.org/2000/svg" style="display:none"><symbol id="i-camera" viewBox="0 0 256 256"><path d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.71,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H80a8,8,0,0,0,6.66-3.56L100.28,48h55.43l13.63,20.44A8,8,0,0,0,176,72h32a8,8,0,0,1,8,8ZM128,88a44,44,0,1,0,44,44A44.05,44.05,0,0,0,128,88Zm0,72a28,28,0,1,1,28-28A28,28,0,0,1,128,160Z"/></symbol><symbol id="i-selfie" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM74.08,197.5a64,64,0,0,1,107.84,0,87.83,87.83,0,0,1-107.84,0ZM96,120a32,32,0,1,1,32,32A32,32,0,0,1,96,120Zm97.76,66.41a79.66,79.66,0,0,0-36.06-28.75,48,48,0,1,0-59.4,0,79.66,79.66,0,0,0-36.06,28.75,88,88,0,1,1,131.52,0Z"/></symbol><symbol id="i-gallery" viewBox="0 0 256 256"><path d="M216,40H72A16,16,0,0,0,56,56V72H40A16,16,0,0,0,24,88V200a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V184h16a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM72,56H216v62.75l-10.07-10.06a16,16,0,0,0-22.63,0l-20,20-44-44a16,16,0,0,0-22.62,0L72,109.37ZM184,200H40V88H56v80a16,16,0,0,0,16,16H184Zm32-32H72V132l36-36,49.66,49.66a8,8,0,0,0,11.31,0L194.63,120,216,141.38V168ZM160,84a12,12,0,1,1,12,12A12,12,0,0,1,160,84Z"/></symbol><symbol id="i-heart" viewBox="0 0 256 256"><path d="M178,40c-20.65,0-38.73,8.88-50,23.89C116.73,48.88,98.65,40,78,40a62.07,62.07,0,0,0-62,62c0,70,103.79,126.66,108.21,129a8,8,0,0,0,7.58,0C136.21,228.66,240,172,240,102A62.07,62.07,0,0,0,178,40ZM128,214.8C109.74,204.16,32,155.69,32,102A46.06,46.06,0,0,1,78,56c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46C224,155.61,146.24,204.15,128,214.8Z"/></symbol><symbol id="i-edit" viewBox="0 0 256 256"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"/></symbol><symbol id="i-close" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></symbol><symbol id="i-prev" viewBox="0 0 256 256"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></symbol><symbol id="i-next" viewBox="0 0 256 256"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></symbol><symbol id="i-open" viewBox="0 0 256 256"><path d="M224,104a8,8,0,0,1-16,0V59.32l-66.33,66.34a8,8,0,0,1-11.32-11.32L196.68,48H152a8,8,0,0,1,0-16h64a8,8,0,0,1,8,8Zm-40,24a8,8,0,0,0-8,8v72H48V80h72a8,8,0,0,0,0-16H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V136A8,8,0,0,0,184,128Z"/></symbol><symbol id="i-album" viewBox="0 0 256 256"><path d="M208,32H80A16,16,0,0,0,64,48V64H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V192h16a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM80,48H208v69.38l-16.7-16.7a16,16,0,0,0-22.62,0L93.37,176H80Zm96,160H48V80H64v96a16,16,0,0,0,16,16h96Zm32-32H116l64-64,28,28v36Zm-88-64A24,24,0,1,0,96,88,24,24,0,0,0,120,112Zm0-32a8,8,0,1,1-8,8A8,8,0,0,1,120,80Z"/></symbol><symbol id="i-ok" viewBox="0 0 256 256"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></symbol><symbol id="i-warn" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></symbol><symbol id="i-retry" viewBox="0 0 256 256"><path d="M224,48V96a8,8,0,0,1-8,8H168a8,8,0,0,1,0-16h28.69L182.06,73.37a79.56,79.56,0,0,0-56.13-23.43h-.45A79.52,79.52,0,0,0,69.59,72.71,8,8,0,0,1,58.41,61.27a96,96,0,0,1,135,.79L208,76.69V48a8,8,0,0,1,16,0ZM186.41,183.29a80,80,0,0,1-112.47-.66L59.31,168H88a8,8,0,0,0,0-16H40a8,8,0,0,0-8,8v48a8,8,0,0,0,16,0V179.31l14.63,14.63A95.43,95.43,0,0,0,130,222.06h.53a95.36,95.36,0,0,0,67.07-27.33,8,8,0,0,0-11.18-11.44Z"/></symbol><symbol id="i-flip" viewBox="0 0 256 256"><path d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.71,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H80a8,8,0,0,0,6.66-3.56L100.28,48h55.43l13.63,20.44A8,8,0,0,0,176,72h32a8,8,0,0,1,8,8ZM176,96v24a8,8,0,0,1-8,8H144a8,8,0,0,1,0-16h5.15a32.12,32.12,0,0,0-40.34-1.61A8,8,0,0,1,99.19,97.6,48.21,48.21,0,0,1,160,100.23V96a8,8,0,0,1,16,0Zm-17.61,59.2a8,8,0,0,1-1.58,11.2A48.21,48.21,0,0,1,96,163.77V168a8,8,0,0,1-16,0V144a8,8,0,0,1,8-8h24a8,8,0,0,1,0,16h-5.15a32.12,32.12,0,0,0,40.34,1.61A8,8,0,0,1,158.39,155.2Z"/></symbol><symbol id="i-download" viewBox="0 0 256 256"><path d="M128 40v132M80 124l48 48 48-48M40 208h176" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-strip" viewBox="0 0 256 256"><rect x="72" y="24" width="112" height="208" rx="10" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/><path d="M100 52h56v44h-56zM100 116h56v44h-56z" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/><path d="M104 196h48" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-share" viewBox="0 0 256 256"><path d="M128 152V36M88 76l40-40 40 40M96 112H64v104h128V112h-32" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></symbol></svg>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none"><symbol id="i-trash" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></symbol><symbol id="i-camera" viewBox="0 0 256 256"><path d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.71,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H80a8,8,0,0,0,6.66-3.56L100.28,48h55.43l13.63,20.44A8,8,0,0,0,176,72h32a8,8,0,0,1,8,8ZM128,88a44,44,0,1,0,44,44A44.05,44.05,0,0,0,128,88Zm0,72a28,28,0,1,1,28-28A28,28,0,0,1,128,160Z"/></symbol><symbol id="i-selfie" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM74.08,197.5a64,64,0,0,1,107.84,0,87.83,87.83,0,0,1-107.84,0ZM96,120a32,32,0,1,1,32,32A32,32,0,0,1,96,120Zm97.76,66.41a79.66,79.66,0,0,0-36.06-28.75,48,48,0,1,0-59.4,0,79.66,79.66,0,0,0-36.06,28.75,88,88,0,1,1,131.52,0Z"/></symbol><symbol id="i-gallery" viewBox="0 0 256 256"><path d="M216,40H72A16,16,0,0,0,56,56V72H40A16,16,0,0,0,24,88V200a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V184h16a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM72,56H216v62.75l-10.07-10.06a16,16,0,0,0-22.63,0l-20,20-44-44a16,16,0,0,0-22.62,0L72,109.37ZM184,200H40V88H56v80a16,16,0,0,0,16,16H184Zm32-32H72V132l36-36,49.66,49.66a8,8,0,0,0,11.31,0L194.63,120,216,141.38V168ZM160,84a12,12,0,1,1,12,12A12,12,0,0,1,160,84Z"/></symbol><symbol id="i-heart" viewBox="0 0 256 256"><path d="M178,40c-20.65,0-38.73,8.88-50,23.89C116.73,48.88,98.65,40,78,40a62.07,62.07,0,0,0-62,62c0,70,103.79,126.66,108.21,129a8,8,0,0,0,7.58,0C136.21,228.66,240,172,240,102A62.07,62.07,0,0,0,178,40ZM128,214.8C109.74,204.16,32,155.69,32,102A46.06,46.06,0,0,1,78,56c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46C224,155.61,146.24,204.15,128,214.8Z"/></symbol><symbol id="i-edit" viewBox="0 0 256 256"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"/></symbol><symbol id="i-close" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></symbol><symbol id="i-prev" viewBox="0 0 256 256"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></symbol><symbol id="i-next" viewBox="0 0 256 256"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></symbol><symbol id="i-open" viewBox="0 0 256 256"><path d="M224,104a8,8,0,0,1-16,0V59.32l-66.33,66.34a8,8,0,0,1-11.32-11.32L196.68,48H152a8,8,0,0,1,0-16h64a8,8,0,0,1,8,8Zm-40,24a8,8,0,0,0-8,8v72H48V80h72a8,8,0,0,0,0-16H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V136A8,8,0,0,0,184,128Z"/></symbol><symbol id="i-album" viewBox="0 0 256 256"><path d="M208,32H80A16,16,0,0,0,64,48V64H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V192h16a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM80,48H208v69.38l-16.7-16.7a16,16,0,0,0-22.62,0L93.37,176H80Zm96,160H48V80H64v96a16,16,0,0,0,16,16h96Zm32-32H116l64-64,28,28v36Zm-88-64A24,24,0,1,0,96,88,24,24,0,0,0,120,112Zm0-32a8,8,0,1,1-8,8A8,8,0,0,1,120,80Z"/></symbol><symbol id="i-ok" viewBox="0 0 256 256"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></symbol><symbol id="i-warn" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></symbol><symbol id="i-retry" viewBox="0 0 256 256"><path d="M224,48V96a8,8,0,0,1-8,8H168a8,8,0,0,1,0-16h28.69L182.06,73.37a79.56,79.56,0,0,0-56.13-23.43h-.45A79.52,79.52,0,0,0,69.59,72.71,8,8,0,0,1,58.41,61.27a96,96,0,0,1,135,.79L208,76.69V48a8,8,0,0,1,16,0ZM186.41,183.29a80,80,0,0,1-112.47-.66L59.31,168H88a8,8,0,0,0,0-16H40a8,8,0,0,0-8,8v48a8,8,0,0,0,16,0V179.31l14.63,14.63A95.43,95.43,0,0,0,130,222.06h.53a95.36,95.36,0,0,0,67.07-27.33,8,8,0,0,0-11.18-11.44Z"/></symbol><symbol id="i-flip" viewBox="0 0 256 256"><path d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.71,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H80a8,8,0,0,0,6.66-3.56L100.28,48h55.43l13.63,20.44A8,8,0,0,0,176,72h32a8,8,0,0,1,8,8ZM176,96v24a8,8,0,0,1-8,8H144a8,8,0,0,1,0-16h5.15a32.12,32.12,0,0,0-40.34-1.61A8,8,0,0,1,99.19,97.6,48.21,48.21,0,0,1,160,100.23V96a8,8,0,0,1,16,0Zm-17.61,59.2a8,8,0,0,1-1.58,11.2A48.21,48.21,0,0,1,96,163.77V168a8,8,0,0,1-16,0V144a8,8,0,0,1,8-8h24a8,8,0,0,1,0,16h-5.15a32.12,32.12,0,0,0,40.34,1.61A8,8,0,0,1,158.39,155.2Z"/></symbol><symbol id="i-download" viewBox="0 0 256 256"><path d="M128 40v132M80 124l48 48 48-48M40 208h176" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-strip" viewBox="0 0 256 256"><rect x="72" y="24" width="112" height="208" rx="10" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/><path d="M100 52h56v44h-56zM100 116h56v44h-56z" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/><path d="M104 196h48" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-share" viewBox="0 0 256 256"><path d="M128 152V36M88 76l40-40 40 40M96 112H64v104h128V112h-32" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></symbol></svg>
 
 <div id="app">
   <div class="wrap" id="mainWrap">
@@ -317,6 +342,12 @@
           </div>
           <p class="lead">Hari ini kamu jadi fotografer kami. Jepret momen favoritmu, atau ajak teman foto bareng di photo booth. Semua langsung terkumpul di satu album.</p>
           <form id="nameForm" novalidate>
+            <div class="field" id="codeField" hidden>
+              <label for="ecode">Kode acara</label>
+              <input id="ecode" name="ecode" class="code" type="text" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="next" placeholder="ada di kartu QR meja tamu" aria-describedby="codeHelp">
+              <p class="help" id="codeHelp">Scan QR di meja tamu, atau ketik kode yang tertulis di kartunya.</p>
+              <p class="field-error" id="codeErr" role="alert" hidden><svg class="ic ic-sm" aria-hidden="true"><use href="#i-warn"/></svg><span>Kode acara salah. Cek lagi kartu QR di meja tamu.</span></p>
+            </div>
             <div class="field">
               <label for="name">Nama kamu</label>
               <input id="name" name="name" type="text" maxlength="40" autocomplete="name" enterkeyhint="go" placeholder="contoh: Rina (teman kantor)" aria-describedby="nameHelp">
@@ -367,7 +398,11 @@
 
       <!-- ============ ALBUM ============ -->
       <section id="viewAlbum" aria-labelledby="albumTitle" hidden>
-        <div class="album-bar">
+        <div class="locked" id="albumLocked" hidden>
+          <p>Album cuma bisa dilihat tamu yang sudah masuk pakai kode acara.</p>
+          <a class="btn btn-primary" href="#kamera">Masuk pakai kode acara</a>
+        </div>
+        <div class="album-bar" id="albumBar">
           <div class="meta">
             <h2 id="albumTitle" tabindex="-1">Album bersama</h2>
             <p id="albumStats" aria-live="polite">Memuat album…</p>
@@ -379,6 +414,55 @@
         </div>
         <div class="grid" id="grid" role="group" aria-labelledby="albumTitle"></div>
         <p class="more" id="more"></p>
+      </section>
+
+      <!-- ============ PANITIA (#admin) ============ -->
+      <section id="viewAdmin" aria-labelledby="adminTitle" hidden>
+        <div id="admLogin" class="locked" hidden>
+          <h2 id="adminTitle" tabindex="-1">Halaman panitia</h2>
+          <p>Masuk pakai kode panitia yang dikirim Afiq.</p>
+          <form id="admForm" novalidate>
+            <div class="field">
+              <label for="admKey">Kode panitia</label>
+              <input id="admKey" class="code" type="password" maxlength="60" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go">
+              <p class="field-error" id="admErr" role="alert" hidden><svg class="ic ic-sm" aria-hidden="true"><use href="#i-warn"/></svg><span>Kode panitia salah atau sudah tidak aktif.</span></p>
+            </div>
+            <button id="admGo" class="btn btn-primary btn-big" type="submit">Masuk</button>
+          </form>
+        </div>
+        <div id="admPanel" hidden>
+          <div class="album-bar">
+            <div class="meta">
+              <h2 tabindex="-1" id="admHead">Panitia · <span id="admName"></span></h2>
+              <p id="admStats" aria-live="polite"></p>
+            </div>
+            <button id="admOut" class="link-btn" type="button">Keluar</button>
+          </div>
+          <div class="adm-tools">
+            <a class="btn btn-ghost btn-sm" href="#live">Buka slideshow layar</a>
+            <a class="btn btn-ghost btn-sm" id="admQr" href="#" target="_blank" rel="noopener noreferrer">Kartu QR untuk print</a>
+          </div>
+          <div class="seg" role="group" aria-label="Menu panitia" style="margin-bottom:var(--s-4)">
+            <button id="admTabAlbum" type="button" aria-pressed="true">Album</button>
+            <button id="admTabTrash" type="button" aria-pressed="false">Disembunyikan</button>
+            <button id="admTabSet" type="button" aria-pressed="false" hidden>Pengaturan</button>
+          </div>
+          <div id="admAlbum">
+            <p class="small" style="text-align:left;margin-bottom:var(--s-3)">Ketuk foto untuk melihat besar, lalu Sembunyikan kalau tidak pantas. File aslinya tetap di Google Drive pemilik.</p>
+            <div class="grid" id="admGrid" role="group" aria-label="Album panitia"></div>
+            <p class="more" id="admMore"></p>
+            <button id="admMoreBtn" class="btn btn-ghost" type="button" hidden>Muat lagi</button>
+          </div>
+          <div id="admTrash" hidden>
+            <ul class="adm-list" id="admTrashList"></ul>
+            <p class="more" id="admTrashMore"></p>
+            <button id="admTrashBtn" class="btn btn-ghost" type="button" hidden>Muat lagi</button>
+          </div>
+          <div id="admSet" hidden>
+            <div class="adm-card" id="admEvent"></div>
+            <div class="adm-card" id="admPan"></div>
+          </div>
+        </div>
       </section>
     </main>
   </div>
@@ -441,6 +525,7 @@
     <div class="lb-cap"><b id="lbTitle"></b><small id="lbMeta"></small></div>
     <div class="lb-act">
       <div class="lb-btns">
+        <button class="lb-del" id="lbDel" type="button" hidden><svg class="ic ic-sm" aria-hidden="true"><use href="#i-trash"/></svg><span>Hapus</span></button>
         <button class="lb-share" id="lbShare" type="button" hidden><svg class="ic ic-sm" aria-hidden="true"><use href="#i-share"/></svg><span>Bagikan</span></button>
         <button class="lb-save" id="lbSave" type="button"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-download"/></svg><span>Simpan</span></button>
       </div>
@@ -578,7 +663,7 @@ async function api(query){
     try {
       const r = await fetchT(API + '?' + query, { credentials: 'omit', cache: 'no-store' }, 25000);
       const j = await r.json();
-      if (j && j.ok === false && j.error) throw Object.assign(new Error(j.error), { server: true });
+      if (j && j.ok === false && j.error) throw Object.assign(new Error(j.error), { server: true, reason: j.reason });
       return j;
     } catch(e) {
       if (e.server) throw e;                     // jawaban jelas dari server: tidak perlu diulang
@@ -599,10 +684,18 @@ const KEY = 'kamera_tamu_afiq_puteri';
 const PKEY = KEY + '_antrian';
 const FKEY = KEY + '_pilihan';
 const guest = store.get(KEY) || { id: uid(), name: '' };
+// QR di meja tamu berisi ?k=KODE → simpan, lalu buang dari alamat supaya nggak ikut ke-share
+(() => {
+  const q = new URLSearchParams(location.search), k = (q.get('k') || '').trim();
+  if (!k) return;
+  guest.code = k; q.delete('k');
+  try { history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash); } catch(e) {}
+})();
 store.set(KEY, guest);
+const gc = () => '&code=' + encodeURIComponent(guest.code || '');
 const pref = Object.assign({ mode: 'cam', filter: 'film' }, store.get(FKEY) || {});
 const savePref = () => store.set(FKEY, pref);
-const S = { used: 0, pending: 0, items: [], local: {}, current: null };
+const S = { used: 0, pending: 0, items: [], local: {}, current: null, locked: false };
 const closed = () => now() > C.closeAt;
 const left = () => Math.max(0, C.maxShots - S.used - S.pending);
 
@@ -1140,7 +1233,7 @@ async function send(){
 
 async function upload(it){
   savePending();
-  const payload = { action: 'upload', guestId: guest.id, name: guest.name, source: it.source, dataUrl: it.dataUrl };
+  const payload = { action: 'upload', guestId: guest.id, name: guest.name, source: it.source, dataUrl: it.dataUrl, code: guest.code || '' };
   // Saat ramai server menolak sebagian kiriman; coba lagi dengan jeda makin panjang (± 3 menit total)
   const waits = [2000, 4000, 8000, 15000, 30000, 45000, 60000];
   let res = null;
@@ -1168,6 +1261,12 @@ async function upload(it){
     S.items = S.items.filter(x => x !== it); delete S.local[it.id];
     if (res.reason === 'habis') S.used = C.maxShots;
     toast(res.reason === 'habis' ? 'Roll kamu sudah habis.' : 'Kamera sudah ditutup.', 'warn');
+  } else if (res && res.reason === 'kode'){
+    it.state = 'fail'; lockOut();
+    toast('Masukkan kode acara dulu. Fotomu aman di HP dan terkirim setelah kamu masuk.', 'warn', 6000);
+  } else if (res && res.reason === 'penuh'){
+    it.state = 'fail';
+    toast('Album sudah penuh. Kabari panitia ya.', 'warn', 6000);
   } else {
     it.state = 'fail';
     toast('Server sedang ramai. Foto tetap aman di HP-mu dan dikirim ulang otomatis.', 'warn', 5000);
@@ -1176,7 +1275,7 @@ async function upload(it){
 }
 
 function retry(it){
-  if (it.state !== 'fail') return;
+  if (it.state !== 'fail' || S.locked) return;
   if (left() <= 0) return toast('Roll kamu sudah habis.', 'warn');
   it.state = 'up'; S.pending++; render(); upload(it);
 }
@@ -1190,7 +1289,7 @@ function applyRoll(r){
 function applyCfg(cfg){
   C.couple = cfg.couple || C.couple; C.dateLabel = cfg.dateLabel || C.dateLabel; C.stamp = cfg.stamp || C.stamp;
   C.maxShots = cfg.maxShots || C.maxShots; C.allowGallery = cfg.allowGallery !== false;
-  C.closeAt = cfg.closeAt || C.closeAt; C.revealAt = cfg.revealAt || 0;
+  C.closeAt = cfg.closeAt || C.closeAt; C.revealAt = cfg.revealAt || 0; C.needCode = !!cfg.needCode;
   if (cfg.now) C.skew = cfg.now - Date.now();
   applyConfig(); render();
 }
@@ -1202,8 +1301,13 @@ function applyStats(s){
 async function boot(){
   for (let i = 0; i < 4; i++){
     try {
-      const r = await api('api=boot&gid=' + encodeURIComponent(guest.id));
-      if (r && r.config) { applyCfg(r.config); if (r.roll) applyRoll(r.roll); applyStats(r.stats); return; }
+      const r = await api('api=boot&gid=' + encodeURIComponent(guest.id) + gc());
+      if (r && r.config) {
+        applyCfg(r.config);
+        if (r.codeOk === false) { lockOut(); return; }
+        unlock();
+        if (r.roll) applyRoll(r.roll); applyStats(r.stats); return;
+      }
     } catch(e) {}
     await sleep((1500 << i) * (0.7 + Math.random() * 0.6));
   }
@@ -1217,7 +1321,29 @@ function showCam(){
 function showWelcome(){
   $('cam').hidden = true; $('welcome').hidden = false;
   $('name').value = guest.name || '';
+  const needCode = S.locked || (C.needCode && !guest.code);
+  $('codeField').hidden = !needCode;
+  if (needCode) $('ecode').value = '';
   setHead();
+}
+/* Kode acara salah/belum ada: kamera & album dikunci sampai tamu masuk. Foto yang belum terkirim tetap di HP. */
+function lockOut(){
+  const was = S.locked; S.locked = true;
+  if (!was) showWelcome();
+  if (!$('viewAlbum').hidden) showAlbumLocked();
+}
+function unlock(){
+  if (!S.locked) return;
+  S.locked = false;
+  $('albumLocked').hidden = true; $('albumBar').hidden = $('grid').hidden = $('more').hidden = false;
+  if (!$('viewAlbum').hidden) openAlbum();
+}
+function showAlbumLocked(){
+  $('albumLocked').hidden = false; $('albumBar').hidden = $('grid').hidden = $('more').hidden = true;
+}
+function codeError(on){
+  $('codeErr').hidden = !on;
+  if (on) $('ecode').setAttribute('aria-invalid', 'true'); else $('ecode').removeAttribute('aria-invalid');
 }
 
 /* ================= PHOTO BOOTH ================= */
@@ -1371,7 +1497,7 @@ async function fetchDirect(id){
   return b;
 }
 async function fetchViaApi(id){
-  const j = await api('api=img&id=' + encodeURIComponent(id));
+  const j = await api('api=img&id=' + encodeURIComponent(id) + gc());
   if (!j || !j.ok || !j.b64) throw new Error('img');
   return b64ToBlob(j.b64, j.type);
 }
@@ -1518,7 +1644,7 @@ async function albumMore(){
   if (A.loading || A.done) return;
   A.loading = true; if (A.filter === 'all') $('more').textContent = 'Memuat foto…';
   try {
-    const r = await api('api=album&offset=' + A.offset + '&limit=60');
+    const r = await api('api=album&offset=' + A.offset + '&limit=60' + gc());
     if (r.locked) { $('albumStats').textContent = 'Album dibuka pukul ' + fmtClock(r.revealAt); A.done = true; return; }
     A.total = r.total; A.guests = r.guests; A.last = Date.now();
     const fresh = r.items.filter(it => !A.ids.has(it.id));
@@ -1534,6 +1660,7 @@ async function albumMore(){
     }
     A.fails = 0;
   } catch(e) {
+    if (e.reason === 'kode') { lockOut(); showAlbumLocked(); return; }
     // sinyal/server tersendat: tampilkan apa adanya lalu coba lagi sendiri (5 → 10 → 20 → 30 detik)
     A.fails = (A.fails || 0) + 1;
     if (!A.items.length) $('albumStats').textContent = 'Album belum termuat';
@@ -1547,7 +1674,7 @@ async function albumRefresh(){
   if (A.loading) return;
   A.loading = true;
   try {
-    const r = await api('api=album&offset=0&limit=60');
+    const r = await api('api=album&offset=0&limit=60' + gc());
     if (r.locked) return;
     A.total = r.total; A.guests = r.guests; A.last = Date.now(); A.dirty = false;
     const fresh = r.items.filter(it => !A.ids.has(it.id));
@@ -1562,10 +1689,11 @@ async function albumRefresh(){
     }
     syncMineTiles();
     renderAlbumStats();
-  } catch(e) {} finally { A.loading = false; }
+  } catch(e) { if (e.reason === 'kode') lockOut(); } finally { A.loading = false; }
 }
 
 function openAlbum(){
+  if (S.locked) return showAlbumLocked();
   if (!A.items.length && !A.done) albumMore();
   else if (A.dirty || Date.now() - A.last > 15000) albumRefresh();
   if (A.filter === 'mine') renderGrid(); else syncMineTiles();
@@ -1591,13 +1719,16 @@ function showLb(i){
   $('lbMeta').textContent = (strip ? 'Foto booth, ' : '') + (it.t ? 'pukul ' + fmtClock(it.t) + ', ' : '') + (A.idx + 1) + ' dari ' + list.length;
   $('lbSave').setAttribute('aria-label', 'Simpan ' + (strip ? 'foto booth' : 'foto') + ' ke HP');
   $('lbDrive').hidden = true;
+  $('lbDel').hidden = !(A.lbAdmin || (!S.locked && S.items.some(x => x.id === it.id && x.state === 'done')));
+  $('lbDel').setAttribute('aria-label', (A.lbAdmin ? 'Sembunyikan ' : 'Hapus ') + (strip ? 'foto booth' : 'foto') + ' ini dari album');
+  $('lbDel').querySelector('span').textContent = A.lbAdmin ? 'Sembunyikan' : 'Hapus';
   $('lbPrev').hidden = $('lbNext').hidden = list.length < 2;
   prefetch(it.id);
   if (list === A.items && A.idx >= A.items.length - 3) albumMore();
 }
-function openLb(list, i){
+function openLb(list, i, admin){
   if (!list.length || i < 0) return;
-  A.lbList = list;
+  A.lbList = list; A.lbAdmin = !!admin;
   showLb(i);
   if (!D.open) openDialog($('lb'), $('lbX'));
 }
@@ -1606,7 +1737,7 @@ function openLb(list, i){
 const L = { pool: [], fresh: [], seen: new Set(), first: true, layer: 0, started: false, paused: false };
 async function livePoll(){
   try {
-    const r = await api('api=album&offset=0&limit=80');
+    const r = await api('api=album&offset=0&limit=80' + gc());
     if (r.locked) return;
     $('liveStats').textContent = r.total.toLocaleString('id-ID') + ' foto dari ' + r.guests + ' fotografer';
     r.items.slice().reverse().forEach(it => {
@@ -1616,7 +1747,9 @@ async function livePoll(){
     });
     if (L.pool.length > 300) L.pool = L.pool.slice(-300);
     L.first = false;
-  } catch(e) {}
+  } catch(e) {
+    if (e.reason === 'kode') { $('liveWait').hidden = false; $('liveWait').textContent = 'Slideshow terkunci. Masuk dulu di halaman panitia (#admin) di perangkat ini.'; }
+  }
 }
 function preload(src){ return new Promise(res => { const i = new Image(); i.referrerPolicy = 'no-referrer'; i.onload = () => res(i); i.onerror = () => res(null); i.src = src; }); }
 async function liveNext(){
@@ -1646,7 +1779,7 @@ function startLive(){
   s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
   s.onload = () => {
     try {
-      const qr = qrcode(0, 'M'); qr.addData(location.origin + location.pathname); qr.make();
+      const qr = qrcode(0, 'M'); qr.addData(location.origin + location.pathname + (guest.code ? '?k=' + encodeURIComponent(guest.code) : '')); qr.make();
       $('liveQr').innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true, alt: 'QR untuk membuka Kamera Tamu' });
     } catch(e) {}
   };
@@ -1662,6 +1795,227 @@ function startLive(){
   setInterval(liveNext, 7000);
 }
 
+/* ================= PANITIA (#admin) ================= */
+const AKEY = KEY + '_admin';
+const ADM = { key: '', role: '', nama: '', ok: false, tab: 'album', items: [], offset: 0, total: 0, done: false, loading: false,
+              tOffset: 0, tDone: false, tLoading: false, pan: [], ev: '', link: '' };
+const isOwner = () => ADM.role === 'owner';
+const FRONT = location.origin + location.pathname;
+
+async function adminPost(op, extra){
+  const r = await apiPost(Object.assign({ action: 'admin', key: ADM.key, op: op }, extra || {}));
+  if (r && r.reason === 'admin') { admLogout(true); throw Object.assign(new Error(r.error || 'Kode panitia salah.'), { server: true }); }
+  if (!r || r.ok === false) throw Object.assign(new Error((r && r.error) || 'Gagal. Coba lagi.'), { server: true });
+  return r;
+}
+function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function copyText(t){
+  const done = () => toast('Tersalin. Tinggal tempel di WhatsApp.');
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, () => prompt('Salin teks ini:', t));
+  else prompt('Salin teks ini:', t);
+}
+
+function showAdmin(){
+  if (!ADM.key) { const s = store.get(AKEY); if (s && s.key) ADM.key = s.key; }
+  if (!ADM.key) { $('admLogin').hidden = false; $('admPanel').hidden = true; return; }
+  if (ADM.ok) { $('admLogin').hidden = true; $('admPanel').hidden = false; admTab(ADM.tab); return; }
+  admEnter(ADM.key, true);
+}
+async function admEnter(key, silent){
+  ADM.key = key;
+  const btn = $('admGo'); btn.disabled = true;
+  try {
+    const r = await adminPost('masuk');
+    Object.assign(ADM, { ok: true, role: r.role, nama: r.nama, ev: r.eventCode || '', link: r.link || '' });
+    store.set(AKEY, { key: key });
+    if (r.eventCode) { guest.code = r.eventCode; store.set(KEY, guest); unlock(); }
+    $('admKey').value = ''; $('admErr').hidden = true;
+    $('admLogin').hidden = true; $('admPanel').hidden = false;
+    $('admName').textContent = r.nama + (r.role === 'owner' ? ' (pemilik)' : '');
+    $('admTabSet').hidden = !isOwner();
+    $('admQr').href = API + '?page=qr&key=' + encodeURIComponent(key);
+    admTab(ADM.tab === 'set' && !isOwner() ? 'album' : ADM.tab);
+    admStats();
+  } catch(e) {
+    if (!e.server) { toast('Sinyal tersendat. Coba lagi.', 'warn'); if (silent) { $('admLogin').hidden = false; $('admPanel').hidden = true; } }
+    else { ADM.key = ''; store.set(AKEY, null); $('admLogin').hidden = false; $('admPanel').hidden = true;
+      if (!silent) { $('admErr').hidden = false; $('admKey').setAttribute('aria-invalid', 'true'); $('admKey').focus(); } }
+  } finally { btn.disabled = false; }
+}
+function admLogout(expired){
+  Object.assign(ADM, { key: '', role: '', nama: '', ok: false, items: [], offset: 0, total: 0, done: false, pan: [] });
+  store.set(AKEY, null);
+  $('admGrid').innerHTML = ''; $('admTrashList').innerHTML = '';
+  $('admLogin').hidden = false; $('admPanel').hidden = true;
+  if (expired) toast('Kode panitia sudah tidak berlaku. Masuk lagi.', 'warn', 5000);
+}
+async function admStats(){
+  try {
+    const s = await adminPost('stats');
+    $('admStats').textContent = s.photos.toLocaleString('id-ID') + ' foto di album · ' + s.guests + ' fotografer · ' + s.dihapus + ' disembunyikan';
+  } catch(e) {}
+}
+function admTab(t){
+  ADM.tab = t;
+  [['album', 'admTabAlbum', 'admAlbum'], ['trash', 'admTabTrash', 'admTrash'], ['set', 'admTabSet', 'admSet']].forEach(([k, b, v]) => {
+    $(b).setAttribute('aria-pressed', String(k === t)); $(v).hidden = k !== t;
+  });
+  if (t === 'album' && !ADM.items.length && !ADM.done) admAlbumMore();
+  if (t === 'trash') admTrashLoad(true);
+  if (t === 'set') admSetLoad();
+}
+
+/* --- album panitia: ketuk foto → lightbox dengan tombol Sembunyikan --- */
+function admTile(it){
+  const b = el('button', 'tile' + kindClass(it)); b.type = 'button';
+  b.setAttribute('aria-label', 'Foto oleh ' + it.name + (it.t ? ', pukul ' + fmtClock(it.t) : '') + '. Buka');
+  const img = el('img'); img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
+  img.addEventListener('load', () => img.classList.add('ok'));
+  watchStrip(img, it, b); setPhoto(img, it.id, 500);
+  b.appendChild(img); b.dataset.id = it.id;
+  b.onclick = () => openLb(ADM.items, ADM.items.findIndex(x => x.id === it.id), true);
+  return b;
+}
+async function admAlbumMore(reset){
+  if (reset) { ADM.items = []; ADM.offset = 0; ADM.done = false; $('admGrid').innerHTML = ''; }
+  if (ADM.loading || ADM.done) return;
+  ADM.loading = true; $('admMore').textContent = 'Memuat foto…'; $('admMoreBtn').hidden = true;
+  try {
+    const r = await adminPost('album', { offset: ADM.offset, limit: 60 });
+    ADM.total = r.total;
+    r.items.forEach(it => { if (ADM.items.some(x => x.id === it.id)) return; ADM.items.push(it); $('admGrid').appendChild(admTile(it)); });
+    ADM.offset += r.items.length;
+    ADM.done = !r.items.length || ADM.offset >= r.total;
+    $('admMore').textContent = ADM.done ? (ADM.items.length ? 'Semua foto sudah tampil' : 'Belum ada foto.') : '';
+    $('admMoreBtn').hidden = ADM.done;
+  } catch(e) { $('admMore').textContent = e.server ? e.message : 'Sinyal tersendat.'; $('admMoreBtn').hidden = false; }
+  finally { ADM.loading = false; }
+}
+
+/* --- foto yang disembunyikan --- */
+const TQ = { list: [], busy: 0 };
+function thumbQueue(id, img){ TQ.list.push([id, img]); thumbPump(); }
+function thumbPump(){
+  while (TQ.busy < 3 && TQ.list.length){
+    const [id, img] = TQ.list.shift(); TQ.busy++;
+    adminPost('thumb', { id }).then(r => { img.src = 'data:' + r.type + ';base64,' + r.b64; }).catch(() => {}).finally(() => { TQ.busy--; thumbPump(); });
+  }
+}
+function admTrashItem(it){
+  const li = el('li', 'adm-item'); li.dataset.id = it.id;
+  const img = el('img'); img.alt = 'Foto oleh ' + it.name; li.appendChild(img); thumbQueue(it.id, img);
+  const tx = el('div', 'txt'); tx.appendChild(el('b', null, it.name));
+  tx.appendChild(document.createTextNode('Dihapus ' + (it.oleh === 'tamu' ? 'tamunya sendiri' : 'oleh ' + it.oleh) + (it.pada ? ' · ' + fmtClock(it.pada) : '')));
+  li.appendChild(tx);
+  if (isOwner() || it.oleh !== 'tamu'){
+    const b = el('button', 'btn btn-ghost btn-sm', 'Pulihkan'); b.type = 'button';
+    b.onclick = async () => {
+      b.disabled = true;
+      try { await adminPost('pulihkan', { id: it.id }); li.remove(); toast('Foto kembali ke album.'); ADM.done = false; A.dirty = true; admAlbumMore(true); admStats(); }
+      catch(e) { b.disabled = false; toast(e.message, 'warn', 5000); }
+    };
+    li.appendChild(b);
+  }
+  return li;
+}
+async function admTrashLoad(reset){
+  if (reset) { ADM.tOffset = 0; ADM.tDone = false; $('admTrashList').innerHTML = ''; TQ.list = []; }
+  if (ADM.tLoading || ADM.tDone) return;
+  ADM.tLoading = true; $('admTrashMore').textContent = 'Memuat…'; $('admTrashBtn').hidden = true;
+  try {
+    const r = await adminPost('dihapus', { offset: ADM.tOffset, limit: 40 });
+    r.items.forEach(it => $('admTrashList').appendChild(admTrashItem(it)));
+    ADM.tOffset += r.items.length;
+    ADM.tDone = !r.items.length || ADM.tOffset >= r.total;
+    $('admTrashMore').textContent = ADM.tOffset ? (ADM.tDone ? 'File aslinya tetap tersimpan di Google Drive pemilik.' : '') : 'Belum ada foto yang disembunyikan.';
+    $('admTrashBtn').hidden = ADM.tDone;
+  } catch(e) { $('admTrashMore').textContent = e.server ? e.message : 'Sinyal tersendat.'; $('admTrashBtn').hidden = false; }
+  finally { ADM.tLoading = false; }
+}
+
+/* --- pengaturan (khusus pemilik): kode acara & 5 panitia --- */
+async function admSetLoad(){
+  if (!isOwner()) return;
+  renderEvent();
+  try { ADM.pan = (await adminPost('panitia')).items; renderPanitia(); } catch(e) { toast(e.message || 'Gagal memuat panitia.', 'warn'); }
+}
+function renderEvent(){
+  const box = $('admEvent'); box.innerHTML = '';
+  box.appendChild(el('h3', null, 'Kode acara'));
+  box.appendChild(el('p', null, ADM.ev ? 'Tamu masuk lewat QR yang berisi kode ini. Tanpa kode, kamera dan album terkunci.' : 'Belum aktif: siapa pun yang tahu link bisa motret dan lihat album.'));
+  if (ADM.ev) { box.appendChild(el('div', 'kode', ADM.ev)); const l = el('p', null, ADM.link); l.style.overflowWrap = 'anywhere'; box.appendChild(l); }
+  const row = el('div', 'adm-row');
+  const add = (label, cls, fn) => { const b = el('button', 'btn btn-sm ' + cls, label); b.type = 'button'; b.onclick = fn; row.appendChild(b); };
+  const run = async (op, extra) => { try { const r = await adminPost(op, extra); ADM.ev = r.eventCode || ''; ADM.link = r.link || ''; if (ADM.ev) { guest.code = ADM.ev; store.set(KEY, guest); } renderEvent(); } catch(e) { toast(e.message, 'warn'); } };
+  if (!ADM.ev) add('Aktifkan kode acara', 'btn-primary', () => run('acaraBuat'));
+  else {
+    add('Salin link QR', 'btn-primary', () => copyText(ADM.link));
+    add('Ganti kode', 'btn-ghost', () => { if (confirm('Ganti kode acara? QR yang sudah dicetak jadi tidak berlaku.')) run('acaraBuat', { ganti: true }); });
+    add('Matikan kode', 'btn-ghost', () => { if (confirm('Matikan kode acara? Siapa pun yang tahu link bisa motret dan lihat album.')) run('acaraMati'); });
+  }
+  box.appendChild(row);
+}
+function renderPanitia(){
+  const box = $('admPan'); box.innerHTML = '';
+  box.appendChild(el('h3', null, 'Panitia'));
+  box.appendChild(el('p', null, 'Panitia bisa lihat album, menyembunyikan foto, dan memulihkan foto yang disembunyikan panitia. Mereka tidak butuh akses Google Drive.'));
+  if (!ADM.pan.length){
+    const b = el('button', 'btn btn-primary btn-sm', 'Buat 5 kode panitia'); b.type = 'button';
+    b.onclick = async () => { b.disabled = true; try { ADM.pan = (await adminPost('panitiaBuat')).items; renderPanitia(); } catch(e) { b.disabled = false; toast(e.message, 'warn'); } };
+    box.appendChild(b); return;
+  }
+  const save = async (extra) => { try { ADM.pan = (await adminPost(extra.op || 'panitiaUbah', extra)).items; renderPanitia(); toast('Tersimpan.'); } catch(e) { toast(e.message, 'warn'); } };
+  ADM.pan.forEach(p => {
+    const d = el('div', 'pan' + (p.aktif ? '' : ' off'));
+    const nm = el('input'); nm.type = 'text'; nm.value = p.nama; nm.maxLength = 40; nm.setAttribute('aria-label', 'Nama panitia ' + p.n);
+    nm.onchange = () => save({ n: p.n, nama: nm.value });
+    d.appendChild(nm);
+    d.appendChild(el('div', 'kode', p.kode));
+    const row = el('div', 'adm-row');
+    const tog = el('label', 'tog'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = !!p.aktif;
+    cb.onchange = () => save({ n: p.n, aktif: cb.checked }); tog.append(cb, document.createTextNode('Aktif')); row.appendChild(tog);
+    const wa = el('button', 'btn btn-ghost btn-sm', 'Salin pesan WA'); wa.type = 'button';
+    wa.onclick = () => copyText('Halo ' + p.nama + ', ini akses panitia Kamera Tamu ' + C.couple + '.\nBuka: ' + FRONT + '#admin\nKode panitia: ' + p.kode + '\nTolong jangan disebar ya.');
+    row.appendChild(wa);
+    const gt = el('button', 'btn btn-ghost btn-sm', 'Ganti kode'); gt.type = 'button';
+    gt.onclick = () => { if (confirm('Ganti kode ' + p.nama + '? Kode lama langsung tidak berlaku (maks. 5 menit).')) save({ op: 'panitiaGanti', n: p.n }); };
+    row.appendChild(gt);
+    d.appendChild(row);
+    box.appendChild(d);
+  });
+}
+
+/* --- hapus foto dari lightbox (tamu: foto sendiri; panitia: semua foto) --- */
+async function delCurrent(){
+  const it = A.lbList[A.idx]; if (!it) return;
+  const admin = A.lbAdmin;
+  if (!confirm(admin ? 'Sembunyikan foto ini dari album? File aslinya tetap tersimpan di Google Drive pemilik.'
+                     : 'Hapus foto ini dari album? Jatah jepretanmu tidak kembali.')) return;
+  const b = $('lbDel'); b.disabled = true;
+  try {
+    const r = admin ? await adminPost('hapus', { id: it.id })
+                    : await apiPost({ action: 'hapus', guestId: guest.id, id: it.id, code: guest.code || '' });
+    if (!r || !r.ok) throw Object.assign(new Error((r && r.error) || 'Gagal menghapus.'), { server: !!r, reason: r && r.reason });
+    removePhoto(it.id);
+    toast(admin ? 'Foto disembunyikan dari album.' : 'Foto dihapus dari album.');
+    if (admin) admStats();
+  } catch(e) {
+    if (e.reason === 'kode') lockOut();
+    toast(e.server ? e.message : 'Sinyal tersendat. Coba lagi.', 'warn', 5000);
+  } finally { b.disabled = false; }
+}
+function removePhoto(id){
+  const wasItems = A.lbList === A.items, wasAdm = A.lbList === ADM.items;
+  if (A.items.some(x => x.id === id)) { A.items = A.items.filter(x => x.id !== id); A.offset = Math.max(0, A.offset - 1); A.total = Math.max(0, A.total - 1); renderAlbumStats(); }
+  if (ADM.items.some(x => x.id === id)) { ADM.items = ADM.items.filter(x => x.id !== id); ADM.offset = Math.max(0, ADM.offset - 1); }
+  S.items = S.items.filter(x => x.id !== id); delete S.local[id];
+  A.list = A.list.filter(x => x.id !== id);
+  document.querySelectorAll('.tile[data-id="' + CSS.escape(id) + '"]').forEach(t => t.remove());
+  A.lbList = wasItems ? A.items : wasAdm ? ADM.items : A.lbList.filter(x => x.id !== id);
+  render();
+  if (!A.lbList.length) closeDialog(); else showLb(Math.min(A.idx, A.lbList.length - 1));
+}
+
 /* ================= NAVIGASI ================= */
 let firstRoute = true;
 function route(){
@@ -1669,15 +2023,16 @@ function route(){
   const live = h === 'live';
   $('app').hidden = live; $('viewLive').hidden = !live;
   if (live) return startLive();
-  const album = h === 'album';
-  $('viewCam').hidden = album; $('viewAlbum').hidden = !album;
-  if (album) { $('navAlbum').setAttribute('aria-current', 'page'); $('navCam').removeAttribute('aria-current'); }
-  else { $('navCam').setAttribute('aria-current', 'page'); $('navAlbum').removeAttribute('aria-current'); }
-  $('mainWrap').classList.toggle('wide', album);
+  const album = h === 'album', admin = h === 'admin';
+  $('viewCam').hidden = album || admin; $('viewAlbum').hidden = !album; $('viewAdmin').hidden = !admin;
+  $('navCam').removeAttribute('aria-current'); $('navAlbum').removeAttribute('aria-current');
+  if (!admin) $(album ? 'navAlbum' : 'navCam').setAttribute('aria-current', 'page');
+  $('mainWrap').classList.toggle('wide', album || admin);
   setHead();
   if (album) openAlbum();
+  if (admin) showAdmin();
   window.scrollTo(0, 0);
-  if (!firstRoute) (album ? $('albumTitle') : $('camTitle')).focus({ preventScroll: true });
+  if (!firstRoute) (admin ? (ADM.ok ? $('admHead') : $('adminTitle')) : album ? $('albumTitle') : $('camTitle')).focus({ preventScroll: true });
   firstRoute = false;
 }
 
@@ -1689,7 +2044,7 @@ buildChips($('chipsSheet'), 'sheet', async id => {
 });
 buildChips($('chipsBooth'), 'booth', id => { pref.filter = id; savePref(); liveFilter(); });
 
-$('nameForm').addEventListener('submit', e => {
+$('nameForm').addEventListener('submit', async e => {
   e.preventDefault();
   const inp = $('name');
   const n = inp.value.replace(/\s+/g, ' ').trim();
@@ -1700,6 +2055,19 @@ $('nameForm').addEventListener('submit', e => {
     return;
   }
   inp.removeAttribute('aria-invalid'); inp.setAttribute('aria-describedby', 'nameHelp'); $('nameErr').hidden = true;
+  if (!$('codeField').hidden) {
+    const ci = $('ecode'), code = ci.value.trim();
+    if (code.replace(/[^a-z0-9]/gi, '').length < 4) { codeError(true); ci.focus(); return; }
+    $('start').disabled = true;
+    try { await api('api=masuk' + '&code=' + encodeURIComponent(code)); }
+    catch(err) {
+      if (err.reason === 'kode') { codeError(true); ci.focus(); } else toast('Sinyal tersendat. Coba lagi.', 'warn');
+      return;
+    } finally { $('start').disabled = false; }
+    codeError(false);
+    guest.code = code; $('codeField').hidden = true;
+    store.set(KEY, guest); unlock(); boot(); setTimeout(() => retryFailed(5), 500);
+  }
   guest.name = n; store.set(KEY, guest); showCam();
   (pref.mode === 'booth' ? $('btnBooth') : $('btnCam')).focus({ preventScroll: true });
 });
@@ -1749,6 +2117,20 @@ $('lbX').onclick = () => closeDialog();
 $('lbPrev').onclick = () => showLb(A.idx - 1);
 $('lbNext').onclick = () => showLb(A.idx + 1);
 $('lbSave').onclick = () => saveCurrent('save');
+$('lbDel').onclick = delCurrent;
+$('ecode').addEventListener('input', () => { if (!$('codeErr').hidden) codeError(false); });
+$('admForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const k = $('admKey').value.trim();
+  if (k.length < 12) { $('admErr').hidden = false; $('admKey').setAttribute('aria-invalid', 'true'); $('admKey').focus(); return; }
+  $('admKey').removeAttribute('aria-invalid'); admEnter(k, false);
+});
+$('admOut').onclick = () => { admLogout(false); $('admKey').focus(); };
+$('admTabAlbum').onclick = () => admTab('album');
+$('admTabTrash').onclick = () => admTab('trash');
+$('admTabSet').onclick = () => admTab('set');
+$('admMoreBtn').onclick = () => admAlbumMore();
+$('admTrashBtn').onclick = () => admTrashLoad();
 $('lbShare').onclick = () => saveCurrent('share');
 $('lb').addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') showLb(A.idx - 1);
