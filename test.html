@@ -15,7 +15,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://lh3.googleusercontent.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,600,0..100,0..1;1,9..144,600,0..100,0..1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Josefin+Sans:wght@400;600;700&family=Caveat:wght@600;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<!-- CSS font dimuat tanpa menahan halaman (sinyal venue lemot ≠ layar putih); huruf kartu ditunggu terpisah (tungguFont) -->
+<link id="gfont" media="print" onload="this.media='all'" onerror="this.dataset.gagal='1'" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,600,100,0;1,9..144,600,100,0&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Josefin+Sans:wght@400;600;700&family=Caveat:wght@600;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
 <style>
   /* Opsi A "Mentega": maroon + butter + periwinkle. Token mengikuti dokumen handoff 3 Nov 2026. */
   :root{
@@ -1409,14 +1410,7 @@ function fitFont(ctx, font, size, parts, sp, maxW){
 /** Bingkai Klasik: 3 foto 16:9 di kertas bertekstur (kartu lama, diperbesar ×1,36 ke kanvas 1080×1920). */
 async function composeKlasik(frames, f, byName){
   const SANS = '"Josefin Sans", "Futura", "Century Gothic", sans-serif', SERIF = '"Cormorant Garamond", Georgia, serif';
-  try {
-    await Promise.race([Promise.all([
-      document.fonts.load('400 40px "Josefin Sans"', 'AFIQ & PUTERI WEDDING DAY'),
-      document.fonts.load('600 17px "Josefin Sans"', 'BY #KAMERA'),
-      document.fonts.load('500 104px "Cormorant Garamond"', 'AP'),
-      document.fonts.load('600 19px "Cormorant Garamond"', '17 JANUARI 2027')
-    ]), sleep(2500)]);
-  } catch(e){}
+  await tungguFont();
   const { W, H } = CARD;
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const ctx = c.getContext('2d');
@@ -1499,8 +1493,51 @@ const BINGKAI = {
 const TULIP_HEAD = 'M9 14L14.5 21L20 8L25.5 21L31 14C34 27 30 38 20 38C10 38 6 27 9 14Z';
 const IMGS = {};
 function cachedImg(src){ return IMGS[src] || (IMGS[src] = loadImg(src).catch(() => null)); }
-async function loadFonts(list, text){
-  try { await Promise.race([Promise.all(list.map(f => document.fonts.load(f, text))), sleep(2500)]); } catch(e){}
+/* ---------- Huruf kanvas ----------
+ * Kanvas tidak menunggu webfont: kalau huruf belum terunduh, kartu tergambar dengan huruf cadangan dan ikut
+ * terunggah ke album. Jadi semua huruf kanvas dimuat di latar sejak halaman terbuka, dan sebelum menggambar kita
+ * tunggu sampai 8 dtk ("Menyiapkan huruf kartu…"). Kalau tetap belum ada, kartu digambar dulu lalu otomatis
+ * digambar ulang begitu hurufnya datang (selama belum dikirim). */
+const KANVAS_FONT = ['italic 600 92px Fraunces', '600 54px Fraunces', '400 40px "Josefin Sans"', '600 28px "Josefin Sans"',
+  '700 30px "Josefin Sans"', '500 104px "Cormorant Garamond"', '600 19px "Cormorant Garamond"', '700 76px Caveat'];
+const FONT_TEKS = 'Afiq & Puteri WEDDING DAY 17.01.2027 JANUARI AP #PUTERIinAFIQtion difoto oleh by KAMERA';
+const FONT = { ok: false, p: null, cssUlang: false };
+async function cekFont(){
+  if (FONT.ok) return true;
+  try {
+    const r = await Promise.all(KANVAS_FONT.map(f => document.fonts.load(f, FONT_TEKS)));
+    FONT.ok = r.every(a => a.length > 0 && a.every(x => x.status === 'loaded'));   // [] = CSS font belum/gagal dimuat
+  } catch(e){ FONT.ok = false; }
+  return FONT.ok;
+}
+/** CSS Google Fonts gagal dimuat (sinyal putus saat halaman dibuka) → pasang sekali lagi. */
+function ulangCssFont(){
+  const l = $('gfont'); if (FONT.cssUlang || !l || (l.sheet && !l.dataset.gagal)) return;
+  FONT.cssUlang = true;
+  const n = l.cloneNode(); n.id = 'gfont2'; n.removeAttribute('data-gagal'); document.head.appendChild(n);
+}
+/** Muat huruf kanvas di latar; dicoba terus dengan jeda sampai ±90 dtk. */
+function siapkanFont(){
+  if (FONT.ok) return Promise.resolve(true);
+  if (!FONT.p) FONT.p = (async () => {
+    const t0 = Date.now();
+    while (!(await cekFont()) && Date.now() - t0 < 90000){
+      if (Date.now() - t0 > 6000) ulangCssFont();
+      await sleep(1500);
+    }
+    FONT.p = null;
+    return FONT.ok;
+  })();
+  return FONT.p;
+}
+/** Dipanggil sebelum menulis teks di kanvas. true = huruf asli siap. */
+async function tungguFont(maxMs){
+  if (FONT.ok || await cekFont()) return true;
+  const bt = $('busyText'), lama = bt.textContent, tampil = !$('busy').hidden, pesan = 'Menyiapkan huruf kartu…';
+  if (tampil) bt.textContent = pesan;
+  try { await Promise.race([siapkanFont(), sleep(maxMs || 8000)]); }
+  finally { if (tampil && bt.textContent === pesan) bt.textContent = lama; }
+  return FONT.ok;
 }
 function roundRect(ctx, x, y, w, h, r){
   ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
@@ -1520,8 +1557,7 @@ async function slotCanvas(fr, w, h, f){
 async function composeStory(frames, f, byName, key){
   const t = BINGKAI[key] || BINGKAI.maroon;
   const FR = '"Fraunces", Georgia, "Times New Roman", serif', JO = '"Josefin Sans", "Century Gothic", sans-serif';
-  const [stkA, stkP] = await Promise.all([cachedImg('aset/afiq_sticker.png'), cachedImg('aset/puteri_sticker.png'), loadFonts([
-    'italic 600 92px Fraunces', '600 54px Fraunces', '600 28px "Josefin Sans"', '700 30px "Josefin Sans"'], 'Afiq & Puteri WEDDING DAY 17.01.2027 AP #PUTERIinAFIQtion')]);
+  const [stkA, stkP] = await Promise.all([cachedImg('aset/afiq_sticker.png'), cachedImg('aset/puteri_sticker.png'), tungguFont()]);
   const W = 1080, H = 1920;
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const ctx = c.getContext('2d');
@@ -1614,6 +1650,10 @@ async function renderPreview(){
     let url;
     if (strip){
       url = (await composeCard(cur.frames, cur.filter, guest.name, cur.bingkai)).toDataURL('image/jpeg', 0.88);
+      if (!FONT.ok && !cur.nantiFont) {           // tergambar dengan huruf cadangan → gambar ulang begitu huruf datang
+        cur.nantiFont = true;
+        siapkanFont().then(ok => { cur.nantiFont = false; if (ok && S.current === cur) renderPreview(); });
+      }
     } else {
       const fc = await filtered(cur.raw, cur.filter);
       url = marked(fc, guest.name).toDataURL('image/jpeg', 0.82);
@@ -1678,7 +1718,7 @@ async function saveFile(cur, style){
     const FR = '"Fraunces", Georgia, serif', JO = '"Josefin Sans", "Century Gothic", sans-serif', CV = '"Caveat", "Segoe Print", cursive';
     const name = cur.name || guest.name || 'Tamu';
     if (style === 'polos') return cur.polosBlob || canvasBlob(marked(cur.fc, name), 0.92);   // foto album sudah bertanda
-    await loadFonts(['700 76px Caveat', '600 32px "Josefin Sans"', 'italic 600 83px Fraunces', '700 70px Caveat', '700 29px "Josefin Sans"'], 'difoto oleh by Afiq & Puteri WEDDING 17-01-2027 #PUTERIinAFIQtion');
+    if (!(await tungguFont())) setTimeout(() => { if (cur.prep) cur.prep[style] = null; }, 0);   // huruf cadangan → jangan disimpan, buat ulang nanti
     const c = document.createElement('canvas'); c.width = 1080; c.height = 1350;
     const ctx = c.getContext('2d'); ctx.textBaseline = 'alphabetic';
     if (style === 'polaroid'){
@@ -2813,6 +2853,9 @@ function closeCover(){
 render();
 
 boot();
+// huruf kartu diunduh di latar sejak awal, supaya sudah siap saat tamu menyusun kartu pertama
+if (document.readyState === 'complete') setTimeout(siapkanFont, 1200);
+else window.addEventListener('load', () => setTimeout(siapkanFont, 1200), { once: true });
 </script>
 </body>
 </html>
