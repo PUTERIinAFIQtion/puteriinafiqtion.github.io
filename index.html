@@ -15,7 +15,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://lh3.googleusercontent.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,600,0..100,0..1;1,9..144,600,0..100,0..1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Josefin+Sans:wght@400;600;700&family=Caveat:wght@600;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<!-- CSS font dimuat tanpa menahan halaman (sinyal venue lemot ≠ layar putih); huruf kartu ditunggu terpisah (tungguFont) -->
+<link id="gfont" media="print" onload="this.media='all'" onerror="this.dataset.gagal='1'" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,600,100,0;1,9..144,600,100,0&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Josefin+Sans:wght@400;600;700&family=Caveat:wght@600;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
 <style>
   /* Opsi A "Mentega": maroon + butter + periwinkle. Token mengikuti dokumen handoff 3 Nov 2026. */
   :root{
@@ -152,11 +153,13 @@
   .section-head span{font-size:15px;color:var(--ink-muted)}
 
   /* grid foto. Kartu photo booth 9:16 = 2 baris. */
-  .roll,.grid{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-flow:dense}
-  .roll{gap:var(--s-2)}
-  .grid{gap:6px}
-  @media(max-width:300px){.grid,.roll{grid-template-columns:repeat(2,1fr)}}
-  @media(min-width:700px){.grid{grid-template-columns:repeat(5,1fr);gap:8px}}
+  /* Tinggi baris = lebar kolom (dihitung dari lebar wadah .cq), jadi kartu booth (2 baris) tidak pernah
+     gepeng walau satu baris isinya kartu semua. Browser lama: pakai aspect-ratio di tiap kotak. */
+  .cq{container-type:inline-size}
+  .roll,.grid{--cols:3;--gap:8px;display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:var(--gap);grid-auto-flow:dense}
+  .grid{--gap:6px}
+  @media(max-width:300px){.grid,.roll{--cols:2}}
+  @media(min-width:700px){.grid{--cols:5;--gap:8px}}
   .shot,.tile{position:relative;aspect-ratio:1;border:0;padding:0;overflow:hidden;cursor:pointer;background:#EADFC0}
   .shot{border-radius:var(--r-sm);transition:transform var(--t-fast) var(--ease-out)}
   .shot:active{transform:scale(.97)}
@@ -164,7 +167,13 @@
   .shot img,.tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
   .tile img{opacity:0;transition:opacity var(--t-slow) var(--ease-out)}
   .tile img.ok{opacity:1}
-  .shot.strip,.tile.strip{grid-row:span 2;aspect-ratio:auto;align-self:stretch;min-height:0;background:var(--butter-300)}
+  .shot.strip,.tile.strip{grid-row:span 2;aspect-ratio:1/2;background:var(--butter-300)}
+  @supports (width:1cqw){
+    .roll,.grid{grid-auto-rows:calc((100cqw - (var(--cols) - 1) * var(--gap)) / var(--cols))}
+    .shot,.tile,.shot.strip,.tile.strip{aspect-ratio:auto}
+  }
+  /* aturBaris() (JS) menulis tinggi baris dalam px di semua browser, termasuk yang belum kenal satuan cqw */
+  .rj > .shot,.rj > .tile{aspect-ratio:auto}
   .shot.strip img,.tile.strip img{object-fit:contain}
   .tile .by{position:absolute;left:4px;bottom:4px;max-width:calc(100% - 8px);padding:1px 7px;border-radius:var(--r-pill);background:rgba(43,26,28,.7);color:var(--butter-50);font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .badge{position:absolute;left:6px;bottom:6px;display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:var(--r-pill);background:#E3F0E7;color:var(--success)}
@@ -192,6 +201,7 @@
   .linkbox span{display:block;font-size:13px;color:var(--maroon-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .linkbox button{flex:none;min-height:44px;padding:0 14px;border:0;border-radius:12px;background:var(--maroon-800);color:var(--butter-50);font-weight:800;font-size:15px;cursor:pointer}
   .more{text-align:center;color:var(--ink-muted);font-size:15px;padding:var(--s-5);margin:0}
+  .ver{text-align:center;color:var(--ink-muted);font-size:13px;margin:var(--s-4) 0 var(--s-2)}
 
   /* navigasi bawah */
   .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:var(--z-nav);background:var(--paper);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
@@ -263,8 +273,8 @@
 
   /* photo booth (layar penuh, tema krem) */
   .booth{position:fixed;inset:0;z-index:var(--z-lb);background:var(--butter-50);color:var(--ink);overflow:auto}
-  .booth-in{max-width:460px;margin:0 auto;padding:calc(env(safe-area-inset-top) + var(--s-2)) var(--s-4) calc(env(safe-area-inset-bottom) + var(--s-4))}
-  .booth-top{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;gap:var(--s-2);margin-bottom:var(--s-3)}
+  .booth-in{max-width:460px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + var(--s-2)) 12px calc(env(safe-area-inset-bottom) + 12px)}
+  .booth-top{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;gap:var(--s-2);margin-bottom:10px}
   .booth-top h2{font-size:26px;text-align:center}
   .icon-btn{appearance:none;border:0;width:48px;height:48px;border-radius:var(--r-pill);display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.14);color:#fff;cursor:pointer;transition:background-color var(--t-fast);flex:none}
   .icon-btn:hover{background:rgba(255,255,255,.24)}
@@ -272,15 +282,25 @@
   .booth .icon-btn{background:transparent;color:var(--maroon-800);border:1.5px solid var(--maroon-800);width:44px;height:44px;justify-self:start}
   .booth .icon-btn:last-child{justify-self:end}
   .booth .icon-btn:hover{background:var(--butter-100)}
-  .bv-frame{position:relative;aspect-ratio:16/9;width:100%;border-radius:14px;overflow:hidden;background:#1E1A2E;box-shadow:0 0 0 5px var(--maroon-900)}
-  .bv-ring{margin:5px}
-  .bv-frame video{width:100%;height:100%;object-fit:cover;display:block}
-  .bv-frame video.mirror{transform:scaleX(-1)}
+  /* Yang terlihat = yang masuk kartu: jendela kamera persis 16:9 selebar layar (tidak ada area gelap di luar
+     kartu), jadi tombol jepret selalu kelihatan tanpa menggulir, juga di HP kecil. */
+  .bv-wrap{flex:none;padding:4px}
+  .bv-frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#1E1A2E;box-shadow:0 0 0 4px var(--maroon-900)}
+  .band{position:absolute;inset:0;z-index:1;pointer-events:none}
+  .zoom{display:flex;justify-content:center;gap:6px;width:max-content;margin:12px auto 0;padding:4px;border-radius:999px;background:var(--maroon-900)}
+  .zoom[hidden]{display:none}
+  .zoom button:focus-visible{outline-color:var(--butter-300)}
+  #boothStart + .booth-sub{margin-top:var(--s-4)}
+  .zoom button{appearance:none;border:0;min-width:44px;height:44px;padding:0 6px;border-radius:999px;background:transparent;color:var(--butter-50);font:700 14px var(--f-sans);cursor:pointer}
+  .zoom button[aria-pressed="true"]{background:var(--butter-300);color:var(--maroon-900)}
+  .zoom button[disabled]{opacity:.5;cursor:default}
+  .bv-frame video{width:100%;height:100%;object-fit:cover;display:block;transform-origin:50% 50%}
   .bpill{position:absolute;left:10px;top:10px;z-index:2;padding:2px 12px;border-radius:var(--r-pill);background:rgba(43,26,28,.72);color:var(--butter-50);font-size:14px;font-weight:700}
   .mk{position:absolute;width:14px;height:14px;border:0 solid rgba(255,249,234,.85);z-index:1}
-  .mk.a{right:10px;top:10px;border-top-width:2px;border-right-width:2px}
-  .mk.b{left:10px;bottom:10px;border-bottom-width:2px;border-left-width:2px}
-  .mk.c{right:10px;bottom:10px;border-bottom-width:2px;border-right-width:2px}
+  .mk.tl{left:8px;top:8px;border-top-width:3px;border-left-width:3px}
+  .mk.a{right:8px;top:8px;border-top-width:3px;border-right-width:3px}
+  .mk.b{left:8px;bottom:8px;border-bottom-width:3px;border-left-width:3px}
+  .mk.c{right:8px;bottom:8px;border-bottom-width:3px;border-right-width:3px}
   .countdown{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;font:italic 600 112px/1 var(--f-display);font-variation-settings:'SOFT' 100,'WONK' 0;color:var(--butter-50);text-shadow:0 4px 24px rgba(0,0,0,.4);pointer-events:none}
   .countdown:not(:empty){background:rgba(74,18,32,.28)}
   .countdown.pop{animation:pop .9s var(--ease-out)}
@@ -288,10 +308,10 @@
   .bv-msg{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s-2);text-align:center;padding:var(--s-3);font-size:15px;color:var(--butter-50)}
   .bv-msg .ic{width:32px;height:32px}
   .bv-msg p{margin:0;max-width:34ch}
-  .booth-status{margin:var(--s-3) 0 var(--s-2);min-height:44px;display:flex;align-items:center}
+  .booth-status{margin:10px 0 2px;min-height:40px;display:flex;align-items:center}
   .booth-status p{margin:0;font-size:15px;font-weight:600;color:var(--maroon-900)}
-  .booth-sub{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s-3);margin:var(--s-2) 0}
-  .booth-sub h3{font-size:20px}
+  .booth-sub{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s-3);margin:2px 0 8px}
+  .booth-sub h3{font-size:19px}
   .booth-sub span{font-size:15px;color:var(--ink-muted)}
   .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:var(--s-2)}
   .slots button{appearance:none;position:relative;height:58px;padding:0;border:0;border-radius:8px;background:var(--butter-100) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font:700 20px var(--f-label);color:#7A5A1E;cursor:default}
@@ -313,17 +333,26 @@
   .lb :focus-visible{outline-color:var(--butter-300)}
   .lb-top{display:flex;justify-content:flex-end;padding:calc(var(--s-2) + env(safe-area-inset-top)) var(--s-2) 0}
   .lb-img{flex:1;display:flex;align-items:center;justify-content:center;padding:var(--s-2);min-height:0;position:relative}
-  .lb-img img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:var(--e-3)}
+  .lb-img img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:var(--e-3);transition:opacity var(--t-base) var(--ease-out)}
+  .lb-img img.loading{opacity:0}
+  .lb-load{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:var(--s-5);text-align:center;color:var(--butter-50);font-size:16px;font-weight:600;pointer-events:none}
+  .lb-load .spin{border-color:rgba(255,249,234,.25);border-top-color:var(--butter-300)}
+  .lb-load.err .spin{display:none}
   .lb .nav-prev,.lb .nav-next{position:absolute;top:50%;transform:translateY(-50%)}
   .lb .nav-prev{left:var(--s-2)} .lb .nav-next{right:var(--s-2)}
-  .lb-bar{display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);padding:var(--s-3) var(--s-4) calc(var(--s-4) + env(safe-area-inset-bottom));flex-wrap:wrap}
+  .lb-bar{display:flex;flex-direction:column;align-items:stretch;gap:var(--s-3);padding:var(--s-3) var(--s-4) calc(var(--s-4) + env(safe-area-inset-bottom));max-width:560px;width:100%;margin:0 auto}
   .lb-cap{min-width:0;flex:1 1 160px}
   .lb-cap b{display:flex;align-items:center;gap:6px;font:600 28px/1.1 var(--f-hand);color:var(--butter-300);overflow-wrap:anywhere}
   .lb-cap small{display:block;font-size:14px;color:#D9CDB0}
-  .lb-act{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
+  .lb-act{display:flex;flex-direction:column;align-items:stretch;gap:4px}
   .lb-save{appearance:none;border:0;display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 var(--s-5);border-radius:var(--r-btn);background:var(--butter-300);color:var(--maroon-900);font-weight:800;font-size:16px;cursor:pointer}
   .lb-save[disabled],.lb-share[disabled]{opacity:.6;cursor:progress}
-  .lb-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  /* 2 atau 3 tombol selalu sama lebar: ikon di atas, tulisan di bawah */
+  .lb-btns{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
+  .lb-btns > button{flex-direction:column;justify-content:center;gap:3px;min-height:60px;padding:6px 4px;font-size:15px;line-height:1.15;text-align:center;min-width:0}
+  .lb-btns > button .ic{width:20px;height:20px}
+  .lb-btns > button span{overflow-wrap:anywhere}
+  .lb-link{align-self:center}
   .lb-share{appearance:none;display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 var(--s-4);border-radius:var(--r-btn);background:transparent;border:1.5px solid var(--butter-300);color:var(--butter-300);font-weight:800;font-size:16px;cursor:pointer}
   .lb-link{color:var(--butter-300);font-size:14px;min-height:44px;display:inline-flex;align-items:center}
 
@@ -591,7 +620,7 @@
           <p class="note" id="note" aria-live="polite"></p>
 
           <div class="section-head"><h2 id="rollTitle">Foto kamu</h2><span id="rollCount"></span></div>
-          <div class="roll" id="roll" role="group" aria-labelledby="rollTitle"></div>
+          <div class="cq"><div class="roll" id="roll" role="group" aria-labelledby="rollTitle"></div></div>
           <p class="empty" id="rollEmpty">Belum ada foto. Jepretan pertamamu muncul di sini.</p>
         </div>
       </section>
@@ -617,7 +646,7 @@
           <div><b>Link album</b><span>puteriinafiqtion.github.io/#album</span></div>
           <button id="copyLink" type="button">Salin</button>
         </section>
-        <div class="grid" id="grid" role="group" aria-labelledby="albumTitle"></div>
+        <div class="cq"><div class="grid" id="grid" role="group" aria-labelledby="albumTitle"></div></div>
         <p class="more" id="more"></p>
       </section>
 
@@ -653,7 +682,7 @@
           </div>
           <div id="admAlbum">
             <p class="small" style="text-align:left;margin-bottom:var(--s-3)">Ketuk foto untuk melihat besar, lalu Sembunyikan kalau tidak pantas. File aslinya tetap di Google Drive pemilik.</p>
-            <div class="grid" id="admGrid" role="group" aria-label="Album panitia"></div>
+            <div class="cq"><div class="grid" id="admGrid" role="group" aria-label="Album panitia"></div></div>
             <p class="more" id="admMore"></p>
             <button id="admMoreBtn" class="btn btn-ghost" type="button" hidden>Muat lagi</button>
           </div>
@@ -664,6 +693,7 @@
           </div>
         </div>
       </section>
+      <p class="ver">Versi halaman 3 Nov 2026 · 21.02</p>
     </main>
   </div>
 
@@ -720,21 +750,21 @@
     <h2 id="boothTitle">Photo booth</h2>
     <button class="icon-btn" id="boothFlip" type="button" aria-label="Ganti ke kamera belakang"><svg class="ic" aria-hidden="true"><use href="#i-flip"/></svg></button>
   </div>
-  <div class="body-cam">
-    <div class="panel-top"><p class="label">Kamera Tamu</p><span class="lens" aria-hidden="true"></span></div>
+  <div class="bv-wrap">
     <div class="bv-frame">
       <video id="bv" playsinline muted autoplay aria-hidden="true"></video>
+      <div class="band" aria-hidden="true"><span class="mk tl"></span><span class="mk a"></span><span class="mk b"></span><span class="mk c"></span></div>
       <span class="bpill" id="bPill" aria-hidden="true">Foto 1 dari 3</span>
-      <span class="mk a" aria-hidden="true"></span><span class="mk b" aria-hidden="true"></span><span class="mk c" aria-hidden="true"></span>
       <div class="countdown" id="bCount" aria-hidden="true"></div>
       <div class="bv-msg" id="bMsg" hidden><svg class="ic" aria-hidden="true"><use href="#i-strip"/></svg><p id="bMsgText"></p></div>
     </div>
   </div>
+  <div class="zoom" id="bZoom" role="group" aria-label="Zoom kamera" hidden></div>
   <div class="booth-status"><p id="bStatus" aria-live="polite">Siap? Ketuk tombol di bawah, hitung mundur 3 detik, lalu bergaya.</p></div>
+  <button id="boothStart" class="btn btn-primary btn-big" type="button">Jepret foto 1 dari 3</button>
   <div class="booth-sub"><h3>Kartu kamu</h3><span>3 foto jadi 1 kartu</span></div>
   <div class="slots" id="bSlots" role="group" aria-label="Foto di kartu"><button type="button" data-i="0" disabled>1</button><button type="button" data-i="1" disabled>2</button><button type="button" data-i="2" disabled>3</button></div>
   <p class="slots-help" id="slotsHelp" hidden>Kurang pas? Ketuk fotonya untuk mengulangi. Filter dipilih setelah 3 foto jadi.</p>
-  <button id="boothStart" class="btn btn-primary btn-big" type="button">Jepret foto 1 dari 3</button>
   <p class="small">1 kartu memakai 1 jatah jepretan.</p>
  </div>
 </div>
@@ -744,6 +774,7 @@
   <div class="lb-top"><button class="icon-btn" id="lbX" type="button" aria-label="Tutup foto"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button></div>
   <div class="lb-img">
     <img id="lbImg" alt="" referrerpolicy="no-referrer">
+    <div class="lb-load" id="lbLoad" role="status" hidden><div class="spin" aria-hidden="true"></div><span>Menyiapkan foto…</span></div>
     <button class="icon-btn nav-prev" id="lbPrev" type="button" aria-label="Foto sebelumnya"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
     <button class="icon-btn nav-next" id="lbNext" type="button" aria-label="Foto berikutnya"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
   </div>
@@ -810,7 +841,7 @@ const API = 'https://script.google.com/macros/s/AKfycbz8z5HBpc8z-E1PzBBujwInBFF6
 const C = {   // nilai awal; sebagian diperbarui dari server (Code.gs → CONFIG). Tanggal & tanda foto SENGAJA tidak diambil dari server.
   couple: 'Afiq & Puteri', dateLabel: 'Ahad, 17 Januari 2027', stampDate: '17-01-2027', dateDots: '17.01.2027',
   boothTitle: 'WEDDING DAY', hashtag: '#PUTERIinAFIQtion',   // tulisan di kartu photo booth
-  maxShots: 20, allowGallery: true, closeAt: Date.parse('2027-01-17T16:00:00+07:00'), revealAt: 0, skew: 0
+  maxShots: 20, allowGallery: true, closeAt: Date.parse('2027-01-18T08:00:00+07:00'), revealAt: 0, skew: 0
 };
 const ALBUM_URL = 'https://puteriinafiqtion.github.io/#album';
 const BINGKAI_IDS = ['maroon', 'mentega', 'klasik'];
@@ -851,10 +882,17 @@ function uid(){
 }
 function photoUrl(id, w){ return 'https://lh3.googleusercontent.com/d/' + encodeURIComponent(id) + '=w' + w; }
 function photoFallback(id, w){ return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w' + w; }
+/** Foto album di kotak grid. Kalau gagal (sinyal / server gambar Google sibuk), pindah ke alamat cadangan lalu
+ *  dicoba lagi dengan jeda, supaya kotak tidak kosong selamanya. */
 function setPhoto(img, id, w){
   img.referrerPolicy = 'no-referrer';
-  img.dataset.fb = '';
-  img.onerror = () => { if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = photoFallback(id, w); } };
+  let n = 0;
+  img.onerror = () => {
+    n++;
+    if (n === 1) { img.src = photoFallback(id, w); return; }
+    if (n > 4) return;
+    setTimeout(() => { if (img.isConnected) img.src = n % 2 ? photoFallback(id, w) + '&r=' + n : photoUrl(id, w); }, [0, 0, 2000, 6000, 15000][n]);
+  };
   img.src = photoUrl(id, w);
 }
 const isStrip = it => !!it && (it.src === 'booth' || it.strip === true);
@@ -1382,14 +1420,7 @@ function fitFont(ctx, font, size, parts, sp, maxW){
 /** Bingkai Klasik: 3 foto 16:9 di kertas bertekstur (kartu lama, diperbesar ×1,36 ke kanvas 1080×1920). */
 async function composeKlasik(frames, f, byName){
   const SANS = '"Josefin Sans", "Futura", "Century Gothic", sans-serif', SERIF = '"Cormorant Garamond", Georgia, serif';
-  try {
-    await Promise.race([Promise.all([
-      document.fonts.load('400 40px "Josefin Sans"', 'AFIQ & PUTERI WEDDING DAY'),
-      document.fonts.load('600 17px "Josefin Sans"', 'BY #KAMERA'),
-      document.fonts.load('500 104px "Cormorant Garamond"', 'AP'),
-      document.fonts.load('600 19px "Cormorant Garamond"', '17 JANUARI 2027')
-    ]), sleep(2500)]);
-  } catch(e){}
+  await tungguFont();
   const { W, H } = CARD;
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const ctx = c.getContext('2d');
@@ -1472,8 +1503,51 @@ const BINGKAI = {
 const TULIP_HEAD = 'M9 14L14.5 21L20 8L25.5 21L31 14C34 27 30 38 20 38C10 38 6 27 9 14Z';
 const IMGS = {};
 function cachedImg(src){ return IMGS[src] || (IMGS[src] = loadImg(src).catch(() => null)); }
-async function loadFonts(list, text){
-  try { await Promise.race([Promise.all(list.map(f => document.fonts.load(f, text))), sleep(2500)]); } catch(e){}
+/* ---------- Huruf kanvas ----------
+ * Kanvas tidak menunggu webfont: kalau huruf belum terunduh, kartu tergambar dengan huruf cadangan dan ikut
+ * terunggah ke album. Jadi semua huruf kanvas dimuat di latar sejak halaman terbuka, dan sebelum menggambar kita
+ * tunggu sampai 8 dtk ("Menyiapkan huruf kartu…"). Kalau tetap belum ada, kartu digambar dulu lalu otomatis
+ * digambar ulang begitu hurufnya datang (selama belum dikirim). */
+const KANVAS_FONT = ['italic 600 92px Fraunces', '600 54px Fraunces', '400 40px "Josefin Sans"', '600 28px "Josefin Sans"',
+  '700 30px "Josefin Sans"', '500 104px "Cormorant Garamond"', '600 19px "Cormorant Garamond"', '700 76px Caveat'];
+const FONT_TEKS = 'Afiq & Puteri WEDDING DAY 17.01.2027 JANUARI AP #PUTERIinAFIQtion difoto oleh by KAMERA';
+const FONT = { ok: false, p: null, cssUlang: false };
+async function cekFont(){
+  if (FONT.ok) return true;
+  try {
+    const r = await Promise.all(KANVAS_FONT.map(f => document.fonts.load(f, FONT_TEKS)));
+    FONT.ok = r.every(a => a.length > 0 && a.every(x => x.status === 'loaded'));   // [] = CSS font belum/gagal dimuat
+  } catch(e){ FONT.ok = false; }
+  return FONT.ok;
+}
+/** CSS Google Fonts gagal dimuat (sinyal putus saat halaman dibuka) → pasang sekali lagi. */
+function ulangCssFont(){
+  const l = $('gfont'); if (FONT.cssUlang || !l || (l.sheet && !l.dataset.gagal)) return;
+  FONT.cssUlang = true;
+  const n = l.cloneNode(); n.id = 'gfont2'; n.removeAttribute('data-gagal'); document.head.appendChild(n);
+}
+/** Muat huruf kanvas di latar; dicoba terus dengan jeda sampai ±90 dtk. */
+function siapkanFont(){
+  if (FONT.ok) return Promise.resolve(true);
+  if (!FONT.p) FONT.p = (async () => {
+    const t0 = Date.now();
+    while (!(await cekFont()) && Date.now() - t0 < 90000){
+      if (Date.now() - t0 > 6000) ulangCssFont();
+      await sleep(1500);
+    }
+    FONT.p = null;
+    return FONT.ok;
+  })();
+  return FONT.p;
+}
+/** Dipanggil sebelum menulis teks di kanvas. true = huruf asli siap. */
+async function tungguFont(maxMs){
+  if (FONT.ok || await cekFont()) return true;
+  const bt = $('busyText'), lama = bt.textContent, tampil = !$('busy').hidden, pesan = 'Sedang menyiapkan…';
+  if (tampil) bt.textContent = pesan;
+  try { await Promise.race([siapkanFont(), sleep(maxMs || 8000)]); }
+  finally { if (tampil && bt.textContent === pesan) bt.textContent = lama; }
+  return FONT.ok;
 }
 function roundRect(ctx, x, y, w, h, r){
   ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
@@ -1493,8 +1567,7 @@ async function slotCanvas(fr, w, h, f){
 async function composeStory(frames, f, byName, key){
   const t = BINGKAI[key] || BINGKAI.maroon;
   const FR = '"Fraunces", Georgia, "Times New Roman", serif', JO = '"Josefin Sans", "Century Gothic", sans-serif';
-  const [stkA, stkP] = await Promise.all([cachedImg('aset/afiq_sticker.png'), cachedImg('aset/puteri_sticker.png'), loadFonts([
-    'italic 600 92px Fraunces', '600 54px Fraunces', '600 28px "Josefin Sans"', '700 30px "Josefin Sans"'], 'Afiq & Puteri WEDDING DAY 17.01.2027 AP #PUTERIinAFIQtion')]);
+  const [stkA, stkP] = await Promise.all([cachedImg('aset/afiq_sticker.png'), cachedImg('aset/puteri_sticker.png'), tungguFont()]);
   const W = 1080, H = 1920;
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const ctx = c.getContext('2d');
@@ -1587,6 +1660,10 @@ async function renderPreview(){
     let url;
     if (strip){
       url = (await composeCard(cur.frames, cur.filter, guest.name, cur.bingkai)).toDataURL('image/jpeg', 0.88);
+      if (!FONT.ok && !cur.nantiFont) {           // tergambar dengan huruf cadangan → gambar ulang begitu huruf datang
+        cur.nantiFont = true;
+        siapkanFont().then(ok => { cur.nantiFont = false; if (ok && S.current === cur) renderPreview(); });
+      }
     } else {
       const fc = await filtered(cur.raw, cur.filter);
       url = marked(fc, guest.name).toDataURL('image/jpeg', 0.82);
@@ -1651,7 +1728,7 @@ async function saveFile(cur, style){
     const FR = '"Fraunces", Georgia, serif', JO = '"Josefin Sans", "Century Gothic", sans-serif', CV = '"Caveat", "Segoe Print", cursive';
     const name = cur.name || guest.name || 'Tamu';
     if (style === 'polos') return cur.polosBlob || canvasBlob(marked(cur.fc, name), 0.92);   // foto album sudah bertanda
-    await loadFonts(['700 76px Caveat', '600 32px "Josefin Sans"', 'italic 600 83px Fraunces', '700 70px Caveat', '700 29px "Josefin Sans"'], 'difoto oleh by Afiq & Puteri WEDDING 17-01-2027 #PUTERIinAFIQtion');
+    if (!(await tungguFont())) setTimeout(() => { if (cur.prep) cur.prep[style] = null; }, 0);   // huruf cadangan → jangan disimpan, buat ulang nanti
     const c = document.createElement('canvas'); c.width = 1080; c.height = 1350;
     const ctx = c.getContext('2d'); ctx.textBaseline = 'alphabetic';
     if (style === 'polaroid'){
@@ -1764,6 +1841,9 @@ async function upload(it){
   } else if (res && res.reason === 'penuh'){
     it.state = 'fail';
     toast('Album sudah penuh. Kabari panitia ya.', 'warn', 6000);
+  } else if (res && res.reason === 'invalid'){   // ditolak server karena isinya (bukan JPEG / terlalu besar): jangan dikirim ulang otomatis
+    it.state = 'fail'; it.tolak = true;
+    toast('Foto ini nggak bisa dikirim. Coba ambil ulang ya.', 'warn', 7000);
   } else {
     it.state = 'fail';
     toast('Server sedang ramai. Foto tetap aman di HP-mu dan dikirim ulang otomatis.', 'warn', 5000);
@@ -1865,11 +1945,93 @@ function boothMsg(text){
 function stopStream(){
   if (B.stream) { B.stream.getTracks().forEach(t => t.stop()); B.stream = null; }
   $('bv').srcObject = null;
+  $('bZoom').hidden = true;
+}
+
+/* ---------- zoom booth: 0.5× (lensa ultra-wide), 1×, 2×, 4× ----------
+   Pakai zoom asli kamera kalau browser mendukung (Chrome Android); kalau tidak, zoom digital (potong tengah).
+   0.5× hanya muncul kalau HP punya lensa ultra-wide yang terbaca browser (iPhone: "Back Ultra Wide Camera"). */
+const Z = { level: 1, hw: null, digital: 1, uwId: null, uwChecked: false, useUW: false };
+function zoomLevels(){
+  const lv = [];
+  if (B.facing === 'environment' && (Z.uwId || (Z.hw && Z.hw.min <= 0.5))) lv.push(0.5);
+  lv.push(1, 2, Z.hw ? 4 : 3);   // tanpa zoom asli, 4× digital terlalu buram → maks. 3×
+  return lv;
+}
+function renderZoom(){
+  const box = $('bZoom'), lv = zoomLevels();
+  box.hidden = !B.stream || B.manual;
+  box.innerHTML = '';
+  lv.forEach(z => {
+    const b = document.createElement('button'); b.type = 'button';
+    b.textContent = (z === 0.5 ? '0.5' : z) + (z === Z.level ? '×' : '');
+    b.setAttribute('aria-label', 'Zoom ' + String(z).replace('.', ',') + ' kali');
+    b.setAttribute('aria-pressed', String(z === Z.level));
+    b.disabled = B.running;
+    b.onclick = () => setZoom(z);
+    box.appendChild(b);
+  });
+}
+function videoTransform(){
+  const t = [];
+  if (B.facing === 'user') t.push('scaleX(-1)');
+  if (Z.digital > 1) t.push('scale(' + Z.digital + ')');
+  $('bv').style.transform = t.join(' ');
+}
+async function readZoomCaps(){
+  Z.hw = null;
+  try {
+    const tr = B.stream && B.stream.getVideoTracks()[0];
+    const c = tr && tr.getCapabilities ? tr.getCapabilities() : {};
+    if (c.zoom && c.zoom.max > c.zoom.min) Z.hw = { min: c.zoom.min, max: c.zoom.max };
+  } catch(e){}
+  if (B.facing === 'environment' && !Z.uwChecked){
+    Z.uwChecked = true;
+    try {
+      const ds = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
+      const uw = ds.find(d => /ultra|0[.,]5x?\b/i.test(d.label) && !/front|depan|user|selfie/i.test(d.label));
+      Z.uwId = uw ? uw.deviceId : null;
+    } catch(e){}
+  }
+}
+async function setZoom(z){
+  if (B.running || !B.stream) return;
+  const prev = Z.level;
+  Z.level = z;
+  try {
+    if (z === 0.5 && !(Z.hw && Z.hw.min <= 0.5)) {           // ganti ke lensa ultra-wide
+      Z.useUW = true; Z.digital = 1; await startStream(); return;
+    }
+    if (z !== 0.5 && Z.useUW) { Z.useUW = false; Z.digital = 1; await startStream(); }   // kembali ke lensa utama
+    const tr = B.stream && B.stream.getVideoTracks()[0];
+    if (Z.hw && tr) {
+      const hz = Math.max(Z.hw.min, Math.min(Z.hw.max, z));
+      await tr.applyConstraints({ advanced: [{ zoom: hz }] });
+      Z.digital = Math.max(1, z / hz);                         // sisa yang tidak sanggup zoom asli → digital
+    } else Z.digital = Math.max(1, z);
+  } catch(e) { Z.level = prev; toast('Zoom tidak tersedia di HP ini.', 'warn'); }
+  videoTransform(); renderZoom();
+}
+/** Ambil persis area pita 16:9 yang terlihat di jendela bidik (ikut zoom digital). */
+function bandCrop(v){
+  const vw = v.videoWidth, vh = v.videoHeight, r = v.getBoundingClientRect();
+  const cw = r.width, ch = r.height, s = Math.max(cw / vw, ch / vh);
+  const bh = Math.min(ch, cw * 9 / 16), by = (ch - bh) / 2;
+  let sw = cw / s, sh = bh / s;
+  let sx = (0 - (cw - vw * s) / 2) / s, sy = (by - (ch - vh * s) / 2) / s;
+  const d = Z.digital || 1, cx = sx + sw / 2, cy = sy + sh / 2;
+  sw /= d; sh /= d; sx = cx - sw / 2; sy = cy - sh / 2;
+  const ow = Math.min(1280, Math.round(sw)), oh = Math.round(ow * 9 / 16);
+  const c = document.createElement('canvas'); c.width = ow; c.height = oh;
+  const ctx = c.getContext('2d'); ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(v, sx, sy, sw, sh, 0, 0, ow, oh);
+  return c;
 }
 function stopBooth(){ B.cancel = true; stopStream(); showCount(''); }
 
 function setManual(text){
-  B.manual = true; stopStream();
+  B.manual = true; stopStream(); Object.assign(Z, { level: 1, digital: 1, useUW: false });
+  $('booth').classList.add('manual');   // tanpa kamera langsung: jendela kembali kecil, cukup untuk pesan
   boothMsg(text);
   $('boothFlip').hidden = true;
   $('boothStart').removeAttribute('aria-disabled'); boothLabel();
@@ -1881,11 +2043,18 @@ async function startStream(){
   $('boothStart').setAttribute('aria-disabled', 'true');
   $('bStatus').textContent = 'Membuka kamera…';
   try {
-    const s = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: B.facing }, width: { ideal: 1280 }, height: { ideal: 960 } } });
+    // resolusi tinggi supaya zoom digital tetap tajam di kartu
+    const vid = Z.useUW && Z.uwId ? { deviceId: { exact: Z.uwId }, width: { ideal: 1920 }, height: { ideal: 1440 } }
+                                  : { facingMode: { ideal: B.facing }, width: { ideal: 1920 }, height: { ideal: 1440 } };
+    const s = await navigator.mediaDevices.getUserMedia({ audio: false, video: vid });
     if ($('booth').hidden) { s.getTracks().forEach(t => t.stop()); return; }
     B.stream = s;
-    const v = $('bv'); v.srcObject = s; v.classList.toggle('mirror', B.facing === 'user');
+    const v = $('bv'); v.srcObject = s;
     try { await v.play(); } catch(e){}
+    await readZoomCaps();
+    if (!Z.useUW && Z.level !== 1 && Z.hw) { try { const hz = Math.max(Z.hw.min, Math.min(Z.hw.max, Z.level)); await s.getVideoTracks()[0].applyConstraints({ advanced: [{ zoom: hz }] }); Z.digital = Math.max(1, Z.level / hz); } catch(e){} }
+    else if (!Z.useUW && Z.level !== 1) Z.digital = Math.max(1, Z.level);
+    videoTransform(); renderZoom();
     $('boothStart').removeAttribute('aria-disabled'); boothLabel();
     $('bStatus').textContent = B.redo != null ? 'Foto ' + (B.redo + 1) + ' akan diulang. Ketuk tombol di bawah, lalu bergaya lagi.'
       : B.frames.length ? 'Ketuk lagi untuk foto ' + (B.frames.length + 1) + '.' : BOOTH_READY;
@@ -1905,8 +2074,10 @@ function openBooth(trigger, opts){
   Object.assign(B, { frames: o.frames ? o.frames.slice() : [], redo: o.redo != null ? o.redo : null, fromCard: !!o.frames,
                      running: false, cancel: false, manual: false, trigger: trigger || $('btnBooth') });
   renderSlots(); boothShape(); showCount(''); boothMsg('');
+  $('booth').classList.remove('manual');
   $('boothFlip').hidden = false; $('boothFlip').disabled = false;
   $('bv').style.filter = 'none';   // filter dipilih sekali di kartu, bukan di sini
+  Object.assign(Z, { level: 1, digital: 1, useUW: false }); videoTransform();
   $('toast').hidden = true;
   // ditutup saat mengulang dari kartu → kembali ke kartu lama, foto tidak hilang
   openDialog($('booth'), $('boothStart'), () => { stopBooth(); if (B.fromCard && B.frames.length >= 3) { B.redo = null; setTimeout(finishBooth, 0); } });
@@ -1924,7 +2095,7 @@ async function runBooth(){
   if (B.redo == null && B.frames.length >= 3) return finishBooth();   // "Lihat kartu"
   if (!B.stream) return;
   const i = boothIdx(), redo = B.redo != null;
-  B.running = true; B.cancel = false; renderSlots();
+  B.running = true; B.cancel = false; renderSlots(); renderZoom();
   $('boothStart').setAttribute('aria-disabled', 'true'); $('boothFlip').disabled = true;
   $('boothStart').textContent = 'Bergaya…';
   let done = false;
@@ -1933,7 +2104,7 @@ async function runBooth(){
     for (let n = 3; n >= 1; n--){ if (B.cancel) return; showCount(n); await sleep(1000); }
     if (B.cancel || !B.stream) return;
     showCount(''); flash();
-    const fr = cropTo($('bv'), SLOT_AR[i], 1280);
+    const fr = bandCrop($('bv'));
     if (B.facing === 'user') { const m = document.createElement('canvas'); m.width = fr.width; m.height = fr.height; const mc = m.getContext('2d'); mc.translate(fr.width, 0); mc.scale(-1, 1); mc.drawImage(fr, 0, 0); B.frames[i] = m; }
     else B.frames[i] = fr;
     B.redo = null;
@@ -1943,7 +2114,7 @@ async function runBooth(){
     else $('bStatus').textContent = 'Foto ' + (i + 1) + (redo ? ' sudah diulang' : ' masuk') + '. Ketuk lagi untuk foto ' + (B.frames.length + 1) + '.';
   } finally {
     B.running = false; showCount('');
-    if (!$('booth').hidden && !done) { $('boothStart').removeAttribute('aria-disabled'); $('boothFlip').disabled = false; boothLabel(); renderSlots(); }
+    if (!$('booth').hidden && !done) { $('boothStart').removeAttribute('aria-disabled'); $('boothFlip').disabled = false; boothLabel(); renderSlots(); renderZoom(); }
   }
 }
 
@@ -2242,13 +2413,54 @@ function setFilter(f){
 }
 
 /* ================= LIGHTBOX ================= */
+/* Foto berikutnya baru tampil setelah selesai dimuat; selama itu muncul "Menyiapkan foto…"
+   (dulu foto sebelumnya sempat terlihat dulu). LB.tok mencegah foto lama yang telat selesai menimpa foto baru. */
+const LB = { tok: 0 };
+function lbLoading(state){
+  const l = $('lbLoad'), err = state === 'err';
+  l.hidden = !state; l.classList.toggle('err', err);
+  l.querySelector('span').textContent = err ? 'Foto belum bisa dimuat. Periksa sinyal, lalu buka lagi.' : 'Menyiapkan foto…';
+}
+function lbPreload(){   // foto sebelah kiri & kanan dimuat diam-diam supaya geser terasa instan
+  const list = A.lbList; if (list.length < 2) return;
+  [A.idx + 1, A.idx - 1].forEach(j => {
+    const it = list[(j + list.length) % list.length];
+    if (!it || S.local[it.id]) return;
+    const im = new Image(); im.referrerPolicy = 'no-referrer'; im.src = photoUrl(it.id, 1600);
+  });
+}
 function showLb(i){
   const list = A.lbList; if (!list.length) return;
   A.idx = (i + list.length) % list.length;
   const it = list[A.idx];
   const strip = isStrip(it);
-  if (S.local[it.id]) { $('lbImg').onerror = null; $('lbImg').src = S.local[it.id]; } else setPhoto($('lbImg'), it.id, 1600);
-  $('lbImg').alt = (strip ? 'Foto booth oleh ' : 'Foto oleh ') + it.name;
+  const img = $('lbImg'), tok = ++LB.tok;
+  // 1) Foto yang sedang tampil langsung disembunyikan & dikosongkan (tanpa animasi pudar, jadi tidak sempat terlihat).
+  // 2) Foto baru dimuat di belakang layar (pre). 3) Baru ditempel & ditampilkan setelah benar-benar siap digambar.
+  img.onload = img.onerror = null;
+  img.style.visibility = 'hidden'; img.classList.add('loading'); img.removeAttribute('src');
+  lbLoading('load');
+  const tampil = () => {
+    if (tok !== LB.tok) return;
+    img.style.visibility = ''; img.classList.remove('loading'); lbLoading(false); lbPreload();
+  };
+  const pasang = src => {
+    if (tok !== LB.tok) return;
+    img.src = src;
+    if (img.decode) img.decode().then(tampil, tampil);
+    else if (img.complete) tampil();
+    else img.onload = img.onerror = tampil;
+  };
+  const pre = new Image(); pre.referrerPolicy = 'no-referrer';
+  let cadangan = false;
+  pre.onload = () => pasang(pre.src);
+  pre.onerror = () => {
+    if (tok !== LB.tok) return;
+    if (!S.local[it.id] && !cadangan) { cadangan = true; pre.src = photoFallback(it.id, 1600); }
+    else lbLoading('err');
+  };
+  pre.src = S.local[it.id] || photoUrl(it.id, 1600);
+  img.alt = (strip ? 'Foto booth oleh ' : 'Foto oleh ') + it.name;
   $('lbTitle').innerHTML = icon('heart', 'ic-sm');
   $('lbTitle').append(it.name);
   $('lbMeta').textContent = (strip ? 'Foto booth, ' : '') + (it.t ? 'pukul ' + fmtClock(it.t) + ', ' : '') + (A.idx + 1) + ' dari ' + list.length;
@@ -2548,6 +2760,7 @@ $('boothX').onclick = () => closeDialog();
 $('boothFlip').onclick = () => {
   B.facing = B.facing === 'user' ? 'environment' : 'user';
   $('boothFlip').setAttribute('aria-label', B.facing === 'user' ? 'Ganti ke kamera belakang' : 'Ganti ke kamera depan');
+  Object.assign(Z, { level: 1, digital: 1, useUW: false });
   startStream();
 };
 document.addEventListener('visibilitychange', () => {
@@ -2627,7 +2840,7 @@ $('lb').addEventListener('touchend', e => {
 new IntersectionObserver(es => { if (es[0].isIntersecting && !$('viewAlbum').hidden && A.filter === 'all') albumMore(); }, { rootMargin: '600px' }).observe($('more'));
 setInterval(() => { if (!$('viewAlbum').hidden && document.visibilityState === 'visible') albumRefresh(); }, 90000);
 // kiriman yang gagal dicoba lagi otomatis (tiap menit saat halaman terbuka, dan saat sinyal kembali)
-const retryFailed = n => S.items.filter(i => i.state === 'fail').slice(0, n).forEach(retry);
+const retryFailed = n => S.items.filter(i => i.state === 'fail' && !i.tolak).slice(0, n).forEach(retry);
 setInterval(() => { if (document.visibilityState === 'visible') retryFailed(2); }, 60000);
 window.addEventListener('online', () => { retryFailed(5); if (!$('viewAlbum').hidden && A.fails) albumMore(); });
 window.addEventListener('hashchange', route);
@@ -2664,7 +2877,25 @@ function closeCover(){
 });
 render();
 
+/* Tinggi baris grid = lebar 1 kolom, dihitung di sini supaya sama di semua browser (iPhone lama, browser dalam
+   aplikasi): kotak foto = 1 baris, kartu booth 9:16 = 2 baris. Tidak bergantung dukungan CSS container query. */
+function aturBaris(g){
+  const w = g.clientWidth; if (!w) return;
+  const cs = getComputedStyle(g), cols = parseInt(cs.getPropertyValue('--cols'), 10) || 3, gap = parseFloat(cs.columnGap) || 0;
+  const h = Math.floor((w - (cols - 1) * gap) / cols * 100) / 100 + 'px';
+  if (g.style.gridAutoRows !== h) g.style.gridAutoRows = h;
+  g.classList.add('rj');
+}
+{
+  const grids = ['roll', 'grid', 'admGrid'].map($).filter(Boolean);
+  if ('ResizeObserver' in window) { const ro = new ResizeObserver(es => es.forEach(e => aturBaris(e.target))); grids.forEach(g => ro.observe(g)); }
+  else { const semua = () => grids.forEach(aturBaris); semua(); window.addEventListener('resize', semua); setInterval(semua, 700); }   // browser sangat lama
+}
+
 boot();
+// huruf kartu diunduh di latar sejak awal, supaya sudah siap saat tamu menyusun kartu pertama
+if (document.readyState === 'complete') setTimeout(siapkanFont, 1200);
+else window.addEventListener('load', () => setTimeout(siapkanFont, 1200), { once: true });
 </script>
 </body>
 </html>
