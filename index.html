@@ -1712,7 +1712,7 @@ async function onPick(e, source, trigger){
 }
 
 function savePending(){
-  const list = S.items.filter(i => i.state !== 'done' && i.dataUrl).map(i => ({ id: i.id, dataUrl: i.dataUrl, source: i.source }));
+  const list = S.items.filter(i => i.state !== 'done' && i.dataUrl).map(i => ({ id: i.id, uid: i.uid, dataUrl: i.dataUrl, source: i.source }));
   if (!store.set(PKEY, list)) store.set(PKEY, list.slice(-2));
 }
 
@@ -1723,7 +1723,7 @@ async function send(){
   (cur.kind === 'strip' ? $('btnBooth') : $('btnCam')).focus({ preventScroll: true });
   flash();
   const source = cur.kind === 'strip' ? 'booth' : cur.source;
-  const it = { id: 'tmp-' + Date.now(), state: 'up', dataUrl: cur.dataUrl, source, src: source };
+  const it = { id: 'tmp-' + Date.now(), uid: uid(), state: 'up', dataUrl: cur.dataUrl, source, src: source };   // uid sama di tiap kirim ulang → server tidak menyimpan dobel
   S.local[it.id] = cur.dataUrl;
   if (cur.fc) it.cleanUrl = cur.fc.toDataURL('image/jpeg', 0.9);   // versi tanpa tanda foto, untuk "Simpan sebagai" dari album (hanya di memori)
   S.items.push(it); S.pending++; render();
@@ -1732,7 +1732,8 @@ async function send(){
 
 async function upload(it){
   savePending();
-  const payload = { action: 'upload', guestId: guest.id, name: guest.name, source: it.source, dataUrl: it.dataUrl };
+  if (!it.uid) it.uid = uid();
+  const payload = { action: 'upload', guestId: guest.id, name: guest.name, source: it.source, dataUrl: it.dataUrl, uploadId: it.uid };
   // Saat ramai server menolak sebagian kiriman; coba lagi dengan jeda makin panjang (± 3 menit total)
   const waits = [2000, 4000, 8000, 15000, 30000, 45000, 60000];
   let res = null;
@@ -2657,7 +2658,7 @@ function closeCover(){
 (store.get(PKEY) || []).forEach(p => {
   if (!p || !p.dataUrl) return;
   const src = p.source || 'kamera';
-  const it = { id: p.id || ('tmp-' + Math.random()), state: 'up', dataUrl: p.dataUrl, source: src, src };
+  const it = { id: p.id || ('tmp-' + Math.random()), uid: p.uid || uid(), state: 'up', dataUrl: p.dataUrl, source: src, src };
   S.local[it.id] = it.dataUrl; S.items.push(it); S.pending++;
   upload(it);
 });
