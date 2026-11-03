@@ -282,15 +282,15 @@
   .booth .icon-btn{background:transparent;color:var(--maroon-800);border:1.5px solid var(--maroon-800);width:44px;height:44px;justify-self:start}
   .booth .icon-btn:last-child{justify-self:end}
   .booth .icon-btn:hover{background:var(--butter-100)}
-  /* Gambar kamera mengisi semua ruang kosong layar (selebar layar, setinggi sisa layar).
-     Pita 16:9 di tengah = bagian yang masuk kartu; sekelilingnya tetap terlihat, sedikit digelapkan. */
-  .bv-wrap{flex:1 1 auto;display:flex;min-height:min(70vw, 322px);max-height:640px;padding:4px}
-  .bv-frame{position:relative;flex:1;width:100%;border-radius:16px;overflow:hidden;background:#1E1A2E;box-shadow:0 0 0 4px var(--maroon-900)}
-  .booth.manual .bv-wrap{flex:none;min-height:0}
-  .booth.manual .bv-frame{flex:none;aspect-ratio:16/9}
-  .band{position:absolute;left:0;right:0;top:50%;aspect-ratio:16/9;transform:translateY(-50%);box-shadow:0 0 0 999px rgba(30,18,22,.42);outline:2px solid rgba(255,249,234,.92);outline-offset:-2px;z-index:1;pointer-events:none}
-  .band-note{position:absolute;right:10px;top:12px;z-index:2;font-size:13px;font-weight:600;color:rgba(255,249,234,.9)}
-  .zoom{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:4;display:flex;gap:6px;padding:4px;border-radius:999px;background:rgba(30,18,22,.55)}
+  /* Yang terlihat = yang masuk kartu: jendela kamera persis 16:9 selebar layar (tidak ada area gelap di luar
+     kartu), jadi tombol jepret selalu kelihatan tanpa menggulir, juga di HP kecil. */
+  .bv-wrap{flex:none;padding:4px}
+  .bv-frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#1E1A2E;box-shadow:0 0 0 4px var(--maroon-900)}
+  .band{position:absolute;inset:0;z-index:1;pointer-events:none}
+  .zoom{display:flex;justify-content:center;gap:6px;width:max-content;margin:12px auto 0;padding:4px;border-radius:999px;background:var(--maroon-900)}
+  .zoom[hidden]{display:none}
+  .zoom button:focus-visible{outline-color:var(--butter-300)}
+  #boothStart + .booth-sub{margin-top:var(--s-4)}
   .zoom button{appearance:none;border:0;min-width:44px;height:44px;padding:0 6px;border-radius:999px;background:transparent;color:var(--butter-50);font:700 14px var(--f-sans);cursor:pointer}
   .zoom button[aria-pressed="true"]{background:var(--butter-300);color:var(--maroon-900)}
   .zoom button[disabled]{opacity:.5;cursor:default}
@@ -693,7 +693,7 @@
           </div>
         </div>
       </section>
-      <p class="ver">Versi halaman 3 Nov 2026 · 20.25</p>
+      <p class="ver">Versi halaman 3 Nov 2026 · 21.02</p>
     </main>
   </div>
 
@@ -755,17 +755,16 @@
       <video id="bv" playsinline muted autoplay aria-hidden="true"></video>
       <div class="band" aria-hidden="true"><span class="mk tl"></span><span class="mk a"></span><span class="mk b"></span><span class="mk c"></span></div>
       <span class="bpill" id="bPill" aria-hidden="true">Foto 1 dari 3</span>
-      <span class="band-note" aria-hidden="true">Yang terang masuk kartu</span>
-      <div class="zoom" id="bZoom" role="group" aria-label="Zoom kamera" hidden></div>
       <div class="countdown" id="bCount" aria-hidden="true"></div>
       <div class="bv-msg" id="bMsg" hidden><svg class="ic" aria-hidden="true"><use href="#i-strip"/></svg><p id="bMsgText"></p></div>
     </div>
   </div>
+  <div class="zoom" id="bZoom" role="group" aria-label="Zoom kamera" hidden></div>
   <div class="booth-status"><p id="bStatus" aria-live="polite">Siap? Ketuk tombol di bawah, hitung mundur 3 detik, lalu bergaya.</p></div>
+  <button id="boothStart" class="btn btn-primary btn-big" type="button">Jepret foto 1 dari 3</button>
   <div class="booth-sub"><h3>Kartu kamu</h3><span>3 foto jadi 1 kartu</span></div>
   <div class="slots" id="bSlots" role="group" aria-label="Foto di kartu"><button type="button" data-i="0" disabled>1</button><button type="button" data-i="1" disabled>2</button><button type="button" data-i="2" disabled>3</button></div>
   <p class="slots-help" id="slotsHelp" hidden>Kurang pas? Ketuk fotonya untuk mengulangi. Filter dipilih setelah 3 foto jadi.</p>
-  <button id="boothStart" class="btn btn-primary btn-big" type="button">Jepret foto 1 dari 3</button>
   <p class="small">1 kartu memakai 1 jatah jepretan.</p>
  </div>
 </div>
