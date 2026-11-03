@@ -272,15 +272,24 @@
   .booth .icon-btn{background:transparent;color:var(--maroon-800);border:1.5px solid var(--maroon-800);width:44px;height:44px;justify-self:start}
   .booth .icon-btn:last-child{justify-self:end}
   .booth .icon-btn:hover{background:var(--butter-100)}
-  .bv-frame{position:relative;aspect-ratio:16/9;width:100%;border-radius:14px;overflow:hidden;background:#1E1A2E;box-shadow:0 0 0 5px var(--maroon-900)}
+  /* Jendela bidik kotak (lebih besar); pita 16:9 di tengah = bagian yang masuk kartu, sisanya digelapkan. */
+  .bv-frame{position:relative;aspect-ratio:4/5;width:100%;max-height:max(230px, calc(100vh - 420px));max-height:max(230px, calc(100dvh - 420px));border-radius:14px;overflow:hidden;background:#1E1A2E;box-shadow:0 0 0 4px var(--maroon-900)}
+  .band{position:absolute;left:0;right:0;top:50%;aspect-ratio:16/9;transform:translateY(-50%);box-shadow:0 0 0 999px rgba(30,18,22,.55);outline:2px solid rgba(255,249,234,.9);outline-offset:-2px;z-index:1;pointer-events:none}
+  .band-note{position:absolute;right:10px;top:12px;z-index:2;font-size:13px;font-weight:600;color:rgba(255,249,234,.9)}
+  .zoom{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:4;display:flex;gap:6px;padding:4px;border-radius:999px;background:rgba(30,18,22,.55)}
+  .zoom button{appearance:none;border:0;min-width:44px;height:44px;padding:0 6px;border-radius:999px;background:transparent;color:var(--butter-50);font:700 14px var(--f-sans);cursor:pointer}
+  .zoom button[aria-pressed="true"]{background:var(--butter-300);color:var(--maroon-900)}
+  .zoom button[disabled]{opacity:.5;cursor:default}
+  .booth .body-cam{padding:10px 10px 12px}
+  .booth .panel-top{margin-bottom:8px}
   .bv-ring{margin:5px}
-  .bv-frame video{width:100%;height:100%;object-fit:cover;display:block}
-  .bv-frame video.mirror{transform:scaleX(-1)}
+  .bv-frame video{width:100%;height:100%;object-fit:cover;display:block;transform-origin:50% 50%}
   .bpill{position:absolute;left:10px;top:10px;z-index:2;padding:2px 12px;border-radius:var(--r-pill);background:rgba(43,26,28,.72);color:var(--butter-50);font-size:14px;font-weight:700}
   .mk{position:absolute;width:14px;height:14px;border:0 solid rgba(255,249,234,.85);z-index:1}
-  .mk.a{right:10px;top:10px;border-top-width:2px;border-right-width:2px}
-  .mk.b{left:10px;bottom:10px;border-bottom-width:2px;border-left-width:2px}
-  .mk.c{right:10px;bottom:10px;border-bottom-width:2px;border-right-width:2px}
+  .mk.tl{left:8px;top:8px;border-top-width:3px;border-left-width:3px}
+  .mk.a{right:8px;top:8px;border-top-width:3px;border-right-width:3px}
+  .mk.b{left:8px;bottom:8px;border-bottom-width:3px;border-left-width:3px}
+  .mk.c{right:8px;bottom:8px;border-bottom-width:3px;border-right-width:3px}
   .countdown{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;font:italic 600 112px/1 var(--f-display);font-variation-settings:'SOFT' 100,'WONK' 0;color:var(--butter-50);text-shadow:0 4px 24px rgba(0,0,0,.4);pointer-events:none}
   .countdown:not(:empty){background:rgba(74,18,32,.28)}
   .countdown.pop{animation:pop .9s var(--ease-out)}
@@ -316,14 +325,19 @@
   .lb-img img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:var(--e-3)}
   .lb .nav-prev,.lb .nav-next{position:absolute;top:50%;transform:translateY(-50%)}
   .lb .nav-prev{left:var(--s-2)} .lb .nav-next{right:var(--s-2)}
-  .lb-bar{display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);padding:var(--s-3) var(--s-4) calc(var(--s-4) + env(safe-area-inset-bottom));flex-wrap:wrap}
+  .lb-bar{display:flex;flex-direction:column;align-items:stretch;gap:var(--s-3);padding:var(--s-3) var(--s-4) calc(var(--s-4) + env(safe-area-inset-bottom));max-width:560px;width:100%;margin:0 auto}
   .lb-cap{min-width:0;flex:1 1 160px}
   .lb-cap b{display:flex;align-items:center;gap:6px;font:600 28px/1.1 var(--f-hand);color:var(--butter-300);overflow-wrap:anywhere}
   .lb-cap small{display:block;font-size:14px;color:#D9CDB0}
-  .lb-act{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
+  .lb-act{display:flex;flex-direction:column;align-items:stretch;gap:4px}
   .lb-save{appearance:none;border:0;display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 var(--s-5);border-radius:var(--r-btn);background:var(--butter-300);color:var(--maroon-900);font-weight:800;font-size:16px;cursor:pointer}
   .lb-save[disabled],.lb-share[disabled]{opacity:.6;cursor:progress}
-  .lb-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  /* 2 atau 3 tombol selalu sama lebar: ikon di atas, tulisan di bawah */
+  .lb-btns{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
+  .lb-btns > button{flex-direction:column;justify-content:center;gap:3px;min-height:60px;padding:6px 4px;font-size:15px;line-height:1.15;text-align:center;min-width:0}
+  .lb-btns > button .ic{width:20px;height:20px}
+  .lb-btns > button span{overflow-wrap:anywhere}
+  .lb-link{align-self:center}
   .lb-share{appearance:none;display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 var(--s-4);border-radius:var(--r-btn);background:transparent;border:1.5px solid var(--butter-300);color:var(--butter-300);font-weight:800;font-size:16px;cursor:pointer}
   .lb-link{color:var(--butter-300);font-size:14px;min-height:44px;display:inline-flex;align-items:center}
 
@@ -724,8 +738,10 @@
     <div class="panel-top"><p class="label">Kamera Tamu</p><span class="lens" aria-hidden="true"></span></div>
     <div class="bv-frame">
       <video id="bv" playsinline muted autoplay aria-hidden="true"></video>
+      <div class="band" aria-hidden="true"><span class="mk tl"></span><span class="mk a"></span><span class="mk b"></span><span class="mk c"></span></div>
       <span class="bpill" id="bPill" aria-hidden="true">Foto 1 dari 3</span>
-      <span class="mk a" aria-hidden="true"></span><span class="mk b" aria-hidden="true"></span><span class="mk c" aria-hidden="true"></span>
+      <span class="band-note" aria-hidden="true">Yang terang masuk kartu</span>
+      <div class="zoom" id="bZoom" role="group" aria-label="Zoom kamera" hidden></div>
       <div class="countdown" id="bCount" aria-hidden="true"></div>
       <div class="bv-msg" id="bMsg" hidden><svg class="ic" aria-hidden="true"><use href="#i-strip"/></svg><p id="bMsgText"></p></div>
     </div>
@@ -1865,11 +1881,92 @@ function boothMsg(text){
 function stopStream(){
   if (B.stream) { B.stream.getTracks().forEach(t => t.stop()); B.stream = null; }
   $('bv').srcObject = null;
+  $('bZoom').hidden = true;
+}
+
+/* ---------- zoom booth: 0.5× (lensa ultra-wide), 1×, 2×, 4× ----------
+   Pakai zoom asli kamera kalau browser mendukung (Chrome Android); kalau tidak, zoom digital (potong tengah).
+   0.5× hanya muncul kalau HP punya lensa ultra-wide yang terbaca browser (iPhone: "Back Ultra Wide Camera"). */
+const Z = { level: 1, hw: null, digital: 1, uwId: null, uwChecked: false, useUW: false };
+function zoomLevels(){
+  const lv = [];
+  if (B.facing === 'environment' && (Z.uwId || (Z.hw && Z.hw.min <= 0.5))) lv.push(0.5);
+  lv.push(1, 2, Z.hw ? 4 : 3);   // tanpa zoom asli, 4× digital terlalu buram → maks. 3×
+  return lv;
+}
+function renderZoom(){
+  const box = $('bZoom'), lv = zoomLevels();
+  box.hidden = !B.stream || B.manual;
+  box.innerHTML = '';
+  lv.forEach(z => {
+    const b = document.createElement('button'); b.type = 'button';
+    b.textContent = (z === 0.5 ? '0.5' : z) + (z === Z.level ? '×' : '');
+    b.setAttribute('aria-label', 'Zoom ' + String(z).replace('.', ',') + ' kali');
+    b.setAttribute('aria-pressed', String(z === Z.level));
+    b.disabled = B.running;
+    b.onclick = () => setZoom(z);
+    box.appendChild(b);
+  });
+}
+function videoTransform(){
+  const t = [];
+  if (B.facing === 'user') t.push('scaleX(-1)');
+  if (Z.digital > 1) t.push('scale(' + Z.digital + ')');
+  $('bv').style.transform = t.join(' ');
+}
+async function readZoomCaps(){
+  Z.hw = null;
+  try {
+    const tr = B.stream && B.stream.getVideoTracks()[0];
+    const c = tr && tr.getCapabilities ? tr.getCapabilities() : {};
+    if (c.zoom && c.zoom.max > c.zoom.min) Z.hw = { min: c.zoom.min, max: c.zoom.max };
+  } catch(e){}
+  if (B.facing === 'environment' && !Z.uwChecked){
+    Z.uwChecked = true;
+    try {
+      const ds = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
+      const uw = ds.find(d => /ultra|0[.,]5x?\b/i.test(d.label) && !/front|depan|user|selfie/i.test(d.label));
+      Z.uwId = uw ? uw.deviceId : null;
+    } catch(e){}
+  }
+}
+async function setZoom(z){
+  if (B.running || !B.stream) return;
+  const prev = Z.level;
+  Z.level = z;
+  try {
+    if (z === 0.5 && !(Z.hw && Z.hw.min <= 0.5)) {           // ganti ke lensa ultra-wide
+      Z.useUW = true; Z.digital = 1; await startStream(); return;
+    }
+    if (z !== 0.5 && Z.useUW) { Z.useUW = false; Z.digital = 1; await startStream(); }   // kembali ke lensa utama
+    const tr = B.stream && B.stream.getVideoTracks()[0];
+    if (Z.hw && tr) {
+      const hz = Math.max(Z.hw.min, Math.min(Z.hw.max, z));
+      await tr.applyConstraints({ advanced: [{ zoom: hz }] });
+      Z.digital = Math.max(1, z / hz);                         // sisa yang tidak sanggup zoom asli → digital
+    } else Z.digital = Math.max(1, z);
+  } catch(e) { Z.level = prev; toast('Zoom tidak tersedia di HP ini.', 'warn'); }
+  videoTransform(); renderZoom();
+}
+/** Ambil persis area pita 16:9 yang terlihat di jendela bidik (ikut zoom digital). */
+function bandCrop(v){
+  const vw = v.videoWidth, vh = v.videoHeight, r = v.getBoundingClientRect();
+  const cw = r.width, ch = r.height, s = Math.max(cw / vw, ch / vh);
+  const bh = Math.min(ch, cw * 9 / 16), by = (ch - bh) / 2;
+  let sw = cw / s, sh = bh / s;
+  let sx = (0 - (cw - vw * s) / 2) / s, sy = (by - (ch - vh * s) / 2) / s;
+  const d = Z.digital || 1, cx = sx + sw / 2, cy = sy + sh / 2;
+  sw /= d; sh /= d; sx = cx - sw / 2; sy = cy - sh / 2;
+  const ow = Math.min(1280, Math.round(sw)), oh = Math.round(ow * 9 / 16);
+  const c = document.createElement('canvas'); c.width = ow; c.height = oh;
+  const ctx = c.getContext('2d'); ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(v, sx, sy, sw, sh, 0, 0, ow, oh);
+  return c;
 }
 function stopBooth(){ B.cancel = true; stopStream(); showCount(''); }
 
 function setManual(text){
-  B.manual = true; stopStream();
+  B.manual = true; stopStream(); Object.assign(Z, { level: 1, digital: 1, useUW: false });
   boothMsg(text);
   $('boothFlip').hidden = true;
   $('boothStart').removeAttribute('aria-disabled'); boothLabel();
@@ -1881,11 +1978,18 @@ async function startStream(){
   $('boothStart').setAttribute('aria-disabled', 'true');
   $('bStatus').textContent = 'Membuka kamera…';
   try {
-    const s = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: B.facing }, width: { ideal: 1280 }, height: { ideal: 960 } } });
+    // resolusi tinggi supaya zoom digital tetap tajam di kartu
+    const vid = Z.useUW && Z.uwId ? { deviceId: { exact: Z.uwId }, width: { ideal: 1920 }, height: { ideal: 1440 } }
+                                  : { facingMode: { ideal: B.facing }, width: { ideal: 1920 }, height: { ideal: 1440 } };
+    const s = await navigator.mediaDevices.getUserMedia({ audio: false, video: vid });
     if ($('booth').hidden) { s.getTracks().forEach(t => t.stop()); return; }
     B.stream = s;
-    const v = $('bv'); v.srcObject = s; v.classList.toggle('mirror', B.facing === 'user');
+    const v = $('bv'); v.srcObject = s;
     try { await v.play(); } catch(e){}
+    await readZoomCaps();
+    if (!Z.useUW && Z.level !== 1 && Z.hw) { try { const hz = Math.max(Z.hw.min, Math.min(Z.hw.max, Z.level)); await s.getVideoTracks()[0].applyConstraints({ advanced: [{ zoom: hz }] }); Z.digital = Math.max(1, Z.level / hz); } catch(e){} }
+    else if (!Z.useUW && Z.level !== 1) Z.digital = Math.max(1, Z.level);
+    videoTransform(); renderZoom();
     $('boothStart').removeAttribute('aria-disabled'); boothLabel();
     $('bStatus').textContent = B.redo != null ? 'Foto ' + (B.redo + 1) + ' akan diulang. Ketuk tombol di bawah, lalu bergaya lagi.'
       : B.frames.length ? 'Ketuk lagi untuk foto ' + (B.frames.length + 1) + '.' : BOOTH_READY;
@@ -1907,6 +2011,7 @@ function openBooth(trigger, opts){
   renderSlots(); boothShape(); showCount(''); boothMsg('');
   $('boothFlip').hidden = false; $('boothFlip').disabled = false;
   $('bv').style.filter = 'none';   // filter dipilih sekali di kartu, bukan di sini
+  Object.assign(Z, { level: 1, digital: 1, useUW: false }); videoTransform();
   $('toast').hidden = true;
   // ditutup saat mengulang dari kartu → kembali ke kartu lama, foto tidak hilang
   openDialog($('booth'), $('boothStart'), () => { stopBooth(); if (B.fromCard && B.frames.length >= 3) { B.redo = null; setTimeout(finishBooth, 0); } });
@@ -1924,7 +2029,7 @@ async function runBooth(){
   if (B.redo == null && B.frames.length >= 3) return finishBooth();   // "Lihat kartu"
   if (!B.stream) return;
   const i = boothIdx(), redo = B.redo != null;
-  B.running = true; B.cancel = false; renderSlots();
+  B.running = true; B.cancel = false; renderSlots(); renderZoom();
   $('boothStart').setAttribute('aria-disabled', 'true'); $('boothFlip').disabled = true;
   $('boothStart').textContent = 'Bergaya…';
   let done = false;
@@ -1933,7 +2038,7 @@ async function runBooth(){
     for (let n = 3; n >= 1; n--){ if (B.cancel) return; showCount(n); await sleep(1000); }
     if (B.cancel || !B.stream) return;
     showCount(''); flash();
-    const fr = cropTo($('bv'), SLOT_AR[i], 1280);
+    const fr = bandCrop($('bv'));
     if (B.facing === 'user') { const m = document.createElement('canvas'); m.width = fr.width; m.height = fr.height; const mc = m.getContext('2d'); mc.translate(fr.width, 0); mc.scale(-1, 1); mc.drawImage(fr, 0, 0); B.frames[i] = m; }
     else B.frames[i] = fr;
     B.redo = null;
@@ -1943,7 +2048,7 @@ async function runBooth(){
     else $('bStatus').textContent = 'Foto ' + (i + 1) + (redo ? ' sudah diulang' : ' masuk') + '. Ketuk lagi untuk foto ' + (B.frames.length + 1) + '.';
   } finally {
     B.running = false; showCount('');
-    if (!$('booth').hidden && !done) { $('boothStart').removeAttribute('aria-disabled'); $('boothFlip').disabled = false; boothLabel(); renderSlots(); }
+    if (!$('booth').hidden && !done) { $('boothStart').removeAttribute('aria-disabled'); $('boothFlip').disabled = false; boothLabel(); renderSlots(); renderZoom(); }
   }
 }
 
@@ -2548,6 +2653,7 @@ $('boothX').onclick = () => closeDialog();
 $('boothFlip').onclick = () => {
   B.facing = B.facing === 'user' ? 'environment' : 'user';
   $('boothFlip').setAttribute('aria-label', B.facing === 'user' ? 'Ganti ke kamera belakang' : 'Ganti ke kamera depan');
+  Object.assign(Z, { level: 1, digital: 1, useUW: false });
   startStream();
 };
 document.addEventListener('visibilitychange', () => {
