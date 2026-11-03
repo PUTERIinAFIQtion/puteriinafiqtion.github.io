@@ -172,6 +172,8 @@
     .roll,.grid{grid-auto-rows:calc((100cqw - (var(--cols) - 1) * var(--gap)) / var(--cols))}
     .shot,.tile,.shot.strip,.tile.strip{aspect-ratio:auto}
   }
+  /* aturBaris() (JS) menulis tinggi baris dalam px di semua browser, termasuk yang belum kenal satuan cqw */
+  .rj > .shot,.rj > .tile{aspect-ratio:auto}
   .shot.strip img,.tile.strip img{object-fit:contain}
   .tile .by{position:absolute;left:4px;bottom:4px;max-width:calc(100% - 8px);padding:1px 7px;border-radius:var(--r-pill);background:rgba(43,26,28,.7);color:var(--butter-50);font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .badge{position:absolute;left:6px;bottom:6px;display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:var(--r-pill);background:#E3F0E7;color:var(--success)}
@@ -199,6 +201,7 @@
   .linkbox span{display:block;font-size:13px;color:var(--maroon-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .linkbox button{flex:none;min-height:44px;padding:0 14px;border:0;border-radius:12px;background:var(--maroon-800);color:var(--butter-50);font-weight:800;font-size:15px;cursor:pointer}
   .more{text-align:center;color:var(--ink-muted);font-size:15px;padding:var(--s-5);margin:0}
+  .ver{text-align:center;color:var(--ink-muted);font-size:13px;margin:var(--s-4) 0 var(--s-2)}
 
   /* navigasi bawah */
   .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:var(--z-nav);background:var(--paper);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
@@ -690,6 +693,7 @@
           </div>
         </div>
       </section>
+      <p class="ver">Versi halaman 3 Nov 2026 · 20.25</p>
     </main>
   </div>
 
@@ -838,7 +842,7 @@ const API = 'https://script.google.com/macros/s/AKfycbz8z5HBpc8z-E1PzBBujwInBFF6
 const C = {   // nilai awal; sebagian diperbarui dari server (Code.gs → CONFIG). Tanggal & tanda foto SENGAJA tidak diambil dari server.
   couple: 'Afiq & Puteri', dateLabel: 'Ahad, 17 Januari 2027', stampDate: '17-01-2027', dateDots: '17.01.2027',
   boothTitle: 'WEDDING DAY', hashtag: '#PUTERIinAFIQtion',   // tulisan di kartu photo booth
-  maxShots: 20, allowGallery: true, closeAt: Date.parse('2027-01-17T16:00:00+07:00'), revealAt: 0, skew: 0
+  maxShots: 20, allowGallery: true, closeAt: Date.parse('2027-01-18T08:00:00+07:00'), revealAt: 0, skew: 0
 };
 const ALBUM_URL = 'https://puteriinafiqtion.github.io/#album';
 const BINGKAI_IDS = ['maroon', 'mentega', 'klasik'];
@@ -879,10 +883,17 @@ function uid(){
 }
 function photoUrl(id, w){ return 'https://lh3.googleusercontent.com/d/' + encodeURIComponent(id) + '=w' + w; }
 function photoFallback(id, w){ return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w' + w; }
+/** Foto album di kotak grid. Kalau gagal (sinyal / server gambar Google sibuk), pindah ke alamat cadangan lalu
+ *  dicoba lagi dengan jeda, supaya kotak tidak kosong selamanya. */
 function setPhoto(img, id, w){
   img.referrerPolicy = 'no-referrer';
-  img.dataset.fb = '';
-  img.onerror = () => { if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = photoFallback(id, w); } };
+  let n = 0;
+  img.onerror = () => {
+    n++;
+    if (n === 1) { img.src = photoFallback(id, w); return; }
+    if (n > 4) return;
+    setTimeout(() => { if (img.isConnected) img.src = n % 2 ? photoFallback(id, w) + '&r=' + n : photoUrl(id, w); }, [0, 0, 2000, 6000, 15000][n]);
+  };
   img.src = photoUrl(id, w);
 }
 const isStrip = it => !!it && (it.src === 'booth' || it.strip === true);
@@ -1533,7 +1544,7 @@ function siapkanFont(){
 /** Dipanggil sebelum menulis teks di kanvas. true = huruf asli siap. */
 async function tungguFont(maxMs){
   if (FONT.ok || await cekFont()) return true;
-  const bt = $('busyText'), lama = bt.textContent, tampil = !$('busy').hidden, pesan = 'Menyiapkan huruf kartu…';
+  const bt = $('busyText'), lama = bt.textContent, tampil = !$('busy').hidden, pesan = 'Sedang menyiapkan…';
   if (tampil) bt.textContent = pesan;
   try { await Promise.race([siapkanFont(), sleep(maxMs || 8000)]); }
   finally { if (tampil && bt.textContent === pesan) bt.textContent = lama; }
@@ -1831,6 +1842,9 @@ async function upload(it){
   } else if (res && res.reason === 'penuh'){
     it.state = 'fail';
     toast('Album sudah penuh. Kabari panitia ya.', 'warn', 6000);
+  } else if (res && res.reason === 'invalid'){   // ditolak server karena isinya (bukan JPEG / terlalu besar): jangan dikirim ulang otomatis
+    it.state = 'fail'; it.tolak = true;
+    toast('Foto ini nggak bisa dikirim. Coba ambil ulang ya.', 'warn', 7000);
   } else {
     it.state = 'fail';
     toast('Server sedang ramai. Foto tetap aman di HP-mu dan dikirim ulang otomatis.', 'warn', 5000);
@@ -2409,9 +2423,9 @@ function lbLoading(state){
   l.querySelector('span').textContent = err ? 'Foto belum bisa dimuat. Periksa sinyal, lalu buka lagi.' : 'Menyiapkan foto…';
 }
 function lbPreload(){   // foto sebelah kiri & kanan dimuat diam-diam supaya geser terasa instan
-  const L = A.lbList; if (L.length < 2) return;
+  const list = A.lbList; if (list.length < 2) return;
   [A.idx + 1, A.idx - 1].forEach(j => {
-    const it = L[(j + L.length) % L.length];
+    const it = list[(j + list.length) % list.length];
     if (!it || S.local[it.id]) return;
     const im = new Image(); im.referrerPolicy = 'no-referrer'; im.src = photoUrl(it.id, 1600);
   });
@@ -2422,19 +2436,31 @@ function showLb(i){
   const it = list[A.idx];
   const strip = isStrip(it);
   const img = $('lbImg'), tok = ++LB.tok;
-  let done = false;
-  const ok = () => { if (done || tok !== LB.tok) return; done = true; img.classList.remove('loading'); lbLoading(false); lbPreload(); };
-  img.classList.add('loading'); lbLoading('load');
-  img.onload = ok;
-  img.referrerPolicy = 'no-referrer';
-  img.dataset.fb = '';
-  img.onerror = () => {
+  // 1) Foto yang sedang tampil langsung disembunyikan & dikosongkan (tanpa animasi pudar, jadi tidak sempat terlihat).
+  // 2) Foto baru dimuat di belakang layar (pre). 3) Baru ditempel & ditampilkan setelah benar-benar siap digambar.
+  img.onload = img.onerror = null;
+  img.style.visibility = 'hidden'; img.classList.add('loading'); img.removeAttribute('src');
+  lbLoading('load');
+  const tampil = () => {
     if (tok !== LB.tok) return;
-    if (!S.local[it.id] && !img.dataset.fb) { img.dataset.fb = '1'; img.src = photoFallback(it.id, 1600); }
+    img.style.visibility = ''; img.classList.remove('loading'); lbLoading(false); lbPreload();
+  };
+  const pasang = src => {
+    if (tok !== LB.tok) return;
+    img.src = src;
+    if (img.decode) img.decode().then(tampil, tampil);
+    else if (img.complete) tampil();
+    else img.onload = img.onerror = tampil;
+  };
+  const pre = new Image(); pre.referrerPolicy = 'no-referrer';
+  let cadangan = false;
+  pre.onload = () => pasang(pre.src);
+  pre.onerror = () => {
+    if (tok !== LB.tok) return;
+    if (!S.local[it.id] && !cadangan) { cadangan = true; pre.src = photoFallback(it.id, 1600); }
     else lbLoading('err');
   };
-  img.src = S.local[it.id] || photoUrl(it.id, 1600);
-  if (img.complete && img.naturalWidth) setTimeout(ok, 0);   // sudah ada di cache browser
+  pre.src = S.local[it.id] || photoUrl(it.id, 1600);
   img.alt = (strip ? 'Foto booth oleh ' : 'Foto oleh ') + it.name;
   $('lbTitle').innerHTML = icon('heart', 'ic-sm');
   $('lbTitle').append(it.name);
@@ -2815,7 +2841,7 @@ $('lb').addEventListener('touchend', e => {
 new IntersectionObserver(es => { if (es[0].isIntersecting && !$('viewAlbum').hidden && A.filter === 'all') albumMore(); }, { rootMargin: '600px' }).observe($('more'));
 setInterval(() => { if (!$('viewAlbum').hidden && document.visibilityState === 'visible') albumRefresh(); }, 90000);
 // kiriman yang gagal dicoba lagi otomatis (tiap menit saat halaman terbuka, dan saat sinyal kembali)
-const retryFailed = n => S.items.filter(i => i.state === 'fail').slice(0, n).forEach(retry);
+const retryFailed = n => S.items.filter(i => i.state === 'fail' && !i.tolak).slice(0, n).forEach(retry);
 setInterval(() => { if (document.visibilityState === 'visible') retryFailed(2); }, 60000);
 window.addEventListener('online', () => { retryFailed(5); if (!$('viewAlbum').hidden && A.fails) albumMore(); });
 window.addEventListener('hashchange', route);
@@ -2851,6 +2877,21 @@ function closeCover(){
   upload(it);
 });
 render();
+
+/* Tinggi baris grid = lebar 1 kolom, dihitung di sini supaya sama di semua browser (iPhone lama, browser dalam
+   aplikasi): kotak foto = 1 baris, kartu booth 9:16 = 2 baris. Tidak bergantung dukungan CSS container query. */
+function aturBaris(g){
+  const w = g.clientWidth; if (!w) return;
+  const cs = getComputedStyle(g), cols = parseInt(cs.getPropertyValue('--cols'), 10) || 3, gap = parseFloat(cs.columnGap) || 0;
+  const h = Math.floor((w - (cols - 1) * gap) / cols * 100) / 100 + 'px';
+  if (g.style.gridAutoRows !== h) g.style.gridAutoRows = h;
+  g.classList.add('rj');
+}
+{
+  const grids = ['roll', 'grid', 'admGrid'].map($).filter(Boolean);
+  if ('ResizeObserver' in window) { const ro = new ResizeObserver(es => es.forEach(e => aturBaris(e.target))); grids.forEach(g => ro.observe(g)); }
+  else { const semua = () => grids.forEach(aturBaris); semua(); window.addEventListener('resize', semua); setInterval(semua, 700); }   // browser sangat lama
+}
 
 boot();
 // huruf kartu diunduh di latar sejak awal, supaya sudah siap saat tamu menyusun kartu pertama
