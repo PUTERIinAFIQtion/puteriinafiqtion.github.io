@@ -293,11 +293,20 @@
   .booth-sub{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s-3);margin:var(--s-2) 0}
   .booth-sub h3{font-size:20px}
   .booth-sub span{font-size:15px;color:var(--ink-muted)}
-  .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:var(--s-4)}
-  .slots span{position:relative;height:58px;border-radius:8px;background:var(--butter-100) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font:700 20px var(--f-label);color:#7A5A1E}
-  .slots span.next{border:2px dashed #C9A64A}
-  .slots span.full{color:transparent}
-  .slots span.full::after{content:"✓";position:absolute;right:4px;top:4px;width:18px;height:18px;border-radius:50%;background:var(--success);color:#fff;font:700 12px/18px var(--f-sans);text-align:center}
+  .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:var(--s-2)}
+  .slots button{appearance:none;position:relative;height:58px;padding:0;border:0;border-radius:8px;background:var(--butter-100) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font:700 20px var(--f-label);color:#7A5A1E;cursor:default}
+  .slots button.next{border:2px dashed #C9A64A}
+  .slots button.full{cursor:pointer}
+  .slots button.full::after{content:"✓";position:absolute;right:4px;top:4px;width:18px;height:18px;border-radius:50%;background:var(--success);color:#fff;font:700 12px/18px var(--f-sans);text-align:center}
+  .slots .rt{position:absolute;left:4px;bottom:4px;padding:1px 7px;border-radius:999px;background:rgba(43,26,28,.72);color:var(--butter-50);font:700 12px/1.4 var(--f-sans)}
+  .slots button.redo{outline:3px solid var(--maroon-800);outline-offset:2px}
+  .slots button.redo::after{content:"↺";background:var(--maroon-800)}
+  .slots-help{font-size:15px;color:var(--ink-muted);margin:0 0 var(--s-4)}
+  .redo-row{margin:0 0 var(--s-3)}
+  .redo-row p{margin:0 0 var(--s-2);font-size:16px;font-weight:700}
+  .redo-row div{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .redo-row button{appearance:none;position:relative;min-height:56px;aspect-ratio:16/9;border:1.5px solid var(--maroon-800);border-radius:10px;background:var(--butter-100) center/cover no-repeat;cursor:pointer;padding:0}
+  .redo-row button span{position:absolute;left:4px;bottom:4px;padding:1px 7px;border-radius:999px;background:rgba(43,26,28,.75);color:var(--butter-50);font-size:12px;font-weight:700}
 
   /* lightbox */
   .lb{position:fixed;inset:0;background:rgba(43,26,28,.97);z-index:var(--z-lb);display:flex;flex-direction:column;color:var(--butter-50)}
@@ -723,8 +732,8 @@
   </div>
   <div class="booth-status"><p id="bStatus" aria-live="polite">Siap? Ketuk tombol di bawah, hitung mundur 3 detik, lalu bergaya.</p></div>
   <div class="booth-sub"><h3>Kartu kamu</h3><span>3 foto jadi 1 kartu</span></div>
-  <div class="slots" id="bSlots" aria-hidden="true"><span>1</span><span>2</span><span>3</span></div>
-  <fieldset class="filters compact-chips"><legend>Pilih filter</legend><div class="chips" id="chipsBooth"></div></fieldset>
+  <div class="slots" id="bSlots" role="group" aria-label="Foto di kartu"><button type="button" data-i="0" disabled>1</button><button type="button" data-i="1" disabled>2</button><button type="button" data-i="2" disabled>3</button></div>
+  <p class="slots-help" id="slotsHelp" hidden>Kurang pas? Ketuk fotonya untuk mengulangi. Filter dipilih setelah 3 foto jadi.</p>
   <button id="boothStart" class="btn btn-primary btn-big" type="button">Jepret foto 1 dari 3</button>
   <p class="small">1 kartu memakai 1 jatah jepretan.</p>
  </div>
@@ -765,6 +774,10 @@
     <div class="pv">
       <div class="polaroid" id="pvPol"><img id="pv" alt="Pratinjau foto yang akan dikirim"><p><svg class="ic ic-sm" aria-hidden="true"><use href="#i-heart"/></svg><span id="pvCap"></span></p></div>
       <img id="pvStrip" class="strip-pv" alt="Pratinjau kartu photo booth yang akan dikirim" hidden>
+    </div>
+    <div class="redo-row" id="redoRow" hidden>
+      <p>Ulangi satu foto</p>
+      <div id="redoBtns"></div>
     </div>
     <fieldset class="filters" id="filterBox"><legend>Pilih filter</legend><div class="chips" id="chipsSheet"></div></fieldset>
     <button id="send" class="btn btn-primary btn-big" type="button"><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg>Kirim ke album</button>
@@ -1605,6 +1618,18 @@ function openSheet(trigger){
   document.querySelectorAll('input[name="bingkai"]').forEach(i => i.checked = i.value === S.current.bingkai);
   syncChips('sheet', S.current.filter);
   thumbChips('sheet', strip ? S.current.frames[0] : S.current.raw);
+  $('redoRow').hidden = !strip;
+  if (strip) {   // ulangi satu foto saja; dua foto lainnya tetap
+    const box = $('redoBtns'); box.innerHTML = '';
+    S.current.frames.forEach((fr, i) => {
+      const b = document.createElement('button'); b.type = 'button';
+      b.style.backgroundImage = 'url(' + squareCrop(fr, 160).toDataURL('image/jpeg', 0.7) + ')';
+      b.setAttribute('aria-label', 'Ulangi foto ' + (i + 1));
+      b.innerHTML = '<span aria-hidden="true">↺ Foto ' + (i + 1) + '</span>';
+      b.onclick = () => { const cur = S.current; if (!cur) return; closeDialog(); openBooth(cur.trigger, { frames: cur.frames, redo: i }); };
+      box.appendChild(b);
+    });
+  }
   $('toast').hidden = true;
   $('cardSend').hidden = false; $('cardSave').hidden = true;
   $('sheet').setAttribute('aria-labelledby', 'sheetTitle');
@@ -1624,8 +1649,8 @@ async function saveFile(cur, style){
   cur.prep = cur.prep || {};
   if (!cur.prep[style]) cur.prep[style] = (async () => {
     const FR = '"Fraunces", Georgia, serif', JO = '"Josefin Sans", "Century Gothic", sans-serif', CV = '"Caveat", "Segoe Print", cursive';
-    const name = guest.name || 'Tamu';
-    if (style === 'polos') return canvasBlob(marked(cur.fc, name), 0.92);
+    const name = cur.name || guest.name || 'Tamu';
+    if (style === 'polos') return cur.polosBlob || canvasBlob(marked(cur.fc, name), 0.92);   // foto album sudah bertanda
     await loadFonts(['700 76px Caveat', '600 32px "Josefin Sans"', 'italic 600 83px Fraunces', '700 70px Caveat', '700 29px "Josefin Sans"'], 'difoto oleh by Afiq & Puteri WEDDING 17-01-2027 #PUTERIinAFIQtion');
     const c = document.createElement('canvas'); c.width = 1080; c.height = 1350;
     const ctx = c.getContext('2d'); ctx.textBaseline = 'alphabetic';
@@ -1700,6 +1725,7 @@ async function send(){
   const source = cur.kind === 'strip' ? 'booth' : cur.source;
   const it = { id: 'tmp-' + Date.now(), state: 'up', dataUrl: cur.dataUrl, source, src: source };
   S.local[it.id] = cur.dataUrl;
+  if (cur.fc) it.cleanUrl = cur.fc.toDataURL('image/jpeg', 0.9);   // versi tanpa tanda foto, untuk "Simpan sebagai" dari album (hanya di memori)
   S.items.push(it); S.pending++; render();
   await upload(it);
 }
@@ -1790,23 +1816,41 @@ function showWelcome(){
 }
 
 /* ================= PHOTO BOOTH ================= */
-const B = { stream: null, facing: 'user', frames: [], running: false, cancel: false, manual: false, trigger: null };
+/* redo = indeks foto yang sedang diulang (null = lanjut foto berikutnya). fromCard = dibuka dari "Kartu kamu jadi!". */
+const B = { stream: null, facing: 'user', frames: [], running: false, cancel: false, manual: false, trigger: null, redo: null, fromCard: false };
 
+/** Foto yang akan diambil berikutnya (indeks 0..2). */
+const boothIdx = () => B.redo != null ? B.redo : Math.min(2, B.frames.length);
 function boothLabel(){
-  $('boothStart').textContent = (B.manual ? 'Ambil foto ' : 'Jepret foto ') + Math.min(3, B.frames.length + 1) + ' dari 3';
+  $('boothStart').textContent = B.redo != null ? 'Ulangi foto ' + (B.redo + 1)
+    : B.frames.length >= 3 ? 'Lihat kartu'
+    : (B.manual ? 'Ambil foto ' : 'Jepret foto ') + (B.frames.length + 1) + ' dari 3';
 }
 const BOOTH_READY = 'Siap? Ketuk tombol di bawah, hitung mundur 3 detik, lalu bergaya.';
-/** Bingkai bidik mengikuti bentuk foto di kartu (16:9). */
+/** Label di jendela bidik mengikuti foto yang sedang diambil. */
 function boothShape(){
-  $('bPill').textContent = 'Foto ' + Math.min(3, B.frames.length + 1) + ' dari 3';
+  $('bPill').textContent = 'Foto ' + (boothIdx() + 1) + ' dari 3';
 }
 function renderSlots(){
   [...$('bSlots').children].forEach((s, i) => {
     const f = B.frames[i];
     s.classList.toggle('full', !!f);
-    s.classList.toggle('next', !f && i === B.frames.length);
+    s.classList.toggle('redo', i === B.redo);
+    s.classList.toggle('next', B.redo == null && !f && i === B.frames.length);
+    s.disabled = !f || B.running;
     s.style.backgroundImage = f ? 'url(' + f.toDataURL('image/jpeg', 0.6) + ')' : '';
+    s.innerHTML = f ? '<span class="rt">' + (i === B.redo ? 'Diulang' : 'Ulangi') + '</span>' : String(i + 1);
+    s.setAttribute('aria-label', f ? 'Foto ' + (i + 1) + (i === B.redo ? ', akan diulang. Ketuk untuk batal' : '. Ketuk untuk mengulangi') : 'Foto ' + (i + 1) + ', belum diambil');
   });
+  $('slotsHelp').hidden = !B.frames.length;
+}
+/** Tombol "↺ Ulangi" di slot: pilih foto mana yang dijepret ulang. */
+function pickRedo(i){
+  if (B.running || !B.frames[i]) return;
+  B.redo = B.redo === i ? null : i;
+  renderSlots(); boothShape(); boothLabel();
+  $('bStatus').textContent = B.redo != null ? 'Foto ' + (i + 1) + ' akan diulang. Ketuk tombol di bawah, lalu bergaya lagi.'
+    : B.frames.length >= 3 ? 'Ketuk "Lihat kartu" untuk kembali ke kartumu.' : 'Ketuk lagi untuk foto ' + (B.frames.length + 1) + '.';
 }
 function showCount(n){
   const el = $('bCount'); el.textContent = n || '';
@@ -1816,7 +1860,6 @@ function boothMsg(text){
   $('bMsg').hidden = !text; $('bMsgText').textContent = text || '';
   $('bv').hidden = !!text;
 }
-function liveFilter(){ const f = FILTERS.find(x => x.id === pref.filter); $('bv').style.filter = f ? f.live : 'none'; }
 
 function stopStream(){
   if (B.stream) { B.stream.getTracks().forEach(t => t.stop()); B.stream = null; }
@@ -1829,7 +1872,7 @@ function setManual(text){
   boothMsg(text);
   $('boothFlip').hidden = true;
   $('boothStart').removeAttribute('aria-disabled'); boothLabel();
-  $('bStatus').textContent = 'Foto ' + Math.min(3, B.frames.length + 1) + ' dari 3';
+  $('bStatus').textContent = 'Foto ' + (boothIdx() + 1) + ' dari 3';
 }
 
 async function startStream(){
@@ -1843,7 +1886,8 @@ async function startStream(){
     const v = $('bv'); v.srcObject = s; v.classList.toggle('mirror', B.facing === 'user');
     try { await v.play(); } catch(e){}
     $('boothStart').removeAttribute('aria-disabled'); boothLabel();
-    $('bStatus').textContent = B.frames.length ? 'Ketuk lagi untuk foto ' + (B.frames.length + 1) + '.' : BOOTH_READY;
+    $('bStatus').textContent = B.redo != null ? 'Foto ' + (B.redo + 1) + ' akan diulang. Ketuk tombol di bawah, lalu bergaya lagi.'
+      : B.frames.length ? 'Ketuk lagi untuk foto ' + (B.frames.length + 1) + '.' : BOOTH_READY;
   } catch(err) {
     const denied = err && (err.name === 'NotAllowedError' || err.name === 'SecurityError');
     setManual(denied
@@ -1852,15 +1896,19 @@ async function startStream(){
   }
 }
 
-function openBooth(trigger){
+/** opts.frames + opts.redo: dibuka dari kartu untuk mengulang satu foto (foto lain tetap). */
+function openBooth(trigger, opts){
   if (closed()) return toast('Kamera sudah ditutup.', 'warn');
   if (left() <= 0) return toast('Roll kamu sudah habis.', 'warn');
-  Object.assign(B, { frames: [], running: false, cancel: false, manual: false, trigger: trigger || $('btnBooth') });
+  const o = opts || {};
+  Object.assign(B, { frames: o.frames ? o.frames.slice() : [], redo: o.redo != null ? o.redo : null, fromCard: !!o.frames,
+                     running: false, cancel: false, manual: false, trigger: trigger || $('btnBooth') });
   renderSlots(); boothShape(); showCount(''); boothMsg('');
   $('boothFlip').hidden = false; $('boothFlip').disabled = false;
-  syncChips('booth', pref.filter); liveFilter();
+  $('bv').style.filter = 'none';   // filter dipilih sekali di kartu, bukan di sini
   $('toast').hidden = true;
-  openDialog($('booth'), $('boothStart'), stopBooth);
+  // ditutup saat mengulang dari kartu → kembali ke kartu lama, foto tidak hilang
+  openDialog($('booth'), $('boothStart'), () => { stopBooth(); if (B.fromCard && B.frames.length >= 3) { B.redo = null; setTimeout(finishBooth, 0); } });
   D.last = B.trigger;
   if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) return setManual('Browser ini tidak bisa membuka kamera langsung. Ambil 3 foto satu per satu ya.');
   boothLabel();
@@ -1869,11 +1917,13 @@ function openBooth(trigger){
 
 /** Satu ketukan = satu foto: hitung mundur 3-2-1 lalu jepret. Setelah foto ke-3, kartu langsung disusun. */
 async function runBooth(){
+  if (!B.running && B.redo == null && B.frames.length >= 3) return finishBooth();
   if (B.manual) return $('inBooth').click();
-  if (B.running || !B.stream || $('boothStart').getAttribute('aria-disabled') === 'true') return;
-  if (B.frames.length >= 3) { B.frames = []; renderSlots(); boothShape(); }
-  const i = B.frames.length;
-  B.running = true; B.cancel = false;
+  if (B.running || $('boothStart').getAttribute('aria-disabled') === 'true') return;
+  if (B.redo == null && B.frames.length >= 3) return finishBooth();   // "Lihat kartu"
+  if (!B.stream) return;
+  const i = boothIdx(), redo = B.redo != null;
+  B.running = true; B.cancel = false; renderSlots();
   $('boothStart').setAttribute('aria-disabled', 'true'); $('boothFlip').disabled = true;
   $('boothStart').textContent = 'Bergaya…';
   let done = false;
@@ -1883,15 +1933,16 @@ async function runBooth(){
     if (B.cancel || !B.stream) return;
     showCount(''); flash();
     const fr = cropTo($('bv'), SLOT_AR[i], 1280);
-    if (B.facing === 'user') { const m = document.createElement('canvas'); m.width = fr.width; m.height = fr.height; const mc = m.getContext('2d'); mc.translate(fr.width, 0); mc.scale(-1, 1); mc.drawImage(fr, 0, 0); B.frames.push(m); }
-    else B.frames.push(fr);
+    if (B.facing === 'user') { const m = document.createElement('canvas'); m.width = fr.width; m.height = fr.height; const mc = m.getContext('2d'); mc.translate(fr.width, 0); mc.scale(-1, 1); mc.drawImage(fr, 0, 0); B.frames[i] = m; }
+    else B.frames[i] = fr;
+    B.redo = null;
     boothShape();
     renderSlots();
     if (B.frames.length >= 3) { done = true; await sleep(450); if (!B.cancel) await finishBooth(); }
-    else $('bStatus').textContent = 'Foto ' + (i + 1) + ' masuk. Ketuk lagi untuk foto ' + (i + 2) + '.';
+    else $('bStatus').textContent = 'Foto ' + (i + 1) + (redo ? ' sudah diulang' : ' masuk') + '. Ketuk lagi untuk foto ' + (B.frames.length + 1) + '.';
   } finally {
     B.running = false; showCount('');
-    if (!$('booth').hidden && !done) { $('boothStart').removeAttribute('aria-disabled'); $('boothFlip').disabled = false; boothLabel(); }
+    if (!$('booth').hidden && !done) { $('boothStart').removeAttribute('aria-disabled'); $('boothFlip').disabled = false; boothLabel(); renderSlots(); }
   }
 }
 
@@ -1915,7 +1966,9 @@ async function onBoothFile(e){
   e.target.value = '';
   if (!f) return;
   try {
-    B.frames.push(cropTo(await decodeFile(f), SLOT_AR[B.frames.length] || 1, 1280));
+    const i = boothIdx();
+    B.frames[i] = cropTo(await decodeFile(f), SLOT_AR[i] || 1, 1280);
+    B.redo = null;
     renderSlots(); boothShape();
     if (B.frames.length >= 3) return finishBooth();
     boothLabel();
@@ -2022,6 +2075,37 @@ async function saveCurrent(how){
     } finally { btn.disabled = false; label.textContent = text; }
   }
   savedToast(await saveBlob(blob, fileName(it.name, it.t, isStrip(it)), how), isStrip(it), how);
+}
+
+/** Simpan dari lightbox (roll & album): foto biasa → pilih gaya (Polos/Polaroid/Kartu tema); kartu booth → langsung. */
+async function lbSaveAs(){
+  const it = A.lbList[A.idx]; if (!it) return;
+  if (isStrip(it)) return saveCurrent('save');
+  const btn = $('lbSave'), label = btn.querySelector('span'), text = label.textContent;
+  btn.disabled = true; label.textContent = 'Menyiapkan…';
+  let src, polosBlob = null;
+  try {
+    const own = S.items.find(x => x.id === it.id && x.cleanUrl);
+    if (own) src = await loadImg(own.cleanUrl);                        // fotoku sesi ini: versi bersih tanpa tanda
+    else {
+      polosBlob = await getBlob(it.id);                                // foto album: sudah bertanda → Polos = file asli
+      const url = URL.createObjectURL(polosBlob);
+      try { src = await loadImg(url); } finally { URL.revokeObjectURL(url); }
+    }
+  } catch(e) {
+    $('lbDrive').href = 'https://drive.google.com/uc?export=download&id=' + encodeURIComponent(it.id);
+    $('lbDrive').hidden = false;
+    toast('Foto belum bisa disiapkan. Pakai tautan Google Drive di bawah tombol Simpan.', 'warn', 6000);
+    return;
+  } finally { btn.disabled = false; label.textContent = text; }
+  const fc = document.createElement('canvas'); fc.width = src.naturalWidth; fc.height = src.naturalHeight;
+  fc.getContext('2d').drawImage(src, 0, 0);
+  const back = { list: A.lbList, idx: A.idx, admin: A.lbAdmin };
+  S.current = { kind: 'photo', fc, polosBlob, saveOnly: true, name: it.name, t: it.t };
+  closeDialog(true);
+  document.querySelectorAll('input[name="saveStyle"]').forEach(i => i.checked = i.value === pref.saveStyle);
+  openDialog($('sheet'), $('saveGo'), () => { S.current = null; openLb(back.list, Math.min(back.idx, back.list.length - 1), back.admin); });
+  showSaveCard(true);
 }
 
 /* ================= ALBUM ================= */
@@ -2432,7 +2516,7 @@ document.querySelectorAll('input[name="bingkai"]').forEach(i => i.addEventListen
   pref.bingkai = i.value; savePref();
   if (S.current && S.current.kind === 'strip') { S.current.bingkai = i.value; await renderPreview(); }
 }));
-buildChips($('chipsBooth'), 'booth', id => { pref.filter = id; savePref(); liveFilter(); });
+$('bSlots').addEventListener('click', e => { const b = e.target.closest('button[data-i]'); if (b) pickRedo(+b.dataset.i); });
 
 $('nameForm').addEventListener('submit', e => {
   e.preventDefault();
@@ -2488,7 +2572,7 @@ $('pvSave').onclick = async () => {
   document.querySelectorAll('input[name="saveStyle"]').forEach(i => i.checked = i.value === pref.saveStyle);
   showSaveCard(true);
 };
-$('saveBack').onclick = () => showSaveCard(false);
+$('saveBack').onclick = () => { if (S.current && S.current.saveOnly) closeDialog(); else showSaveCard(false); };
 $('saveGo').onclick = async () => {
   const cur = S.current; if (!cur || !cur.fc) return;
   const sel = document.querySelector('input[name="saveStyle"]:checked'), style = sel ? sel.value : 'polos';
@@ -2496,8 +2580,8 @@ $('saveGo').onclick = async () => {
   const btn = $('saveGo'); btn.disabled = true;
   try {
     const blob = await saveFile(cur, style);
-    const r = await saveBlob(blob, fileName(guest.name, Date.now(), false, style), 'save');
-    showSaveCard(false);
+    const r = await saveBlob(blob, fileName(cur.name || guest.name, cur.t || Date.now(), false, style), 'save');
+    if (cur.saveOnly) closeDialog(); else showSaveCard(false);
     savedToast(r, false, 'save');
   } catch(e) { toast('File gagal dibuat. Coba lagi ya.', 'warn'); }
   finally { btn.disabled = false; }
@@ -2515,7 +2599,7 @@ $('fMine').onclick = () => setFilter('mine');
 $('lbX').onclick = () => closeDialog();
 $('lbPrev').onclick = () => showLb(A.idx - 1);
 $('lbNext').onclick = () => showLb(A.idx + 1);
-$('lbSave').onclick = () => saveCurrent('save');
+$('lbSave').onclick = lbSaveAs;
 $('lbDel').onclick = delCurrent;
 $('admForm').addEventListener('submit', e => {
   e.preventDefault();
