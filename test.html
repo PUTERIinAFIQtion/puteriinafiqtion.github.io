@@ -152,11 +152,13 @@
   .section-head span{font-size:15px;color:var(--ink-muted)}
 
   /* grid foto. Kartu photo booth 9:16 = 2 baris. */
-  .roll,.grid{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-flow:dense}
-  .roll{gap:var(--s-2)}
-  .grid{gap:6px}
-  @media(max-width:300px){.grid,.roll{grid-template-columns:repeat(2,1fr)}}
-  @media(min-width:700px){.grid{grid-template-columns:repeat(5,1fr);gap:8px}}
+  /* Tinggi baris = lebar kolom (dihitung dari lebar wadah .cq), jadi kartu booth (2 baris) tidak pernah
+     gepeng walau satu baris isinya kartu semua. Browser lama: pakai aspect-ratio di tiap kotak. */
+  .cq{container-type:inline-size}
+  .roll,.grid{--cols:3;--gap:8px;display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:var(--gap);grid-auto-flow:dense}
+  .grid{--gap:6px}
+  @media(max-width:300px){.grid,.roll{--cols:2}}
+  @media(min-width:700px){.grid{--cols:5;--gap:8px}}
   .shot,.tile{position:relative;aspect-ratio:1;border:0;padding:0;overflow:hidden;cursor:pointer;background:#EADFC0}
   .shot{border-radius:var(--r-sm);transition:transform var(--t-fast) var(--ease-out)}
   .shot:active{transform:scale(.97)}
@@ -164,7 +166,11 @@
   .shot img,.tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
   .tile img{opacity:0;transition:opacity var(--t-slow) var(--ease-out)}
   .tile img.ok{opacity:1}
-  .shot.strip,.tile.strip{grid-row:span 2;aspect-ratio:auto;align-self:stretch;min-height:0;background:var(--butter-300)}
+  .shot.strip,.tile.strip{grid-row:span 2;aspect-ratio:1/2;background:var(--butter-300)}
+  @supports (width:1cqw){
+    .roll,.grid{grid-auto-rows:calc((100cqw - (var(--cols) - 1) * var(--gap)) / var(--cols))}
+    .shot,.tile,.shot.strip,.tile.strip{aspect-ratio:auto}
+  }
   .shot.strip img,.tile.strip img{object-fit:contain}
   .tile .by{position:absolute;left:4px;bottom:4px;max-width:calc(100% - 8px);padding:1px 7px;border-radius:var(--r-pill);background:rgba(43,26,28,.7);color:var(--butter-50);font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .badge{position:absolute;left:6px;bottom:6px;display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:var(--r-pill);background:#E3F0E7;color:var(--success)}
@@ -263,8 +269,8 @@
 
   /* photo booth (layar penuh, tema krem) */
   .booth{position:fixed;inset:0;z-index:var(--z-lb);background:var(--butter-50);color:var(--ink);overflow:auto}
-  .booth-in{max-width:460px;margin:0 auto;padding:calc(env(safe-area-inset-top) + var(--s-2)) var(--s-4) calc(env(safe-area-inset-bottom) + var(--s-4))}
-  .booth-top{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;gap:var(--s-2);margin-bottom:var(--s-3)}
+  .booth-in{max-width:460px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + var(--s-2)) 12px calc(env(safe-area-inset-bottom) + 12px)}
+  .booth-top{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;gap:var(--s-2);margin-bottom:10px}
   .booth-top h2{font-size:26px;text-align:center}
   .icon-btn{appearance:none;border:0;width:48px;height:48px;border-radius:var(--r-pill);display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.14);color:#fff;cursor:pointer;transition:background-color var(--t-fast);flex:none}
   .icon-btn:hover{background:rgba(255,255,255,.24)}
@@ -272,17 +278,18 @@
   .booth .icon-btn{background:transparent;color:var(--maroon-800);border:1.5px solid var(--maroon-800);width:44px;height:44px;justify-self:start}
   .booth .icon-btn:last-child{justify-self:end}
   .booth .icon-btn:hover{background:var(--butter-100)}
-  /* Jendela bidik kotak (lebih besar); pita 16:9 di tengah = bagian yang masuk kartu, sisanya digelapkan. */
-  .bv-frame{position:relative;aspect-ratio:4/5;width:100%;max-height:max(230px, calc(100vh - 420px));max-height:max(230px, calc(100dvh - 420px));border-radius:14px;overflow:hidden;background:#1E1A2E;box-shadow:0 0 0 4px var(--maroon-900)}
-  .band{position:absolute;left:0;right:0;top:50%;aspect-ratio:16/9;transform:translateY(-50%);box-shadow:0 0 0 999px rgba(30,18,22,.55);outline:2px solid rgba(255,249,234,.9);outline-offset:-2px;z-index:1;pointer-events:none}
+  /* Gambar kamera mengisi semua ruang kosong layar (selebar layar, setinggi sisa layar).
+     Pita 16:9 di tengah = bagian yang masuk kartu; sekelilingnya tetap terlihat, sedikit digelapkan. */
+  .bv-wrap{flex:1 1 auto;display:flex;min-height:min(70vw, 322px);max-height:640px;padding:4px}
+  .bv-frame{position:relative;flex:1;width:100%;border-radius:16px;overflow:hidden;background:#1E1A2E;box-shadow:0 0 0 4px var(--maroon-900)}
+  .booth.manual .bv-wrap{flex:none;min-height:0}
+  .booth.manual .bv-frame{flex:none;aspect-ratio:16/9}
+  .band{position:absolute;left:0;right:0;top:50%;aspect-ratio:16/9;transform:translateY(-50%);box-shadow:0 0 0 999px rgba(30,18,22,.42);outline:2px solid rgba(255,249,234,.92);outline-offset:-2px;z-index:1;pointer-events:none}
   .band-note{position:absolute;right:10px;top:12px;z-index:2;font-size:13px;font-weight:600;color:rgba(255,249,234,.9)}
   .zoom{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:4;display:flex;gap:6px;padding:4px;border-radius:999px;background:rgba(30,18,22,.55)}
   .zoom button{appearance:none;border:0;min-width:44px;height:44px;padding:0 6px;border-radius:999px;background:transparent;color:var(--butter-50);font:700 14px var(--f-sans);cursor:pointer}
   .zoom button[aria-pressed="true"]{background:var(--butter-300);color:var(--maroon-900)}
   .zoom button[disabled]{opacity:.5;cursor:default}
-  .booth .body-cam{padding:10px 10px 12px}
-  .booth .panel-top{margin-bottom:8px}
-  .bv-ring{margin:5px}
   .bv-frame video{width:100%;height:100%;object-fit:cover;display:block;transform-origin:50% 50%}
   .bpill{position:absolute;left:10px;top:10px;z-index:2;padding:2px 12px;border-radius:var(--r-pill);background:rgba(43,26,28,.72);color:var(--butter-50);font-size:14px;font-weight:700}
   .mk{position:absolute;width:14px;height:14px;border:0 solid rgba(255,249,234,.85);z-index:1}
@@ -297,10 +304,10 @@
   .bv-msg{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s-2);text-align:center;padding:var(--s-3);font-size:15px;color:var(--butter-50)}
   .bv-msg .ic{width:32px;height:32px}
   .bv-msg p{margin:0;max-width:34ch}
-  .booth-status{margin:var(--s-3) 0 var(--s-2);min-height:44px;display:flex;align-items:center}
+  .booth-status{margin:10px 0 2px;min-height:40px;display:flex;align-items:center}
   .booth-status p{margin:0;font-size:15px;font-weight:600;color:var(--maroon-900)}
-  .booth-sub{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s-3);margin:var(--s-2) 0}
-  .booth-sub h3{font-size:20px}
+  .booth-sub{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s-3);margin:2px 0 8px}
+  .booth-sub h3{font-size:19px}
   .booth-sub span{font-size:15px;color:var(--ink-muted)}
   .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:var(--s-2)}
   .slots button{appearance:none;position:relative;height:58px;padding:0;border:0;border-radius:8px;background:var(--butter-100) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font:700 20px var(--f-label);color:#7A5A1E;cursor:default}
@@ -322,7 +329,11 @@
   .lb :focus-visible{outline-color:var(--butter-300)}
   .lb-top{display:flex;justify-content:flex-end;padding:calc(var(--s-2) + env(safe-area-inset-top)) var(--s-2) 0}
   .lb-img{flex:1;display:flex;align-items:center;justify-content:center;padding:var(--s-2);min-height:0;position:relative}
-  .lb-img img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:var(--e-3)}
+  .lb-img img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:var(--e-3);transition:opacity var(--t-base) var(--ease-out)}
+  .lb-img img.loading{opacity:0}
+  .lb-load{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:var(--s-5);text-align:center;color:var(--butter-50);font-size:16px;font-weight:600;pointer-events:none}
+  .lb-load .spin{border-color:rgba(255,249,234,.25);border-top-color:var(--butter-300)}
+  .lb-load.err .spin{display:none}
   .lb .nav-prev,.lb .nav-next{position:absolute;top:50%;transform:translateY(-50%)}
   .lb .nav-prev{left:var(--s-2)} .lb .nav-next{right:var(--s-2)}
   .lb-bar{display:flex;flex-direction:column;align-items:stretch;gap:var(--s-3);padding:var(--s-3) var(--s-4) calc(var(--s-4) + env(safe-area-inset-bottom));max-width:560px;width:100%;margin:0 auto}
@@ -605,7 +616,7 @@
           <p class="note" id="note" aria-live="polite"></p>
 
           <div class="section-head"><h2 id="rollTitle">Foto kamu</h2><span id="rollCount"></span></div>
-          <div class="roll" id="roll" role="group" aria-labelledby="rollTitle"></div>
+          <div class="cq"><div class="roll" id="roll" role="group" aria-labelledby="rollTitle"></div></div>
           <p class="empty" id="rollEmpty">Belum ada foto. Jepretan pertamamu muncul di sini.</p>
         </div>
       </section>
@@ -631,7 +642,7 @@
           <div><b>Link album</b><span>puteriinafiqtion.github.io/#album</span></div>
           <button id="copyLink" type="button">Salin</button>
         </section>
-        <div class="grid" id="grid" role="group" aria-labelledby="albumTitle"></div>
+        <div class="cq"><div class="grid" id="grid" role="group" aria-labelledby="albumTitle"></div></div>
         <p class="more" id="more"></p>
       </section>
 
@@ -667,7 +678,7 @@
           </div>
           <div id="admAlbum">
             <p class="small" style="text-align:left;margin-bottom:var(--s-3)">Ketuk foto untuk melihat besar, lalu Sembunyikan kalau tidak pantas. File aslinya tetap di Google Drive pemilik.</p>
-            <div class="grid" id="admGrid" role="group" aria-label="Album panitia"></div>
+            <div class="cq"><div class="grid" id="admGrid" role="group" aria-label="Album panitia"></div></div>
             <p class="more" id="admMore"></p>
             <button id="admMoreBtn" class="btn btn-ghost" type="button" hidden>Muat lagi</button>
           </div>
@@ -734,8 +745,7 @@
     <h2 id="boothTitle">Photo booth</h2>
     <button class="icon-btn" id="boothFlip" type="button" aria-label="Ganti ke kamera belakang"><svg class="ic" aria-hidden="true"><use href="#i-flip"/></svg></button>
   </div>
-  <div class="body-cam">
-    <div class="panel-top"><p class="label">Kamera Tamu</p><span class="lens" aria-hidden="true"></span></div>
+  <div class="bv-wrap">
     <div class="bv-frame">
       <video id="bv" playsinline muted autoplay aria-hidden="true"></video>
       <div class="band" aria-hidden="true"><span class="mk tl"></span><span class="mk a"></span><span class="mk b"></span><span class="mk c"></span></div>
@@ -760,6 +770,7 @@
   <div class="lb-top"><button class="icon-btn" id="lbX" type="button" aria-label="Tutup foto"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button></div>
   <div class="lb-img">
     <img id="lbImg" alt="" referrerpolicy="no-referrer">
+    <div class="lb-load" id="lbLoad" role="status" hidden><div class="spin" aria-hidden="true"></div><span>Menyiapkan foto…</span></div>
     <button class="icon-btn nav-prev" id="lbPrev" type="button" aria-label="Foto sebelumnya"><svg class="ic" aria-hidden="true"><use href="#i-prev"/></svg></button>
     <button class="icon-btn nav-next" id="lbNext" type="button" aria-label="Foto berikutnya"><svg class="ic" aria-hidden="true"><use href="#i-next"/></svg></button>
   </div>
@@ -1967,6 +1978,7 @@ function stopBooth(){ B.cancel = true; stopStream(); showCount(''); }
 
 function setManual(text){
   B.manual = true; stopStream(); Object.assign(Z, { level: 1, digital: 1, useUW: false });
+  $('booth').classList.add('manual');   // tanpa kamera langsung: jendela kembali kecil, cukup untuk pesan
   boothMsg(text);
   $('boothFlip').hidden = true;
   $('boothStart').removeAttribute('aria-disabled'); boothLabel();
@@ -2009,6 +2021,7 @@ function openBooth(trigger, opts){
   Object.assign(B, { frames: o.frames ? o.frames.slice() : [], redo: o.redo != null ? o.redo : null, fromCard: !!o.frames,
                      running: false, cancel: false, manual: false, trigger: trigger || $('btnBooth') });
   renderSlots(); boothShape(); showCount(''); boothMsg('');
+  $('booth').classList.remove('manual');
   $('boothFlip').hidden = false; $('boothFlip').disabled = false;
   $('bv').style.filter = 'none';   // filter dipilih sekali di kartu, bukan di sini
   Object.assign(Z, { level: 1, digital: 1, useUW: false }); videoTransform();
@@ -2347,13 +2360,42 @@ function setFilter(f){
 }
 
 /* ================= LIGHTBOX ================= */
+/* Foto berikutnya baru tampil setelah selesai dimuat; selama itu muncul "Menyiapkan foto…"
+   (dulu foto sebelumnya sempat terlihat dulu). LB.tok mencegah foto lama yang telat selesai menimpa foto baru. */
+const LB = { tok: 0 };
+function lbLoading(state){
+  const l = $('lbLoad'), err = state === 'err';
+  l.hidden = !state; l.classList.toggle('err', err);
+  l.querySelector('span').textContent = err ? 'Foto belum bisa dimuat. Periksa sinyal, lalu buka lagi.' : 'Menyiapkan foto…';
+}
+function lbPreload(){   // foto sebelah kiri & kanan dimuat diam-diam supaya geser terasa instan
+  const L = A.lbList; if (L.length < 2) return;
+  [A.idx + 1, A.idx - 1].forEach(j => {
+    const it = L[(j + L.length) % L.length];
+    if (!it || S.local[it.id]) return;
+    const im = new Image(); im.referrerPolicy = 'no-referrer'; im.src = photoUrl(it.id, 1600);
+  });
+}
 function showLb(i){
   const list = A.lbList; if (!list.length) return;
   A.idx = (i + list.length) % list.length;
   const it = list[A.idx];
   const strip = isStrip(it);
-  if (S.local[it.id]) { $('lbImg').onerror = null; $('lbImg').src = S.local[it.id]; } else setPhoto($('lbImg'), it.id, 1600);
-  $('lbImg').alt = (strip ? 'Foto booth oleh ' : 'Foto oleh ') + it.name;
+  const img = $('lbImg'), tok = ++LB.tok;
+  let done = false;
+  const ok = () => { if (done || tok !== LB.tok) return; done = true; img.classList.remove('loading'); lbLoading(false); lbPreload(); };
+  img.classList.add('loading'); lbLoading('load');
+  img.onload = ok;
+  img.referrerPolicy = 'no-referrer';
+  img.dataset.fb = '';
+  img.onerror = () => {
+    if (tok !== LB.tok) return;
+    if (!S.local[it.id] && !img.dataset.fb) { img.dataset.fb = '1'; img.src = photoFallback(it.id, 1600); }
+    else lbLoading('err');
+  };
+  img.src = S.local[it.id] || photoUrl(it.id, 1600);
+  if (img.complete && img.naturalWidth) setTimeout(ok, 0);   // sudah ada di cache browser
+  img.alt = (strip ? 'Foto booth oleh ' : 'Foto oleh ') + it.name;
   $('lbTitle').innerHTML = icon('heart', 'ic-sm');
   $('lbTitle').append(it.name);
   $('lbMeta').textContent = (strip ? 'Foto booth, ' : '') + (it.t ? 'pukul ' + fmtClock(it.t) + ', ' : '') + (A.idx + 1) + ' dari ' + list.length;
