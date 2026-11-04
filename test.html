@@ -705,7 +705,7 @@
           </div>
         </div>
       </section>
-      <p class="ver">Versi halaman 4 Nov 2026 · 07.36</p>
+      <p class="ver" id="ver" hidden>Versi halaman 4 Nov 2026 · 07.36</p>
     </main>
   </div>
 
@@ -2955,6 +2955,8 @@ function aturBaris(g){
   else { const semua = () => grids.forEach(aturBaris); semua(); window.addEventListener('resize', semua); setInterval(semua, 700); }   // browser sangat lama
 }
 
+// label versi hanya untuk halaman uji (test.html), tidak pernah tampil di halaman utama tamu
+if (/test\.html$/.test(location.pathname)) $('ver').hidden = false; else $('ver').remove();
 boot();
 // huruf kartu diunduh di latar sejak awal, supaya sudah siap saat tamu menyusun kartu pertama
 if (document.readyState === 'complete') setTimeout(siapkanFont, 1200);

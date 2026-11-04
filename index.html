@@ -416,6 +416,13 @@
   .locked .btn{margin-top:var(--s-4);text-decoration:none;display:flex;align-items:center;justify-content:center}
   .btn-sm{min-height:44px;font-size:15px;width:auto;padding:var(--s-2) var(--s-4)}
   .adm-tools{display:flex;flex-wrap:wrap;gap:var(--s-2);margin:0 0 var(--s-4)}
+  .adm-akses{margin:0 0 var(--s-4);padding:0 var(--s-3) var(--s-2);border:1.5px solid var(--butter-500);border-radius:var(--r-md);background:var(--butter-100)}
+  .adm-akses summary{min-height:48px;display:flex;align-items:center;font-weight:800;color:var(--maroon-800);cursor:pointer}
+  .adm-akses .small{text-align:left;margin:0 0 var(--s-2)}
+  .akses-list{list-style:none;margin:0;padding:0}
+  .akses-row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2);padding:var(--s-2) 0;border-top:1px solid var(--butter-500)}
+  .akses-row b{flex:1 1 100%;font-size:16px}
+  .akses-row .btn{flex:1 1 0}
   .adm-tools .btn{flex:1 1 180px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:var(--s-2)}
   .adm-list{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-3)}
   .adm-item{display:flex;gap:var(--s-3);align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s-3)}
@@ -444,7 +451,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none"><symbol id="i-trash" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></symbol><symbol id="i-camera" viewBox="0 0 256 256"><path d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.71,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H80a8,8,0,0,0,6.66-3.56L100.28,48h55.43l13.63,20.44A8,8,0,0,0,176,72h32a8,8,0,0,1,8,8ZM128,88a44,44,0,1,0,44,44A44.05,44.05,0,0,0,128,88Zm0,72a28,28,0,1,1,28-28A28,28,0,0,1,128,160Z"/></symbol><symbol id="i-selfie" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM74.08,197.5a64,64,0,0,1,107.84,0,87.83,87.83,0,0,1-107.84,0ZM96,120a32,32,0,1,1,32,32A32,32,0,0,1,96,120Zm97.76,66.41a79.66,79.66,0,0,0-36.06-28.75,48,48,0,1,0-59.4,0,79.66,79.66,0,0,0-36.06,28.75,88,88,0,1,1,131.52,0Z"/></symbol><symbol id="i-gallery" viewBox="0 0 256 256"><path d="M216,40H72A16,16,0,0,0,56,56V72H40A16,16,0,0,0,24,88V200a16,16,0,0,0,16,16H184a16,16,0,0,0,16-16V184h16a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM72,56H216v62.75l-10.07-10.06a16,16,0,0,0-22.63,0l-20,20-44-44a16,16,0,0,0-22.62,0L72,109.37ZM184,200H40V88H56v80a16,16,0,0,0,16,16H184Zm32-32H72V132l36-36,49.66,49.66a8,8,0,0,0,11.31,0L194.63,120,216,141.38V168ZM160,84a12,12,0,1,1,12,12A12,12,0,0,1,160,84Z"/></symbol><symbol id="i-heart" viewBox="0 0 256 256"><path d="M178,40c-20.65,0-38.73,8.88-50,23.89C116.73,48.88,98.65,40,78,40a62.07,62.07,0,0,0-62,62c0,70,103.79,126.66,108.21,129a8,8,0,0,0,7.58,0C136.21,228.66,240,172,240,102A62.07,62.07,0,0,0,178,40ZM128,214.8C109.74,204.16,32,155.69,32,102A46.06,46.06,0,0,1,78,56c19.45,0,35.78,10.36,42.6,27a8,8,0,0,0,14.8,0c6.82-16.67,23.15-27,42.6-27a46.06,46.06,0,0,1,46,46C224,155.61,146.24,204.15,128,214.8Z"/></symbol><symbol id="i-edit" viewBox="0 0 256 256"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"/></symbol><symbol id="i-close" viewBox="0 0 256 256"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></symbol><symbol id="i-prev" viewBox="0 0 256 256"><path d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z"/></symbol><symbol id="i-next" viewBox="0 0 256 256"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></symbol><symbol id="i-open" viewBox="0 0 256 256"><path d="M224,104a8,8,0,0,1-16,0V59.32l-66.33,66.34a8,8,0,0,1-11.32-11.32L196.68,48H152a8,8,0,0,1,0-16h64a8,8,0,0,1,8,8Zm-40,24a8,8,0,0,0-8,8v72H48V80h72a8,8,0,0,0,0-16H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V136A8,8,0,0,0,184,128Z"/></symbol><symbol id="i-album" viewBox="0 0 256 256"><path d="M208,32H80A16,16,0,0,0,64,48V64H48A16,16,0,0,0,32,80V208a16,16,0,0,0,16,16H176a16,16,0,0,0,16-16V192h16a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM80,48H208v69.38l-16.7-16.7a16,16,0,0,0-22.62,0L93.37,176H80Zm96,160H48V80H64v96a16,16,0,0,0,16,16h96Zm32-32H116l64-64,28,28v36Zm-88-64A24,24,0,1,0,96,88,24,24,0,0,0,120,112Zm0-32a8,8,0,1,1-8,8A8,8,0,0,1,120,80Z"/></symbol><symbol id="i-ok" viewBox="0 0 256 256"><path d="M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></symbol><symbol id="i-warn" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z"/></symbol><symbol id="i-retry" viewBox="0 0 256 256"><path d="M224,48V96a8,8,0,0,1-8,8H168a8,8,0,0,1,0-16h28.69L182.06,73.37a79.56,79.56,0,0,0-56.13-23.43h-.45A79.52,79.52,0,0,0,69.59,72.71,8,8,0,0,1,58.41,61.27a96,96,0,0,1,135,.79L208,76.69V48a8,8,0,0,1,16,0ZM186.41,183.29a80,80,0,0,1-112.47-.66L59.31,168H88a8,8,0,0,0,0-16H40a8,8,0,0,0-8,8v48a8,8,0,0,0,16,0V179.31l14.63,14.63A95.43,95.43,0,0,0,130,222.06h.53a95.36,95.36,0,0,0,67.07-27.33,8,8,0,0,0-11.18-11.44Z"/></symbol><symbol id="i-flip" viewBox="0 0 256 256"><path d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.71,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H80a8,8,0,0,0,6.66-3.56L100.28,48h55.43l13.63,20.44A8,8,0,0,0,176,72h32a8,8,0,0,1,8,8ZM176,96v24a8,8,0,0,1-8,8H144a8,8,0,0,1,0-16h5.15a32.12,32.12,0,0,0-40.34-1.61A8,8,0,0,1,99.19,97.6,48.21,48.21,0,0,1,160,100.23V96a8,8,0,0,1,16,0Zm-17.61,59.2a8,8,0,0,1-1.58,11.2A48.21,48.21,0,0,1,96,163.77V168a8,8,0,0,1-16,0V144a8,8,0,0,1,8-8h24a8,8,0,0,1,0,16h-5.15a32.12,32.12,0,0,0,40.34,1.61A8,8,0,0,1,158.39,155.2Z"/></symbol><symbol id="i-download" viewBox="0 0 256 256"><path d="M128 40v132M80 124l48 48 48-48M40 208h176" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-strip" viewBox="0 0 256 256"><rect x="72" y="24" width="112" height="208" rx="10" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/><path d="M100 52h56v44h-56zM100 116h56v44h-56z" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/><path d="M104 196h48" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-share" viewBox="0 0 256 256"><path d="M128 152V36M88 76l40-40 40 40M96 112H64v104h128V112h-32" fill="none" stroke="currentColor" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></symbol><symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></symbol><symbol id="i-tulip" viewBox="0 0 40 84"><path d="M20 38C20 52 21 66 20 82" stroke="#7F9268" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M20 70C12 66 9 58 10 52C16 54 20 60 20 70Z" fill="#93A57F"/><path d="M9 14L14.5 21L20 8L25.5 21L31 14C34 27 30 38 20 38C10 38 6 27 9 14Z" fill="currentColor"/></symbol><path id="i-tulip-head" d="M9 14L14.5 21L20 8L25.5 21L31 14C34 27 30 38 20 38C10 38 6 27 9 14Z" fill="currentColor"/></svg>
 
 <!-- ============ HALAMAN AWAL (A0) ============ -->
-<div id="cover" class="cover" role="button" tabindex="0" aria-label="Wedding Afiq dan Puteri, 17-01-2027. Ketuk untuk mulai." hidden>
+<div id="cover" class="cover" role="button" tabindex="0" aria-label="Wedding Afiq dan Puteri, 17 Januari 2027. Ketuk untuk mulai." hidden>
   <div class="cover-art" id="coverArt">
 
 <p style="position: absolute; left: 0; top: 44px; width: 360px; margin: 0; text-align: center; font-family: 'Josefin Sans', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: 0.42em; color: #9A3644">WEDDING</p>
@@ -546,7 +553,7 @@
 <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" style="position: absolute; left: 168px; top: 632px"><g fill="#F3E19C"><circle cx="12" cy="6" r="5"></circle><circle cx="17.7" cy="10.1" r="5"></circle><circle cx="15.5" cy="16.9" r="5"></circle><circle cx="8.5" cy="16.9" r="5"></circle><circle cx="6.3" cy="10.1" r="5"></circle></g><circle cx="12" cy="12" r="3.2" fill="#6B1D2A"></circle><circle cx="11" cy="11" r="1" fill="#F3E19C"></circle></svg>
 <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" style="position: absolute; left: 4px; top: 620px"><g fill="#B8C3EE"><circle cx="12" cy="6" r="5"></circle><circle cx="17.7" cy="10.1" r="5"></circle><circle cx="15.5" cy="16.9" r="5"></circle><circle cx="8.5" cy="16.9" r="5"></circle><circle cx="6.3" cy="10.1" r="5"></circle></g><circle cx="12" cy="12" r="3.2" fill="#6B1D2A"></circle><circle cx="11" cy="11" r="1" fill="#F3E19C"></circle></svg>
 <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" style="position: absolute; left: 334px; top: 612px"><g fill="#F3E19C"><circle cx="12" cy="6" r="5"></circle><circle cx="17.7" cy="10.1" r="5"></circle><circle cx="15.5" cy="16.9" r="5"></circle><circle cx="8.5" cy="16.9" r="5"></circle><circle cx="6.3" cy="10.1" r="5"></circle></g><circle cx="12" cy="12" r="3.2" fill="#6B1D2A"></circle><circle cx="11" cy="11" r="1" fill="#F3E19C"></circle></svg>
-<span style="position: absolute; left: 70px; top: 678px; width: 220px; height: 52px; box-sizing: border-box; border-radius: 999px; background: #6B1D2A; color: #FFF9EA; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 800; font-size: 17px; box-shadow: 0 4px 0 #4A1220"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11"></path><path d="M12 10.5a1.5 1.5 0 0 1 3 0V12"></path><path d="M15 11.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-.6a5 5 0 0 1-4-2l-2.6-3.5a1.5 1.5 0 0 1 2.3-1.9L9 15"></path><path d="M6 4.5l-1.5-1M15 4.5l1.5-1M10.5 1.5v-1"></path></svg>Ketuk untuk mulai</span>
+<span style="position: absolute; left: 70px; top: 678px; width: 220px; height: 52px; box-sizing: border-box; border-radius: 999px; background: #6B1D2A; color: #FFF9EA; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 800; font-size: 17px; box-shadow: 0 4px 0 #4A1220"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11"></path><path d="M12 10.5a1.5 1.5 0 0 1 3 0V12"></path><path d="M15 11.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-.6a5 5 0 0 1-4-2l-2.6-3.5a1.5 1.5 0 0 1 2.3-1.9L9 15"></path><path d="M6 4.5l-1.5-1M15 4.5l1.5-1M10.5 1.5v-1"></path></svg><span id="coverTeks" style="max-width: 164px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Ketuk untuk mulai</span></span>
 
   </div>
 </div>
@@ -654,7 +661,7 @@
       <section id="viewAdmin" aria-labelledby="adminTitle" hidden>
         <div id="admLogin" class="locked" hidden>
           <h2 id="adminTitle" tabindex="-1">Halaman panitia</h2>
-          <p>Masuk pakai kode panitia dari Afiq.</p>
+          <p>Ketuk link masuk yang dikirim Afiq lewat WhatsApp, atau ketik kode panitia di sini.</p>
           <form id="admForm" novalidate>
             <div class="field">
               <label for="admKey">Kode panitia</label>
@@ -676,6 +683,11 @@
             <a class="btn btn-ghost btn-sm" href="#live">Buka slideshow layar</a>
             <a class="btn btn-ghost btn-sm" id="admQr" href="#" target="_blank" rel="noopener noreferrer">Kartu QR untuk print</a>
           </div>
+          <details class="adm-akses" id="admAkses" hidden>
+            <summary>Kirim link masuk ke panitia</summary>
+            <p class="small">Panitia cukup ketuk link-nya, langsung masuk tanpa ketik kode, dan tetap masuk di HP itu sampai menekan Keluar. Link ini sama dengan kodenya, jadi kirim ke orangnya saja.</p>
+            <ul class="akses-list" id="admAksesList"></ul>
+          </details>
           <div class="seg" role="group" aria-label="Menu panitia" style="margin-bottom:var(--s-4)">
             <button id="admTabAlbum" type="button" aria-pressed="true">Album</button>
             <button id="admTabTrash" type="button" aria-pressed="false">Disembunyikan</button>
@@ -693,7 +705,7 @@
           </div>
         </div>
       </section>
-      <p class="ver">Versi halaman 3 Nov 2026 · 21.02</p>
+      <p class="ver" id="ver" hidden>Versi halaman 4 Nov 2026 · 07.36</p>
     </main>
   </div>
 
@@ -2554,6 +2566,11 @@ async function adminPost(op, extra){
 function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 
 function showAdmin(){
+  if (ADM.linkKey) {            // dibuka dari link masuk: langsung masuk tanpa mengetik
+    const k = ADM.linkKey; ADM.linkKey = ''; ADM.ok = false;
+    $('admPanel').hidden = true; $('admLogin').hidden = false; $('admKey').value = k;
+    return admEnter(k, false);
+  }
   if (!ADM.key) { const s = store.get(AKEY); if (s && s.key) ADM.key = s.key; }
   if (!ADM.key) { $('admLogin').hidden = false; $('admPanel').hidden = true; return; }
   if (ADM.ok) { $('admLogin').hidden = true; $('admPanel').hidden = false; admTab(ADM.tab); return; }
@@ -2572,15 +2589,42 @@ async function admEnter(key, silent){
     $('admQr').href = API + '?page=qr';
     admTab(ADM.tab);
     admStats();
+    admAkses();
   } catch(e) {
     if (!e.server) { toast('Sinyal tersendat. Coba lagi.', 'warn'); if (silent) { $('admLogin').hidden = false; $('admPanel').hidden = true; } }
     else { ADM.key = ''; store.set(AKEY, null); $('admLogin').hidden = false; $('admPanel').hidden = true;
       if (!silent) { $('admErr').hidden = false; $('admKey').setAttribute('aria-invalid', 'true'); $('admKey').focus(); } }
   } finally { btn.disabled = false; }
 }
+/** Khusus pemilik: daftar panitia + tombol kirim link masuk lewat WhatsApp / salin link. */
+async function admAkses(){
+  const box = $('admAkses'), ul = $('admAksesList');
+  box.hidden = ADM.role !== 'owner'; ul.textContent = '';
+  if (box.hidden) return;
+  ul.append(el('li', 'small', 'Memuat daftar panitia…'));
+  try {
+    const r = await adminPost('panitia');
+    ul.textContent = '';
+    if (!r.items.length) return ul.append(el('li', 'small', 'Belum ada panitia yang punya kode. Isi kodenya di Sheet, tab "Panitia".'));
+    r.items.forEach(x => {
+      // link mengikuti halaman yang sedang dibuka (test.html saat uji, halaman utama setelah naik)
+      x.link = location.origin + location.pathname + '#admin=' + x.link.split('#admin=')[1];
+      const li = el('li', 'akses-row'); li.append(el('b', '', x.nama));
+      const pesan = 'Halo ' + x.nama + ', ini akses panitia Kamera Tamu ' + C.couple + '.\nKetuk link ini, langsung masuk tanpa ketik kode:\n' + x.link + '\nTolong jangan disebar ya.';
+      const wa = el('a', 'btn btn-primary btn-sm', 'Kirim WA');
+      wa.href = 'https://wa.me/?text=' + encodeURIComponent(pesan); wa.target = '_blank'; wa.rel = 'noopener noreferrer';
+      wa.setAttribute('aria-label', 'Kirim link masuk ke ' + x.nama + ' lewat WhatsApp');
+      const cp = el('button', 'btn btn-ghost btn-sm', 'Salin link'); cp.type = 'button';
+      cp.setAttribute('aria-label', 'Salin link masuk ' + x.nama);
+      cp.onclick = () => salinTeks(x.link, 'Link masuk ' + x.nama + ' disalin');
+      li.append(wa, cp); ul.append(li);
+    });
+  } catch(e) { ul.textContent = ''; ul.append(el('li', 'small', e.server ? e.message : 'Sinyal tersendat. Buka lagi nanti.')); }
+}
 function admLogout(expired){
   Object.assign(ADM, { key: '', role: '', nama: '', ok: false, items: [], offset: 0, total: 0, done: false });
   store.set(AKEY, null);
+  $('admAkses').hidden = true; $('admAksesList').textContent = ''; $('admName').textContent = '';
   $('admGrid').innerHTML = ''; $('admTrashList').innerHTML = '';
   $('admLogin').hidden = false; $('admPanel').hidden = true;
   if (expired) toast('Kode panitia sudah tidak berlaku. Masuk lagi.', 'warn', 5000);
@@ -2701,7 +2745,13 @@ function removePhoto(id){
 /* ================= NAVIGASI ================= */
 let firstRoute = true;
 function route(){
-  const h = location.hash.slice(1);
+  let h = location.hash.slice(1);
+  const link = /^admin[=/](.+)$/.exec(h);
+  if (link) {   // link masuk panitia (#admin=KODE): kode disimpan, lalu dihapus dari alamat & riwayat browser
+    try { ADM.linkKey = decodeURIComponent(link[1]); } catch(e) { ADM.linkKey = link[1]; }
+    history.replaceState(null, '', location.pathname + location.search + '#admin');
+    h = 'admin';
+  }
   const live = h === 'live';
   $('app').hidden = live; $('viewLive').hidden = !live;
   if (live) return startLive();
@@ -2801,13 +2851,14 @@ $('saveGo').onclick = async () => {
   finally { btn.disabled = false; }
 };
 $('lbShare').hidden = !CAN_SHARE_FILES;
-$('copyLink').onclick = async () => {
-  try { await navigator.clipboard.writeText(ALBUM_URL); toast('Link album disalin'); }
+async function salinTeks(teks, pesanOk){
+  try { await navigator.clipboard.writeText(teks); toast(pesanOk); }
   catch(e) {
-    try { const t = document.createElement('textarea'); t.value = ALBUM_URL; t.style.cssText = 'position:fixed;left:-999px'; document.body.appendChild(t); t.select(); const ok = document.execCommand('copy'); t.remove(); toast(ok ? 'Link album disalin' : ALBUM_URL, ok ? 'ok' : 'warn', 6000); }
-    catch(e2) { toast(ALBUM_URL, 'warn', 6000); }
+    try { const t = document.createElement('textarea'); t.value = teks; t.style.cssText = 'position:fixed;left:-999px'; document.body.appendChild(t); t.select(); const ok = document.execCommand('copy'); t.remove(); toast(ok ? pesanOk : teks, ok ? 'ok' : 'warn', 6000); }
+    catch(e2) { toast(teks, 'warn', 6000); }
   }
-};
+}
+$('copyLink').onclick = () => salinTeks(ALBUM_URL, 'Link album disalin');
 $('fAll').onclick = () => setFilter('all');
 $('fMine').onclick = () => setFilter('mine');
 $('lbX').onclick = () => closeDialog();
@@ -2850,7 +2901,10 @@ route();
 
 /* halaman awal (sampul): sekali per sesi untuk tamu baru yang belum menulis nama */
 function fitCover(){ $('coverArt').style.transform = 'scale(' + Math.min(innerWidth / 360, innerHeight / 740) + ')'; }
+let coverAuto = 0;
 function closeCover(){
+  clearTimeout(coverAuto);
+  if ($('cover').hidden) return;
   $('cover').hidden = true; $('app').inert = false; $('app').removeAttribute('aria-hidden');
   try { sessionStorage.setItem('kt_sampul', '1'); } catch(e){}
   window.removeEventListener('resize', fitCover);
@@ -2859,7 +2913,16 @@ function closeCover(){
 (function(){
   let seen = false; try { seen = sessionStorage.getItem('kt_sampul') === '1'; } catch(e){}
   const h = location.hash.slice(1);
-  if (guest.name || seen || (h && h !== 'kamera') || /[?&]sampul=0/.test(location.search)) return;
+  // Sampul tampil tiap halaman dibuka baru (scan QR, link WA, tab baru); tidak muncul lagi saat kembali ke tab yang sama.
+  // Tamu yang sudah isi nama: disapa, lalu lanjut sendiri setelah 2,5 dtk (atau ketuk). Tamu baru: ketuk untuk mulai.
+  if (seen || (h && h !== 'kamera') || /[?&]sampul=0/.test(location.search)) return;
+  if (guest.name) {
+    $('coverTeks').textContent = 'Halo, ' + guest.name;
+    const pill = $('coverTeks').parentElement;   // tombol dilebarkan supaya nama muat; ikon ketuk disembunyikan
+    pill.style.left = '24px'; pill.style.width = '312px'; pill.querySelector('svg').style.display = 'none'; $('coverTeks').style.maxWidth = '284px';
+    $('cover').setAttribute('aria-label', 'Halo ' + guest.name + '. Wedding Afiq dan Puteri, 17 Januari 2027. Kamera terbuka sebentar lagi, atau ketuk untuk langsung masuk.');
+    coverAuto = setTimeout(closeCover, 2500);
+  }
   $('cover').hidden = false; $('app').inert = true; $('app').setAttribute('aria-hidden', 'true');
   fitCover(); window.addEventListener('resize', fitCover);
   $('cover').onclick = closeCover;
@@ -2892,6 +2955,8 @@ function aturBaris(g){
   else { const semua = () => grids.forEach(aturBaris); semua(); window.addEventListener('resize', semua); setInterval(semua, 700); }   // browser sangat lama
 }
 
+// label versi hanya untuk halaman uji (test.html), tidak pernah tampil di halaman utama tamu
+if (/test\.html$/.test(location.pathname)) $('ver').hidden = false; else $('ver').remove();
 boot();
 // huruf kartu diunduh di latar sejak awal, supaya sudah siap saat tamu menyusun kartu pertama
 if (document.readyState === 'complete') setTimeout(siapkanFont, 1200);
