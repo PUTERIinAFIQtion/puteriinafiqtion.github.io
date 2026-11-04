@@ -6,6 +6,9 @@
 <title>Kamera Tamu · Afiq &amp; Puteri</title>
 <meta name="description" content="Jadi fotografer kami hari ini. Jepret momen favoritmu atau foto bareng di photo booth, semua terkumpul jadi satu album.">
 <meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<!-- Pengaman: script hanya dari situs ini (+ library QR di cdnjs yang dikunci SRI); data hanya dikirim ke server kamera & Google. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://lh3.googleusercontent.com https://*.googleusercontent.com https://drive.google.com; connect-src 'self' https://script.google.com/macros/s/AKfycbz8z5HBpc8z-E1PzBBujwInBFF6iZ6FPbsHrvVoWa65LIX_yu15v4Tu_eW8foVn1haWqg/exec https://script.googleusercontent.com https://lh3.googleusercontent.com https://*.googleusercontent.com https://drive.google.com https://fonts.googleapis.com https://fonts.gstatic.com; media-src 'self' blob: mediastream:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="theme-color" content="#FFF9EA">
 <meta name="color-scheme" content="light">
 <meta property="og:title" content="Kamera Tamu · Afiq & Puteri">
@@ -175,8 +178,8 @@
   /* aturBaris() (JS) menulis tinggi baris dalam px di semua browser, termasuk yang belum kenal satuan cqw */
   .rj > .shot,.rj > .tile{aspect-ratio:auto}
   .shot.strip img,.tile.strip img{object-fit:contain}
-  .tile .by{position:absolute;left:4px;bottom:4px;max-width:calc(100% - 8px);padding:1px 7px;border-radius:var(--r-pill);background:rgba(43,26,28,.7);color:var(--butter-50);font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .badge{position:absolute;left:6px;bottom:6px;display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:var(--r-pill);background:#E3F0E7;color:var(--success)}
+  .tile .by{position:absolute;left:4px;bottom:4px;max-width:calc(100% - 8px);padding:1px 7px;border-radius:var(--r-pill);background:rgba(43,26,28,.7);color:var(--butter-50);font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .badge{position:absolute;left:6px;bottom:6px;display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:700;padding:2px 8px;border-radius:var(--r-pill);background:#E3F0E7;color:var(--success)}
   .badge.up{background:var(--peri-100);color:var(--peri-700)}
   .badge.wait{background:var(--butter-100);color:var(--ink-muted)}
   .shot.up img{opacity:.6}
@@ -198,9 +201,33 @@
   .linkbox svg{flex:none;color:var(--maroon-800)}
   .linkbox div{flex:1;min-width:0}
   .linkbox b{display:block;font-size:14px;font-weight:800;color:var(--maroon-900)}
-  .linkbox span{display:block;font-size:13px;color:var(--maroon-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .linkbox span{display:block;font-size:14px;color:var(--maroon-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .linkbox button{flex:none;min-height:44px;padding:0 14px;border:0;border-radius:12px;background:var(--maroon-800);color:var(--butter-50);font-weight:800;font-size:15px;cursor:pointer}
   .more{text-align:center;color:var(--ink-muted);font-size:15px;padding:var(--s-5);margin:0}
+
+  /* gerbang: dibuka tanpa link rahasia */
+  .gerbang{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:var(--s-6) var(--s-5);background:var(--butter-50);text-align:center}
+  .gerbang-in{max-width:360px}
+  .gerbang .couple{margin:var(--s-2) 0 var(--s-5)}
+  .gerbang-t{font-size:20px;font-weight:800;color:var(--maroon-900);margin:0 0 var(--s-3)}
+  .gerbang-s{font-size:17px;line-height:1.5;color:var(--maroon-900);margin:0 0 var(--s-6)}
+  .gerbang .link-btn{font-size:16px}
+  /* konfirmasi di dalam lightbox (pengganti confirm() bawaan browser) */
+  .lb-tanya{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px;padding:4px 0}
+  .lb-tanya p{flex:1 1 100%;margin:0 0 4px;color:var(--butter-50);font-size:16px;font-weight:700;text-align:left}
+  .lb-tanya .btn{flex:1 1 0}
+  .toast-aksi{flex:none;margin-left:var(--s-2);min-height:40px;padding:0 var(--s-3);border:1.5px solid var(--butter-300);border-radius:var(--r-pill);background:transparent;color:var(--butter-50);font:inherit;font-weight:800;cursor:pointer}
+  .toast:has(.toast-aksi){pointer-events:auto}
+  /* panel pemilik: link tamu, kartu QR, kesehatan */
+  .adm-akses .row{display:flex;flex-wrap:wrap;gap:var(--s-2);margin:0 0 var(--s-3)}
+  .adm-link{display:block;padding:var(--s-2) var(--s-3);margin:0 0 var(--s-2);border-radius:var(--r-sm);background:#fff;border:1px solid var(--butter-500);font:600 15px/1.4 ui-monospace,Menlo,Consolas,monospace;color:var(--maroon-900);word-break:break-all;text-align:left}
+  .adm-tanya{padding:var(--s-3);margin:0 0 var(--s-3);border-radius:var(--r-sm);background:#fff;border:1.5px solid var(--maroon-800);text-align:left}
+  .adm-tanya p{margin:0 0 var(--s-2);font-weight:700;color:var(--maroon-900)}
+  .sehat{margin:0 0 var(--s-3);display:grid;grid-template-columns:auto 1fr;gap:4px var(--s-3);text-align:left;font-size:15px}
+  .sehat dt{color:var(--ink-muted)}
+  .sehat dd{margin:0;font-weight:700;color:var(--maroon-900);word-break:break-word}
+  .sehat dd.buruk{color:#A3361F}
+  .boot-reset{display:block;margin:var(--s-2) auto 0}
   .ver{text-align:center;color:var(--ink-muted);font-size:13px;margin:var(--s-4) 0 var(--s-2)}
 
   /* navigasi bawah */
@@ -343,7 +370,7 @@
   .lb-bar{display:flex;flex-direction:column;align-items:stretch;gap:var(--s-3);padding:var(--s-3) var(--s-4) calc(var(--s-4) + env(safe-area-inset-bottom));max-width:560px;width:100%;margin:0 auto}
   .lb-cap{min-width:0;flex:1 1 160px}
   .lb-cap b{display:flex;align-items:center;gap:6px;font:600 28px/1.1 var(--f-hand);color:var(--butter-300);overflow-wrap:anywhere}
-  .lb-cap small{display:block;font-size:14px;color:#D9CDB0}
+  .lb-cap small{display:block;font-size:15px;color:#D9CDB0}
   .lb-act{display:flex;flex-direction:column;align-items:stretch;gap:4px}
   .lb-save{appearance:none;border:0;display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 var(--s-5);border-radius:var(--r-btn);background:var(--butter-300);color:var(--maroon-900);font-weight:800;font-size:16px;cursor:pointer}
   .lb-save[disabled],.lb-share[disabled]{opacity:.6;cursor:progress}
@@ -558,6 +585,16 @@
   </div>
 </div>
 
+<section id="gerbang" class="gerbang" hidden aria-labelledby="gerbangJudul">
+  <div class="gerbang-in">
+    <p class="label">Kamera Tamu</p>
+    <h1 class="couple js-couple" id="gerbangJudul" tabindex="-1">Afiq <span class="amp">&amp;</span> Puteri</h1>
+    <p class="gerbang-t">Halaman ini khusus tamu undangan.</p>
+    <p class="gerbang-s">Scan QR di meja penerima tamu, atau buka lagi link dari undangan WhatsApp.</p>
+    <a class="link-btn" href="#admin">Saya panitia</a>
+  </div>
+</section>
+
 <div id="app">
   <div class="wrap" id="mainWrap">
     <header class="head" id="head">
@@ -597,7 +634,7 @@
         <div id="cam" hidden>
           <div class="sendbar" id="sendBar" role="status" hidden>
             <b id="sbTitle">Mengirim 1 foto…</b>
-            <span>Biarkan halaman ini terbuka.</span>
+            <span id="sbSub">Biarkan halaman ini terbuka.</span>
             <div class="bar" aria-hidden="true"><i></i></div>
           </div>
           <div class="hello">
@@ -681,8 +718,28 @@
           </div>
           <div class="adm-tools">
             <a class="btn btn-ghost btn-sm" href="#live">Buka slideshow layar</a>
-            <a class="btn btn-ghost btn-sm" id="admQr" href="#" target="_blank" rel="noopener noreferrer">Kartu QR untuk print</a>
           </div>
+          <details class="adm-akses" id="admTamu" hidden>
+            <summary>Link tamu &amp; kartu QR</summary>
+            <p class="small" id="admTamuInfo">Memuat…</p>
+            <code class="adm-link" id="admTamuLink"></code>
+            <div class="row">
+              <button class="btn btn-primary btn-sm" id="admTamuSalin" type="button">Salin link tamu</button>
+              <button class="btn btn-ghost btn-sm" id="admLiveSalin" type="button">Salin link slideshow</button>
+              <button class="btn btn-ghost btn-sm" id="admTamuQr" type="button">Unduh QR (PNG)</button>
+            </div>
+            <p class="small">Link ini yang dipakai di QR meja dan undangan WhatsApp. Kalau bocor ke media sosial, ganti kuncinya: link dan QR lama langsung berhenti berlaku.</p>
+            <div class="adm-tanya" id="admGantiTanya" hidden>
+              <p>Ganti kunci? Semua QR yang sudah dicetak dan link undangan lama langsung tidak bisa dipakai.</p>
+              <div class="row"><button class="btn btn-ghost btn-sm" id="admGantiBatal" type="button">Batal</button><button class="btn btn-primary btn-sm" id="admGantiYa" type="button">Ya, ganti kunci</button></div>
+            </div>
+            <div class="row"><button class="btn btn-ghost btn-sm" id="admGanti" type="button">Ganti kunci…</button></div>
+          </details>
+          <details class="adm-akses" id="admSehat" hidden>
+            <summary>Kesehatan sistem</summary>
+            <dl class="sehat" id="admSehatIsi"></dl>
+            <div class="row"><button class="btn btn-ghost btn-sm" id="admSehatCek" type="button">Periksa sekarang</button></div>
+          </details>
           <details class="adm-akses" id="admAkses" hidden>
             <summary>Kirim link masuk ke panitia</summary>
             <p class="small">Panitia cukup ketuk link-nya, langsung masuk tanpa ketik kode, dan tetap masuk di HP itu sampai menekan Keluar. Link ini sama dengan kodenya, jadi kirim ke orangnya saja.</p>
@@ -705,7 +762,7 @@
           </div>
         </div>
       </section>
-      <p class="ver" id="ver" hidden>Versi halaman 4 Nov 2026 · 07.36</p>
+      <p class="ver" id="ver" hidden>Versi halaman 5 Nov 2026 · aman</p>
     </main>
   </div>
 
@@ -778,6 +835,7 @@
   <div class="slots" id="bSlots" role="group" aria-label="Foto di kartu"><button type="button" data-i="0" disabled>1</button><button type="button" data-i="1" disabled>2</button><button type="button" data-i="2" disabled>3</button></div>
   <p class="slots-help" id="slotsHelp" hidden>Kurang pas? Ketuk fotonya untuk mengulangi. Filter dipilih setelah 3 foto jadi.</p>
   <p class="small">1 kartu memakai 1 jatah jepretan.</p>
+  <button class="link-btn boot-reset" id="boothReset" type="button" hidden>Mulai kartu baru dari awal</button>
  </div>
 </div>
 
@@ -795,6 +853,7 @@
     <div class="lb-act">
       <div class="lb-btns">
         <button class="lb-del" id="lbDel" type="button" hidden><svg class="ic ic-sm" aria-hidden="true"><use href="#i-trash"/></svg><span>Hapus</span></button>
+        <button class="lb-del" id="lbDelAll" type="button" hidden><svg class="ic ic-sm" aria-hidden="true"><use href="#i-trash"/></svg><span>Semua foto tamu ini</span></button>
         <button class="lb-share" id="lbShare" type="button" hidden><svg class="ic ic-sm" aria-hidden="true"><use href="#i-share"/></svg><span>Bagikan</span></button>
         <button class="lb-save" id="lbSave" type="button"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-download"/></svg><span>Simpan</span></button>
       </div>
@@ -835,9 +894,9 @@
     <h2 id="saveTitle">Simpan sebagai…</h2>
     <p class="sub">Pilih gaya file yang masuk ke galeri HP-mu.</p>
     <fieldset class="opts"><legend class="sr-only">Gaya file</legend>
-      <label class="opt"><input type="radio" name="saveStyle" value="polos" checked><span><span class="mini" aria-hidden="true"><span class="wm"><b>by Rina</b><b>17-01-2027</b></span></span><span><b>Polos</b><small>Fotomu apa adanya, dengan tanda tanggal</small></span></span></label>
-      <label class="opt"><input type="radio" name="saveStyle" value="polaroid"><span><span class="mini pola" aria-hidden="true"><i></i><em>♡ Rina</em></span><span><b>Polaroid</b><small>Bingkai putih dengan namamu</small></span></span></label>
-      <label class="opt"><input type="radio" name="saveStyle" value="tema"><span><span class="mini tema" aria-hidden="true"><em>Afiq &amp; Puteri</em><i></i><u>by Rina</u></span><span><b>Kartu tema</b><small>Latar maroon bertema pernikahan</small></span></span></label>
+      <label class="opt"><input type="radio" name="saveStyle" value="polos" checked><span><span class="mini" aria-hidden="true"><span class="wm"><b class="js-nm" data-pre="by ">by Rina</b><b>17-01-2027</b></span></span><span><b>Polos</b><small>Fotomu apa adanya, dengan tanda tanggal</small></span></span></label>
+      <label class="opt"><input type="radio" name="saveStyle" value="polaroid"><span><span class="mini pola" aria-hidden="true"><i></i><em class="js-nm" data-pre="♡ ">♡ Rina</em></span><span><b>Polaroid</b><small>Bingkai putih dengan namamu</small></span></span></label>
+      <label class="opt"><input type="radio" name="saveStyle" value="tema"><span><span class="mini tema" aria-hidden="true"><em>Afiq &amp; Puteri</em><i></i><u class="js-nm" data-pre="by ">by Rina</u></span><span><b>Kartu tema</b><small>Latar maroon bertema pernikahan</small></span></span></label>
     </fieldset>
     <button id="saveGo" class="btn btn-primary btn-big" type="button"><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg>Simpan ke HP</button>
     <button id="saveBack" class="link-plain" type="button">Batal</button>
@@ -853,9 +912,9 @@ const API = 'https://script.google.com/macros/s/AKfycbz8z5HBpc8z-E1PzBBujwInBFF6
 const C = {   // nilai awal; sebagian diperbarui dari server (Code.gs → CONFIG). Tanggal & tanda foto SENGAJA tidak diambil dari server.
   couple: 'Afiq & Puteri', dateLabel: 'Ahad, 17 Januari 2027', stampDate: '17-01-2027', dateDots: '17.01.2027',
   boothTitle: 'WEDDING DAY', hashtag: '#PUTERIinAFIQtion',   // tulisan di kartu photo booth
-  maxShots: 20, allowGallery: true, closeAt: Date.parse('2027-01-18T08:00:00+07:00'), revealAt: 0, skew: 0
+  maxShots: 20, allowGallery: true, closeAt: Date.parse('2027-01-18T08:00:00+07:00'), revealAt: 0, skew: 0,
+  liveTahan: 60000   // slideshow layar besar menahan foto baru 1 menit (panitia sempat hapus foto iseng); dari server
 };
-const ALBUM_URL = 'https://puteriinafiqtion.github.io/#album';
 const BINGKAI_IDS = ['maroon', 'mentega', 'klasik'];
 const DRY = /[?&]dry=1/.test(location.search);   // test.html?dry=1 → foto tidak benar-benar dikirim ke album
 /* Cerah = LUT "Natural Glow Up", Potret = LUT "Portrait Tone". `live` = pendekatan CSS untuk pratinjau kamera booth
@@ -880,7 +939,14 @@ function toast(msg, kind, ms){
   const t = $('toast');
   t.innerHTML = icon(kind === 'warn' ? 'warn' : 'ok', 'ic-sm');
   const s = document.createElement('span'); s.textContent = msg; t.appendChild(s);
-  t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => t.hidden = true, ms || 3500);
+  t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => t.hidden = true, ms || (kind === 'warn' ? 7000 : 4500));
+}
+/** Toast dengan tombol, mis. "Urungkan" setelah panitia menyembunyikan foto. */
+function toastAksi(msg, label, fn, ms){
+  toast(msg, 'ok', ms || 10000);
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'toast-aksi'; b.textContent = label;
+  b.onclick = async () => { b.disabled = true; $('toast').hidden = true; try { await fn(); } catch(e) { toast(e.server ? e.message : 'Gagal. Coba lagi.', 'warn'); } };
+  $('toast').appendChild(b);
 }
 function busy(on, text){ $('busyText').textContent = text || 'Mencuci foto…'; $('busy').hidden = !on; }
 function flash(){
@@ -919,6 +985,7 @@ function watchStrip(img, it, el){
 
 /* ================= DIALOG (fokus terkunci, Esc menutup, fokus kembali) ================= */
 const D = { open: null, last: null, onClose: null };
+const TANYA = { batal: null };   // konfirmasi yang sedang tampil di lightbox
 const FOCUSABLE = 'button:not([disabled]), a[href]:not([hidden]), input:not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])';
 function openDialog(el, focusEl, onClose){
   if (D.open && D.open !== el) closeDialog(true);
@@ -928,6 +995,7 @@ function openDialog(el, focusEl, onClose){
   (focusEl || el.querySelector(FOCUSABLE)).focus({ preventScroll: true });
 }
 function closeDialog(silent){
+  if (TANYA.batal) TANYA.batal();
   const el = D.open; if (!el) return;
   el.hidden = true; D.open = null;
   $('app').inert = false; $('app').removeAttribute('aria-hidden');
@@ -960,8 +1028,9 @@ async function api(query){
   let lastErr;
   for (let i = 0; i < 3; i++){
     try {
-      const r = await fetchT(API + '?' + query, { credentials: 'omit', cache: 'no-store' }, 25000);
+      const r = await fetchT(API + '?' + query + (TAMU.kunci ? '&k=' + encodeURIComponent(TAMU.kunci) : ''), { credentials: 'omit', cache: 'no-store' }, 25000);
       const j = await r.json();
+      if (j && j.reason === 'kunci') gerbang();
       if (j && j.ok === false && j.error) throw Object.assign(new Error(j.error), { server: true, reason: j.reason });
       return j;
     } catch(e) {
@@ -975,8 +1044,11 @@ async function api(query){
 async function apiPost(body){
   if (DRY && body && body.action === 'upload') { await sleep(1200); return { ok: true, id: 'dry-' + Date.now(), used: S.used + 1, max: C.maxShots }; }
   // batas longgar (2 menit): kiriman foto di sinyal lemah memang lama; yang benar-benar macet dicoba ulang oleh upload()
+  if (body && body.action !== 'admin' && TAMU.kunci) body = Object.assign({ k: TAMU.kunci }, body);
   const r = await fetchT(API, { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }, 120000);
-  return r.json();
+  const j = await r.json();
+  if (j && j.reason === 'kunci') gerbang();
+  return j;
 }
 
 /* ================= STATE ================= */
@@ -985,6 +1057,53 @@ const PKEY = KEY + '_antrian_v2';
 const FKEY = KEY + '_pilihan_v2';
 const guest = store.get(KEY) || { id: uid(), name: '' };
 store.set(KEY, guest);
+
+/* ================= LINK RAHASIA TAMU (?k=...) =================
+   QR meja & link undangan memuat ?k=KUNCI. Kunci disimpan di HP, jadi dibuka lagi dari riwayat/layar utama tetap jalan.
+   Server menolak (reason 'kunci') kalau kunci wajib dan tidak cocok → tampil gerbang "scan QR". */
+const KKEY = KEY + '_kunci';
+const TAMU = { kunci: '', ditolak: false };
+{
+  const q = String(new URLSearchParams(location.search).get('k') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  let simpan = ''; try { simpan = localStorage.getItem(KKEY) || ''; } catch(e){}
+  TAMU.kunci = q.length >= 8 ? q : simpan;
+  if (q.length >= 8 && q !== simpan) try { localStorage.setItem(KKEY, q); } catch(e){}
+}
+/** Link halaman ini untuk dibagikan / QR slideshow (memuat kunci tamu kalau ada). */
+function linkHalaman(hash){ return location.origin + location.pathname + (TAMU.kunci ? '?k=' + TAMU.kunci : '') + (hash || ''); }
+function gerbang(){
+  if (TAMU.ditolak) return;
+  TAMU.ditolak = true; TAMU.kunci = '';
+  try { localStorage.removeItem(KKEY); } catch(e){}
+  route();
+}
+
+/* Antrean foto yang belum terkirim: IndexedDB (muat puluhan MB), cadangan localStorage. */
+const IDB = {
+  p: null,
+  buka(){
+    if (!this.p) this.p = new Promise((res, rej) => {
+      try {
+        const r = indexedDB.open('kamera_tamu', 1);
+        r.onupgradeneeded = () => r.result.createObjectStore('antrian', { keyPath: 'uid' });
+        r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+      } catch(e) { rej(e); }
+    });
+    return this.p;
+  },
+  async tulis(list){
+    const db = await this.buka();
+    await new Promise((res, rej) => {
+      const tx = db.transaction('antrian', 'readwrite'), st = tx.objectStore('antrian');
+      st.clear(); list.forEach(x => st.put(x));
+      tx.oncomplete = res; tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error);
+    });
+  },
+  async baca(){
+    const db = await this.buka();
+    return new Promise((res, rej) => { const q = db.transaction('antrian').objectStore('antrian').getAll(); q.onsuccess = () => res(q.result || []); q.onerror = () => rej(q.error); });
+  }
+};
 const pref = Object.assign({ filter: 'cerah', bingkai: 'maroon', saveStyle: 'polos' }, store.get(FKEY) || {});
 if (!FILTERS.some(f => f.id === pref.filter)) pref.filter = 'cerah';
 if (!BINGKAI_IDS.includes(pref.bingkai)) pref.bingkai = 'maroon';
@@ -1130,9 +1249,10 @@ function render(){
   ['btnCam','btnSelfie','btnGal','btnBooth'].forEach(id => $(id).disabled = off);
   $('btnGal').hidden = !C.allowGallery;
 
-  const sending = S.items.filter(i => i.state === 'up').length;
+  const sending = S.items.filter(i => i.state === 'up').length, antre = S.items.some(i => i.state === 'up' && i.wait);
   $('sendBar').hidden = !sending;
-  $('sbTitle').textContent = 'Mengirim ' + sending + ' foto…';
+  $('sbTitle').textContent = antre ? 'Server sedang ramai, ' + sending + ' foto antre' : 'Mengirim ' + sending + ' foto…';
+  $('sbSub').textContent = antre ? 'Fotomu aman di HP ini dan terkirim otomatis. Jangan tutup halaman ini ya.' : 'Biarkan halaman ini terbuka.';
 
   const note = $('note'); note.classList.remove('warn');
   if (closed()) note.textContent = 'Kamera sudah ditutup. Terima kasih sudah motret! Fotonya bisa dilihat di Album.';
@@ -1695,6 +1815,8 @@ async function renderPreview(){
 
 function showSaveCard(on){
   $('cardSend').hidden = on; $('cardSave').hidden = !on;
+  if (on) { const nm = String((S.current && S.current.name) || guest.name || 'Tamu').split(' ')[0].slice(0, 12);
+    document.querySelectorAll('.js-nm').forEach(e => e.textContent = e.dataset.pre + nm); }
   $('sheet').setAttribute('aria-labelledby', on ? 'saveTitle' : 'sheetTitle');
   const cur = S.current;
   if (on && cur && !cur.prep) cur.prep = {};          // file dibuat di latar saat tamu memilih gaya (supaya share iPhone tidak kehilangan "ketukan")
@@ -1786,6 +1908,7 @@ async function saveFile(cur, style){
   return cur.prep[style];
 }
 
+const HEIF = f => /hei[cf]/i.test((f && f.type) || '') || /\.hei[cf]$/i.test((f && f.name) || '');
 async function onPick(e, source, trigger){
   const f = e.target.files && e.target.files[0];
   e.target.value = '';
@@ -1801,7 +1924,7 @@ async function onPick(e, source, trigger){
     openSheet(trigger);
   } catch(err) {
     S.current = null;
-    toast('Foto tidak bisa dibaca. Coba jepret ulang ya.', 'warn');
+    toast(HEIF(f) ? 'Format foto ini (HEIC) belum bisa dibaca browser. Pakai tombol Buka kamera ya.' : 'Foto tidak bisa dibaca. Coba jepret ulang ya.', 'warn');
   } finally { busy(false); }
 }
 
@@ -1815,8 +1938,10 @@ function lepasKanvas(cur){
 }
 
 function savePending(){
-  const list = S.items.filter(i => i.state !== 'done' && i.dataUrl).map(i => ({ id: i.id, uid: i.uid, dataUrl: i.dataUrl, source: i.source }));
-  if (!store.set(PKEY, list)) store.set(PKEY, list.slice(-2));
+  const list = S.items.filter(i => i.state !== 'done' && !i.tolak && i.dataUrl).map(i => ({ id: i.id, uid: i.uid || uid(), dataUrl: i.dataUrl, source: i.source }));
+  // IndexedDB muat banyak foto; localStorage (±5 MB) hanya cadangan kalau IndexedDB tidak tersedia
+  IDB.tulis(list).then(() => { try { localStorage.removeItem(PKEY); } catch(e){} })
+    .catch(() => { if (!store.set(PKEY, list)) store.set(PKEY, list.slice(-2)); });
 }
 
 async function send(){
@@ -1870,6 +1995,8 @@ async function upload(it){
   } else if (res && res.reason === 'penuh'){
     it.state = 'fail';
     toast('Album sudah penuh. Kabari panitia ya.', 'warn', 6000);
+  } else if (res && res.reason === 'kunci'){       // dibuka tanpa link rahasia: foto tetap di HP, terkirim setelah buka dari QR/undangan
+    it.state = 'fail';
   } else if (res && res.reason === 'invalid'){   // ditolak server karena isinya (bukan JPEG / terlalu besar): jangan dikirim ulang otomatis
     it.state = 'fail'; it.tolak = true;
     toast('Foto ini nggak bisa dikirim. Coba ambil ulang ya.', 'warn', 7000);
@@ -1896,6 +2023,7 @@ function applyCfg(cfg){
   C.couple = cfg.couple || C.couple;   // dateLabel & stamp dari server sengaja diabaikan (sumber: frontend)
   C.maxShots = cfg.maxShots || C.maxShots; C.allowGallery = cfg.allowGallery !== false;
   C.closeAt = cfg.closeAt || C.closeAt; C.revealAt = cfg.revealAt || 0;
+  if (typeof cfg.liveTahan === 'number') C.liveTahan = cfg.liveTahan;
   if (cfg.now) C.skew = cfg.now - Date.now();
   applyConfig(); render();
 }
@@ -2109,7 +2237,8 @@ function openBooth(trigger, opts){
   if (closed()) return toast('Kamera sudah ditutup.', 'warn');
   if (left() <= 0) return toast('Roll kamu sudah habis.', 'warn');
   const o = opts || {};
-  Object.assign(B, { frames: o.frames ? o.frames.slice() : [], redo: o.redo != null ? o.redo : null, fromCard: !!o.frames,
+  const lanjut = !o.frames && B.sisa && B.sisa.length > 0 && B.sisa.length < 3;   // ✕ sebelum foto ke-3 → kartu dilanjutkan
+  Object.assign(B, { frames: o.frames ? o.frames.slice() : lanjut ? B.sisa.slice() : [], redo: o.redo != null ? o.redo : null, fromCard: !!o.frames,
                      running: false, cancel: false, manual: false, trigger: trigger || $('btnBooth') });
   renderSlots(); boothShape(); showCount(''); boothMsg('');
   $('booth').classList.remove('manual');
@@ -2118,7 +2247,12 @@ function openBooth(trigger, opts){
   Object.assign(Z, { level: 1, digital: 1, useUW: false }); videoTransform();
   $('toast').hidden = true;
   // ditutup saat mengulang dari kartu → kembali ke kartu lama, foto tidak hilang
-  openDialog($('booth'), $('boothStart'), () => { stopBooth(); if (B.fromCard && B.frames.length >= 3) { B.redo = null; setTimeout(finishBooth, 0); } });
+  B.sisa = null; $('boothReset').hidden = !lanjut;
+  openDialog($('booth'), $('boothStart'), () => {
+    stopBooth();
+    if (B.fromCard && B.frames.length >= 3) { B.redo = null; setTimeout(finishBooth, 0); }
+    else if (!B.fromCard && B.frames.length > 0 && B.frames.length < 3) B.sisa = B.frames.slice();
+  });
   D.last = B.trigger;
   if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) return setManual('Browser ini tidak bisa membuka kamera langsung. Ambil 3 foto satu per satu ya.');
   boothLabel();
@@ -2432,7 +2566,11 @@ async function albumRefresh(){
     }
     syncMineTiles();
     renderAlbumStats();
-  } catch(e) {} finally { A.loading = false; }
+    A.refreshFails = 0; A.nextRefresh = 0;
+  } catch(e) {
+    A.refreshFails = (A.refreshFails || 0) + 1;      // 90 dtk → 3 → 4,5 menit (maks. 5) supaya server ramai tidak makin ramai
+    A.nextRefresh = Date.now() + Math.min(300000, 90000 * (A.refreshFails + 1));
+  } finally { A.loading = false; }
 }
 
 /* Album baru kebuka setelah tamu nulis nama (tanpa kode apa pun). */
@@ -2474,6 +2612,7 @@ function lbPreload(){   // foto sebelah kiri & kanan dimuat diam-diam supaya ges
   });
 }
 function showLb(i){
+  if (TANYA.batal) TANYA.batal();
   const list = A.lbList; if (!list.length) return;
   A.idx = (i + list.length) % list.length;
   const it = list[A.idx];
@@ -2511,6 +2650,7 @@ function showLb(i){
   $('lbSave').setAttribute('aria-label', 'Simpan ' + (strip ? 'foto booth' : 'foto') + ' ke HP');
   $('lbDrive').hidden = true;
   $('lbDel').hidden = !(A.lbAdmin || S.items.some(x => x.id === it.id && x.state === 'done'));
+  $('lbDelAll').hidden = !A.lbAdmin;
   $('lbDel').setAttribute('aria-label', (A.lbAdmin ? 'Sembunyikan ' : 'Hapus ') + (strip ? 'foto booth' : 'foto') + ' ini dari album');
   $('lbDel').querySelector('span').textContent = A.lbAdmin ? 'Sembunyikan' : 'Hapus';
   $('lbPrev').hidden = $('lbNext').hidden = list.length < 2;
@@ -2528,11 +2668,18 @@ function openLb(list, i, admin){
 const L = { pool: [], fresh: [], seen: new Set(), first: true, layer: 0, started: false, paused: false };
 async function livePoll(){
   try {
-    const r = await api('api=album&offset=0&limit=80');
+    const r = await api('api=album&offset=0&limit=120');
     if (r.locked) return;
     $('liveN').textContent = r.total.toLocaleString('id-ID'); $('liveStats').textContent = 'foto dari ' + r.guests + ' fotografer';
+    // foto yang baru disembunyikan panitia: hilang dari slideshow (yang lebih tua dari jendela 120 foto tetap diputar)
+    const ada = new Set(r.items.map(x => x.id)), tertua = r.items.length ? r.items[r.items.length - 1].t : 0;
+    const masih = x => ada.has(x.id) || (x.t && x.t < tertua);
+    L.pool = L.pool.filter(masih); L.fresh = L.fresh.filter(masih);
+    // foto baru ditahan C.liveTahan (bawaan 1 menit) supaya panitia sempat menyembunyikan foto iseng sebelum tampil di layar besar
+    const batas = now() - (C.liveTahan || 0);
     r.items.slice().reverse().forEach(it => {
       if (L.seen.has(it.id)) return;
+      if (C.liveTahan && it.t && it.t > batas) return;
       L.seen.add(it.id); L.pool.push(it);
       if (!L.first) L.fresh.push(it);
     });
@@ -2562,17 +2709,30 @@ async function liveNext(){
   nxt.classList.add('on'); cur.classList.remove('on');
   L.layer = 1 - L.layer;
 }
+/** Library QR dari cdnjs, dikunci sidik jari (SRI): kalau isinya diubah orang, browser menolak menjalankannya. */
+let QR_P = null;
+function muatQr(){
+  if (window.qrcode) return Promise.resolve(window.qrcode);
+  if (!QR_P) QR_P = new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
+    s.integrity = 'sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1'; s.crossOrigin = 'anonymous'; s.referrerPolicy = 'no-referrer';
+    s.onload = () => res(window.qrcode); s.onerror = () => { QR_P = null; rej(new Error('qr')); };
+    document.head.appendChild(s);
+  });
+  return QR_P;
+}
+async function nyalakanLayar(){   // laptop/TV venue jangan sampai tidur di tengah resepsi
+  try { if ('wakeLock' in navigator && document.visibilityState === 'visible') L.wake = await navigator.wakeLock.request('screen'); } catch(e){}
+}
 function startLive(){
   if (L.started) return; L.started = true;
-  const s = document.createElement('script');
-  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
-  s.onload = () => {
-    try {
-      const qr = qrcode(0, 'M'); qr.addData(location.origin + location.pathname); qr.make();
-      $('liveQr').innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true, alt: 'QR untuk membuka Kamera Tamu' });
-    } catch(e) {}
-  };
-  document.head.appendChild(s);
+  muatQr().then(q => {
+    const qr = q(0, 'M'); qr.addData(linkHalaman()); qr.make();
+    $('liveQr').innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true, alt: 'QR untuk membuka Kamera Tamu' });
+  }).catch(() => {});
+  nyalakanLayar();
+  document.addEventListener('visibilitychange', () => { if (!$('viewLive').hidden) nyalakanLayar(); });
   setTimeout(() => $('hint').style.opacity = 0, 8000);
   document.addEventListener('keydown', e => {
     if (e.code !== 'Space' || $('viewLive').hidden) return;
@@ -2591,10 +2751,12 @@ const ADM = { key: '', role: '', nama: '', ok: false, tab: 'album', items: [], o
 
 async function adminPost(op, extra){
   const r = await apiPost(Object.assign({ action: 'admin', key: ADM.key, op: op }, extra || {}));
-  if (r && r.reason === 'admin') { admLogout(true); throw Object.assign(new Error(r.error || 'Kode panitia salah.'), { server: true }); }
-  if (!r || r.ok === false) throw Object.assign(new Error((r && r.error) || 'Gagal. Coba lagi.'), { server: true });
+  if (r && r.reason === 'admin') { admLogout(ADM.ok); throw Object.assign(new Error(r.error || 'Kode panitia salah.'), { server: true, reason: 'admin' }); }
+  if (!r || r.ok === false) throw Object.assign(new Error((r && r.error) || 'Gagal. Coba lagi.'), { server: true, reason: r && r.reason });
   return r;
 }
+const ADM_SALAH = 'Kode panitia salah atau sudah tidak aktif.';
+function admPesan(teks){ $('admErr').querySelector('span').textContent = teks; $('admErr').hidden = false; }
 function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 
 function showAdmin(){
@@ -2618,15 +2780,87 @@ async function admEnter(key, silent){
     $('admKey').value = ''; $('admErr').hidden = true;
     $('admLogin').hidden = true; $('admPanel').hidden = false;
     $('admName').textContent = r.nama + (r.role === 'owner' ? ' (pemilik)' : '');
-    $('admQr').href = API + '?page=qr';
     admTab(ADM.tab);
     admStats();
     admAkses();
+    admTamu();
+    $('admSehat').hidden = r.role !== 'owner';
   } catch(e) {
-    if (!e.server) { toast('Sinyal tersendat. Coba lagi.', 'warn'); if (silent) { $('admLogin').hidden = false; $('admPanel').hidden = true; } }
-    else { ADM.key = ''; store.set(AKEY, null); $('admLogin').hidden = false; $('admPanel').hidden = true;
-      if (!silent) { $('admErr').hidden = false; $('admKey').setAttribute('aria-invalid', 'true'); $('admKey').focus(); } }
+    $('admLogin').hidden = false; $('admPanel').hidden = true;
+    if (e.server && e.reason === 'admin') {        // kode memang salah → baru dilupakan
+      ADM.key = ''; store.set(AKEY, null);
+      if (!silent) { admPesan(ADM_SALAH); $('admKey').setAttribute('aria-invalid', 'true'); $('admKey').focus(); }
+    } else if (e.server && e.reason === 'tunggu') admPesan(e.message);
+    else admPesan('Server sedang sibuk atau sinyal tersendat. Kodenya tetap tersimpan, coba lagi sebentar lagi.');
   } finally { btn.disabled = false; }
+}
+/** Khusus pemilik: link rahasia tamu (QR meja & undangan), unduh QR, ganti kunci. */
+async function admTamu(){
+  const box = $('admTamu');
+  box.hidden = ADM.role !== 'owner'; if (box.hidden) return;
+  $('admTamuInfo').textContent = 'Memuat…';
+  try {
+    const r = await adminPost('kunci');
+    ADM.linkTamu = r.link || '';
+    $('admTamuLink').textContent = ADM.linkTamu || '(belum ada)';
+    $('admTamuInfo').textContent = r.wajib ? 'Link rahasia: WAJIB. Yang membuka tanpa link ini tidak bisa melihat album.'
+      : 'Link rahasia: belum wajib (masa peralihan). Nyalakan di Sheet, tab "Pengaturan Acara", baris "Wajib link rahasia" = Ya.';
+  } catch(e) { $('admTamuInfo').textContent = e.server ? e.message : 'Sinyal tersendat. Buka lagi nanti.'; }
+}
+async function admUnduhQr(){
+  if (!ADM.linkTamu) return toast('Link tamu belum termuat.', 'warn');
+  try {
+    const q = await muatQr(), qr = q(0, 'M'); qr.addData(ADM.linkTamu); qr.make();
+    const n = qr.getModuleCount(), W = 1200, H = 1560, sel = Math.floor(860 / (n + 8)), ukuran = sel * (n + 8), ox = (W - ukuran) / 2, oy = 290;
+    const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+    x.fillStyle = '#FFF9EA'; x.fillRect(0, 0, W, H);
+    x.textAlign = 'center'; x.fillStyle = '#6B1D2A';
+    x.font = '600 34px ' + getComputedStyle(document.body).fontFamily; x.fillText('KAMERA TAMU', W / 2, 110);
+    x.font = 'italic 600 88px Fraunces, Georgia, serif'; x.fillText(C.couple, W / 2, 215);
+    x.fillStyle = '#fff'; x.fillRect(ox, oy, ukuran, ukuran);
+    x.fillStyle = '#2B1A1C';
+    for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) if (qr.isDark(r, k)) x.fillRect(ox + (k + 4) * sel, oy + (r + 4) * sel, sel, sel);
+    x.fillStyle = '#6B1D2A'; x.font = '700 46px ' + getComputedStyle(document.body).fontFamily;
+    x.fillText('Scan, tulis nama, lalu jepret!', W / 2, oy + ukuran + 95);
+    x.font = '36px ' + getComputedStyle(document.body).fontFamily; x.fillText(C.dateLabel, W / 2, oy + ukuran + 155);
+    const blob = await new Promise(res => c.toBlob(res, 'image/png'));
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'QR-Kamera-Tamu.png';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  } catch(e) { toast('QR gagal dibuat. Cek sinyal lalu coba lagi.', 'warn'); }
+}
+async function admGantiKunci(){
+  const b = $('admGantiYa'); b.disabled = true;
+  try {
+    const r = await adminPost('kunciBaru', { yakin: true });
+    $('admGantiTanya').hidden = true; ADM.linkTamu = r.link; $('admTamuLink').textContent = r.link;
+    toast('Kunci baru aktif. Cetak ulang QR dan kirim link baru ke tamu.', 'ok', 8000);
+  } catch(e) { toast(e.server ? e.message : 'Sinyal tersendat. Coba lagi.', 'warn'); }
+  finally { b.disabled = false; }
+}
+/** Khusus pemilik: apa semuanya jalan? */
+async function admCekSehat(){
+  const dl = $('admSehatIsi'); dl.textContent = '';
+  const tulis = (k, v, buruk) => { dl.append(el('dt', '', k)); const d = el('dd', buruk ? 'buruk' : '', v); dl.append(d); };
+  const tgl = ms => ms ? new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Jakarta' }).format(new Date(ms)) + ' WIB' : '(kosong)';
+  tulis('Status', 'Memeriksa…');
+  try {
+    const h = await adminPost('health'); dl.textContent = '';
+    const p = h.pengaturan || {};
+    tulis('Versi server', h.versi);
+    tulis('Foto di album', h.foto.toLocaleString('id-ID') + ' dari ' + h.tamu + ' tamu · ' + h.dihapus + ' disembunyikan');
+    tulis('Batas total foto', h.maksFoto.toLocaleString('id-ID'), h.foto + h.dihapus > h.maksFoto * 0.8);
+    tulis('Album diperbarui', Math.round(h.indeksUmur / 1000) + ' detik lalu', h.indeksUmur > 120000);
+    if (h.ruang) { const gb = v => (v / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' GB';
+      tulis('Sisa Google Drive', gb(h.ruang.sisa) + ' dari ' + gb(h.ruang.batas), h.ruang.sisa < 5e9); }
+    if (h.belumDibagikan) tulis('Foto belum terbuka', h.belumDibagikan + ' foto (dicoba ulang otomatis)', true);
+    tulis('Kamera tutup', tgl(p.closeAt));
+    tulis('Mulai acara', tgl(p.acaraMulai));
+    tulis('Jatah per tamu', String(p.maxShots));
+    tulis('Link rahasia', p.kunciWajib ? 'Wajib' : 'Belum wajib', !p.kunciWajib);
+    tulis('Tahan slideshow', p.liveTahan + ' detik');
+    if (p.salahIsi && p.salahIsi.length) tulis('Isian Sheet salah', p.salahIsi.join(', ') + ' (dipakai nilai bawaan)', true);
+    tulis('Error terakhir', h.error.length ? h.error.length + ' catatan, terbaru ' + tgl(h.error[0].t) + ': ' + h.error[0].di : 'Tidak ada', !!h.error.length);
+  } catch(e) { dl.textContent = ''; tulis('Status', e.server ? e.message : 'Sinyal tersendat.', true); }
 }
 /** Khusus pemilik: daftar panitia + tombol kirim link masuk lewat WhatsApp / salin link. */
 async function admAkses(){
@@ -2657,6 +2891,7 @@ function admLogout(expired){
   Object.assign(ADM, { key: '', role: '', nama: '', ok: false, items: [], offset: 0, total: 0, done: false });
   store.set(AKEY, null);
   $('admAkses').hidden = true; $('admAksesList').textContent = ''; $('admName').textContent = '';
+  $('admTamu').hidden = true; $('admSehat').hidden = true; $('admTamuLink').textContent = ''; ADM.linkTamu = '';
   $('admGrid').innerHTML = ''; $('admTrashList').innerHTML = '';
   $('admLogin').hidden = false; $('admPanel').hidden = true;
   if (expired) toast('Kode panitia sudah tidak berlaku. Masuk lagi.', 'warn', 5000);
@@ -2722,7 +2957,7 @@ function admTrashItem(it){
     const b = el('button', 'btn btn-ghost btn-sm', 'Pulihkan'); b.type = 'button';
     b.onclick = async () => {
       b.disabled = true;
-      try { await adminPost('pulihkan', { id: it.id }); li.remove(); toast('Foto kembali ke album.'); ADM.done = false; A.dirty = true; admAlbumMore(true); admStats(); }
+      try { await adminPost('pulihkan', { id: it.id }); li.remove(); toast('Foto kembali ke album.'); admSegarkan(); }
       catch(e) { b.disabled = false; toast(e.message, 'warn', 5000); }
     };
     li.appendChild(b);
@@ -2745,22 +2980,56 @@ async function admTrashLoad(reset){
 }
 
 /* --- hapus foto dari lightbox (tamu: foto sendiri; panitia: semua foto) --- */
+/** Konfirmasi di dalam lightbox (confirm() bawaan bisa diblokir di browser dalam aplikasi & sulit dibaca lansia). */
+function tanyaLb(pesan, ya){
+  return new Promise(res => {
+    if (TANYA.batal) TANYA.batal();
+    const act = $('lb').querySelector('.lb-act'), btns = act.querySelector('.lb-btns');
+    const box = el('div', 'lb-tanya'); box.setAttribute('role', 'group'); box.setAttribute('aria-label', 'Konfirmasi');
+    const p = el('p', '', pesan);
+    const no = el('button', 'btn btn-ghost btn-sm', 'Batal'); no.type = 'button';
+    const ok = el('button', 'btn btn-primary btn-sm', ya); ok.type = 'button';
+    const selesai = v => { TANYA.batal = null; box.remove(); btns.hidden = false; res(v); };
+    no.onclick = () => selesai(false); ok.onclick = () => selesai(true);
+    TANYA.batal = () => selesai(false);
+    box.append(p, no, ok); btns.hidden = true; act.prepend(box); no.focus({ preventScroll: true });
+  });
+}
+function admSegarkan(){ ADM.done = false; A.dirty = true; admAlbumMore(true); admStats(); }
 async function delCurrent(){
   const it = A.lbList[A.idx]; if (!it) return;
   const admin = A.lbAdmin;
-  if (!confirm(admin ? 'Sembunyikan foto ini dari album? File aslinya tetap tersimpan di Google Drive pemilik.'
-                     : 'Hapus foto ini dari album? Jatah jepretanmu tidak kembali.')) return;
+  const ya = await tanyaLb(admin ? 'Sembunyikan foto ini dari album? File aslinya tetap di Google Drive pemilik.'
+                                 : 'Hapus foto ini dari album? Jatah jepretanmu tidak kembali.', admin ? 'Ya, sembunyikan' : 'Ya, hapus');
+  if (!ya) return;
   const b = $('lbDel'); b.disabled = true;
   try {
     const r = admin ? await adminPost('hapus', { id: it.id })
                     : await apiPost({ action: 'hapus', guestId: guest.id, id: it.id });
     if (!r || !r.ok) throw Object.assign(new Error((r && r.error) || 'Gagal menghapus.'), { server: !!r, reason: r && r.reason });
     removePhoto(it.id);
-    toast(admin ? 'Foto disembunyikan dari album.' : 'Foto dihapus dari album.');
-    if (admin) admStats();
+    if (admin) { admStats(); toastAksi('Foto disembunyikan dari album.', 'Urungkan', async () => { await adminPost('pulihkanBanyak', { ids: [it.id] }); toast('Foto kembali ke album.'); admSegarkan(); }); }
+    else toast('Foto dihapus dari album.');
   } catch(e) {
-    toast(e.server ? e.message : 'Sinyal tersendat. Coba lagi.', 'warn', 5000);
+    toast(e.server ? e.message : 'Sinyal tersendat. Coba lagi.', 'warn');
   } finally { b.disabled = false; }
+}
+/** Panitia: sembunyikan semua foto dari tamu yang sama (mis. tamu iseng), bisa diurungkan. */
+async function delSemuaTamu(){
+  const it = A.lbList[A.idx]; if (!it || !A.lbAdmin) return;
+  const b = $('lbDelAll'); b.disabled = true;
+  try {
+    const r = await adminPost('fotoTamu', { id: it.id });
+    const ids = r.items.map(x => x.id);
+    if (!ids.length) return toast('Foto tamu ini sudah tidak ada di album.', 'warn');
+    if (!await tanyaLb('Sembunyikan semua ' + ids.length + ' foto dari ' + (r.nama || 'tamu ini') + '?', 'Ya, sembunyikan ' + ids.length)) return;
+    const h = await adminPost('hapusBanyak', { ids });
+    ids.forEach(removePhoto);
+    admStats();
+    toastAksi(h.n + ' foto dari ' + (r.nama || 'tamu ini') + ' disembunyikan.', 'Urungkan', async () => {
+      await adminPost('pulihkanBanyak', { ids }); toast(ids.length + ' foto kembali ke album.'); admSegarkan(); });
+  } catch(e) { toast(e.server ? e.message : 'Sinyal tersendat. Coba lagi.', 'warn'); }
+  finally { b.disabled = false; }
 }
 function removePhoto(id){
   const wasItems = A.lbList === A.items, wasAdm = A.lbList === ADM.items;
@@ -2784,6 +3053,10 @@ function route(){
     history.replaceState(null, '', location.pathname + location.search + '#admin');
     h = 'admin';
   }
+  const tolak = TAMU.ditolak && h !== 'admin';     // tanpa link rahasia: hanya halaman panitia yang terbuka
+  $('gerbang').hidden = !tolak;
+  if (tolak) { $('app').hidden = true; $('viewLive').hidden = true; $('cover').hidden = true; $('app').inert = false; closeDialog(true);
+    $('gerbangJudul').focus({ preventScroll: true }); return; }
   const live = h === 'live';
   $('app').hidden = live; $('viewLive').hidden = !live;
   if (live) return startLive();
@@ -2817,7 +3090,8 @@ $('nameForm').addEventListener('submit', e => {
   e.preventDefault();
   const inp = $('name');
   const n = inp.value.replace(/\s+/g, ' ').trim();
-  if (n.length < 2) {
+  if (n.length < 2 || kasar(n)) {
+    $('nameErr').querySelector('span') && ($('nameErr').querySelector('span').textContent = n.length < 2 ? NAMA_PENDEK : 'Pakai nama asli ya, nama ini tampil di album dan layar.');
     inp.setAttribute('aria-invalid', 'true');
     inp.setAttribute('aria-describedby', 'nameHelp nameErr');
     $('nameErr').hidden = false; inp.focus();
@@ -2827,6 +3101,14 @@ $('nameForm').addEventListener('submit', e => {
   guest.name = n; store.set(KEY, guest); showCam();
   $('btnCam').focus({ preventScroll: true });
 });
+const KASAR = ['anjing', 'anjg', 'anjrit', 'bangsat', 'bajingan', 'brengsek', 'kontol', 'memek', 'ngentot', 'entot', 'jancok', 'jancuk', 'asu', 'babi',
+  'goblok', 'goblog', 'tolol', 'kampret', 'taik', 'pepek', 'pantek', 'perek', 'lonte', 'pelacur', 'jembut', 'bacot', 'keparat', 'fuck', 'shit', 'bitch',
+  'pussy', 'porn', 'bokep', 'ngewe'].map(w => w.replace(/(.)\1+/g, '$1'));
+function kasar(t){   // sama dengan server: kata utuh, huruf ganda & angka-huruf disamakan
+  return String(t).toLowerCase().replace(/0/g, 'o').replace(/1/g, 'i').replace(/3/g, 'e').replace(/4/g, 'a').replace(/5/g, 's').replace(/7/g, 't')
+    .replace(/@/g, 'a').replace(/\$/g, 's').split(/[^a-z]+/).some(w => w && KASAR.indexOf(w.replace(/(.)\1+/g, '$1')) >= 0);
+}
+const NAMA_PENDEK = (($('nameErr') && $('nameErr').querySelector('span')) || {}).textContent || 'Tulis nama dulu ya, minimal 2 huruf.';
 $('name').addEventListener('input', () => { if (!$('nameErr').hidden && $('name').value.trim().length >= 2) { $('nameErr').hidden = true; $('name').removeAttribute('aria-invalid'); } });
 $('rename').onclick = () => { showWelcome(); $('name').focus(); };
 $('btnCam').onclick = () => $('inCam').click();
@@ -2891,7 +3173,7 @@ async function salinTeks(teks, pesanOk){
     catch(e2) { toast(teks, 'warn', 6000); }
   }
 }
-$('copyLink').onclick = () => salinTeks(ALBUM_URL, 'Link album disalin');
+$('copyLink').onclick = () => salinTeks(linkHalaman('#album'), 'Link album disalin');
 $('fAll').onclick = () => setFilter('all');
 $('fMine').onclick = () => setFilter('mine');
 $('lbX').onclick = () => closeDialog();
@@ -2899,10 +3181,25 @@ $('lbPrev').onclick = () => showLb(A.idx - 1);
 $('lbNext').onclick = () => showLb(A.idx + 1);
 $('lbSave').onclick = lbSaveAs;
 $('lbDel').onclick = delCurrent;
+$('lbDelAll').onclick = delSemuaTamu;
+$('admTamuSalin').onclick = () => ADM.linkTamu && salinTeks(ADM.linkTamu, 'Link tamu disalin');
+$('admLiveSalin').onclick = () => ADM.linkTamu && salinTeks(ADM.linkTamu + '#live', 'Link slideshow disalin');
+$('admTamuQr').onclick = admUnduhQr;
+$('admGanti').onclick = () => { $('admGantiTanya').hidden = false; $('admGantiBatal').focus(); };
+$('admGantiBatal').onclick = () => { $('admGantiTanya').hidden = true; $('admGanti').focus(); };
+$('admGantiYa').onclick = admGantiKunci;
+$('admSehatCek').onclick = admCekSehat;
+$('admSehat').addEventListener('toggle', () => { if ($('admSehat').open && !$('admSehatIsi').children.length) admCekSehat(); });
+$('boothReset').onclick = () => {
+  if (B.running) return;
+  B.frames = []; B.redo = null; renderSlots(); boothShape(); boothLabel(); $('boothReset').hidden = true;
+  $('bStatus').textContent = BOOTH_READY;
+};
 $('admForm').addEventListener('submit', e => {
   e.preventDefault();
   const k = $('admKey').value.trim();
-  if (k.replace(/[^a-z0-9]/gi, '').length < 6) { $('admErr').hidden = false; $('admKey').setAttribute('aria-invalid', 'true'); $('admKey').focus(); return; }
+  if (k.replace(/[^a-z0-9]/gi, '').length < 6) { admPesan(ADM_SALAH); $('admKey').setAttribute('aria-invalid', 'true'); $('admKey').focus(); return; }
+  $('admErr').hidden = true;
   $('admKey').removeAttribute('aria-invalid'); admEnter(k, false);
 });
 $('admOut').onclick = () => { admLogout(false); $('admKey').focus(); };
@@ -2922,7 +3219,7 @@ $('lb').addEventListener('touchend', e => {
   if (Math.abs(dx) > 50) showLb(A.idx + (dx < 0 ? 1 : -1));
 });
 new IntersectionObserver(es => { if (es[0].isIntersecting && !$('viewAlbum').hidden && A.filter === 'all') albumMore(); }, { rootMargin: '600px' }).observe($('more'));
-setInterval(() => { if (!$('viewAlbum').hidden && document.visibilityState === 'visible') albumRefresh(); }, 90000);
+setInterval(() => { if (!$('viewAlbum').hidden && document.visibilityState === 'visible' && Date.now() >= (A.nextRefresh || 0)) albumRefresh(); }, 90000);
 // kiriman yang gagal dicoba lagi otomatis (tiap menit saat halaman terbuka, dan saat sinyal kembali)
 const retryFailed = n => S.items.filter(i => i.state === 'fail' && !i.tolak).slice(0, n).forEach(retry);
 setInterval(() => { if (document.visibilityState === 'visible') retryFailed(2); }, 60000);
@@ -2963,15 +3260,25 @@ function closeCover(){
   $('cover').focus({ preventScroll: true });
 })();
 
-// foto yang belum terkirim waktu halaman ditutup → kirim ulang otomatis
-(store.get(PKEY) || []).forEach(p => {
-  if (!p || !p.dataUrl) return;
-  const src = p.source || 'kamera';
-  const it = { id: p.id || ('tmp-' + Math.random()), uid: p.uid || uid(), state: 'up', dataUrl: p.dataUrl, source: src, src };
-  S.local[it.id] = it.dataUrl; S.items.push(it); S.pending++;
-  upload(it);
-});
+// foto yang belum terkirim waktu halaman ditutup → kirim ulang otomatis (IndexedDB + sisa antrean versi lama di localStorage)
+(async () => {
+  let list = [];
+  try { list = await IDB.baca(); } catch(e) { list = []; }
+  const lama = store.get(PKEY) || [];
+  lama.forEach(p => { if (p && p.dataUrl && !list.some(x => x.uid && x.uid === p.uid)) list.push(p); });
+  list.forEach(p => {
+    if (!p || !p.dataUrl || S.items.some(x => x.uid && x.uid === p.uid)) return;
+    const src = p.source || 'kamera';
+    const it = { id: p.id || ('tmp-' + Math.random()), uid: p.uid || uid(), state: 'up', dataUrl: p.dataUrl, source: src, src };
+    S.local[it.id] = it.dataUrl; S.items.push(it); S.pending++;
+    upload(it);
+  });
+  render();
+})();
 render();
+window.addEventListener('beforeunload', e => {   // peringatan kalau masih ada foto yang belum terkirim
+  if (S.items.some(i => i.state === 'up')) { e.preventDefault(); e.returnValue = ''; }
+});
 
 /* Tinggi baris grid = lebar 1 kolom, dihitung di sini supaya sama di semua browser (iPhone lama, browser dalam
    aplikasi): kotak foto = 1 baris, kartu booth 9:16 = 2 baris. Tidak bergantung dukungan CSS container query. */
