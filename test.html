@@ -416,6 +416,13 @@
   .locked .btn{margin-top:var(--s-4);text-decoration:none;display:flex;align-items:center;justify-content:center}
   .btn-sm{min-height:44px;font-size:15px;width:auto;padding:var(--s-2) var(--s-4)}
   .adm-tools{display:flex;flex-wrap:wrap;gap:var(--s-2);margin:0 0 var(--s-4)}
+  .adm-akses{margin:0 0 var(--s-4);padding:0 var(--s-3) var(--s-2);border:1.5px solid var(--butter-500);border-radius:var(--r-md);background:var(--butter-100)}
+  .adm-akses summary{min-height:48px;display:flex;align-items:center;font-weight:800;color:var(--maroon-800);cursor:pointer}
+  .adm-akses .small{text-align:left;margin:0 0 var(--s-2)}
+  .akses-list{list-style:none;margin:0;padding:0}
+  .akses-row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2);padding:var(--s-2) 0;border-top:1px solid var(--butter-500)}
+  .akses-row b{flex:1 1 100%;font-size:16px}
+  .akses-row .btn{flex:1 1 0}
   .adm-tools .btn{flex:1 1 180px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:var(--s-2)}
   .adm-list{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-3)}
   .adm-item{display:flex;gap:var(--s-3);align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s-3)}
@@ -654,7 +661,7 @@
       <section id="viewAdmin" aria-labelledby="adminTitle" hidden>
         <div id="admLogin" class="locked" hidden>
           <h2 id="adminTitle" tabindex="-1">Halaman panitia</h2>
-          <p>Masuk pakai kode panitia dari Afiq.</p>
+          <p>Ketuk link masuk yang dikirim Afiq lewat WhatsApp, atau ketik kode panitia di sini.</p>
           <form id="admForm" novalidate>
             <div class="field">
               <label for="admKey">Kode panitia</label>
@@ -676,6 +683,11 @@
             <a class="btn btn-ghost btn-sm" href="#live">Buka slideshow layar</a>
             <a class="btn btn-ghost btn-sm" id="admQr" href="#" target="_blank" rel="noopener noreferrer">Kartu QR untuk print</a>
           </div>
+          <details class="adm-akses" id="admAkses" hidden>
+            <summary>Kirim link masuk ke panitia</summary>
+            <p class="small">Panitia cukup ketuk link-nya, langsung masuk tanpa ketik kode, dan tetap masuk di HP itu sampai menekan Keluar. Link ini sama dengan kodenya, jadi kirim ke orangnya saja.</p>
+            <ul class="akses-list" id="admAksesList"></ul>
+          </details>
           <div class="seg" role="group" aria-label="Menu panitia" style="margin-bottom:var(--s-4)">
             <button id="admTabAlbum" type="button" aria-pressed="true">Album</button>
             <button id="admTabTrash" type="button" aria-pressed="false">Disembunyikan</button>
@@ -693,7 +705,7 @@
           </div>
         </div>
       </section>
-      <p class="ver">Versi halaman 3 Nov 2026 · 21.02</p>
+      <p class="ver">Versi halaman 4 Nov 2026 · 07.26</p>
     </main>
   </div>
 
@@ -2554,6 +2566,11 @@ async function adminPost(op, extra){
 function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 
 function showAdmin(){
+  if (ADM.linkKey) {            // dibuka dari link masuk: langsung masuk tanpa mengetik
+    const k = ADM.linkKey; ADM.linkKey = ''; ADM.ok = false;
+    $('admPanel').hidden = true; $('admLogin').hidden = false; $('admKey').value = k;
+    return admEnter(k, false);
+  }
   if (!ADM.key) { const s = store.get(AKEY); if (s && s.key) ADM.key = s.key; }
   if (!ADM.key) { $('admLogin').hidden = false; $('admPanel').hidden = true; return; }
   if (ADM.ok) { $('admLogin').hidden = true; $('admPanel').hidden = false; admTab(ADM.tab); return; }
@@ -2572,15 +2589,42 @@ async function admEnter(key, silent){
     $('admQr').href = API + '?page=qr';
     admTab(ADM.tab);
     admStats();
+    admAkses();
   } catch(e) {
     if (!e.server) { toast('Sinyal tersendat. Coba lagi.', 'warn'); if (silent) { $('admLogin').hidden = false; $('admPanel').hidden = true; } }
     else { ADM.key = ''; store.set(AKEY, null); $('admLogin').hidden = false; $('admPanel').hidden = true;
       if (!silent) { $('admErr').hidden = false; $('admKey').setAttribute('aria-invalid', 'true'); $('admKey').focus(); } }
   } finally { btn.disabled = false; }
 }
+/** Khusus pemilik: daftar panitia + tombol kirim link masuk lewat WhatsApp / salin link. */
+async function admAkses(){
+  const box = $('admAkses'), ul = $('admAksesList');
+  box.hidden = ADM.role !== 'owner'; ul.textContent = '';
+  if (box.hidden) return;
+  ul.append(el('li', 'small', 'Memuat daftar panitia…'));
+  try {
+    const r = await adminPost('panitia');
+    ul.textContent = '';
+    if (!r.items.length) return ul.append(el('li', 'small', 'Belum ada panitia yang punya kode. Isi kodenya di Sheet, tab "Panitia".'));
+    r.items.forEach(x => {
+      // link mengikuti halaman yang sedang dibuka (test.html saat uji, halaman utama setelah naik)
+      x.link = location.origin + location.pathname + '#admin=' + x.link.split('#admin=')[1];
+      const li = el('li', 'akses-row'); li.append(el('b', '', x.nama));
+      const pesan = 'Halo ' + x.nama + ', ini akses panitia Kamera Tamu ' + C.couple + '.\nKetuk link ini, langsung masuk tanpa ketik kode:\n' + x.link + '\nTolong jangan disebar ya.';
+      const wa = el('a', 'btn btn-primary btn-sm', 'Kirim WA');
+      wa.href = 'https://wa.me/?text=' + encodeURIComponent(pesan); wa.target = '_blank'; wa.rel = 'noopener noreferrer';
+      wa.setAttribute('aria-label', 'Kirim link masuk ke ' + x.nama + ' lewat WhatsApp');
+      const cp = el('button', 'btn btn-ghost btn-sm', 'Salin link'); cp.type = 'button';
+      cp.setAttribute('aria-label', 'Salin link masuk ' + x.nama);
+      cp.onclick = () => salinTeks(x.link, 'Link masuk ' + x.nama + ' disalin');
+      li.append(wa, cp); ul.append(li);
+    });
+  } catch(e) { ul.textContent = ''; ul.append(el('li', 'small', e.server ? e.message : 'Sinyal tersendat. Buka lagi nanti.')); }
+}
 function admLogout(expired){
   Object.assign(ADM, { key: '', role: '', nama: '', ok: false, items: [], offset: 0, total: 0, done: false });
   store.set(AKEY, null);
+  $('admAkses').hidden = true; $('admAksesList').textContent = ''; $('admName').textContent = '';
   $('admGrid').innerHTML = ''; $('admTrashList').innerHTML = '';
   $('admLogin').hidden = false; $('admPanel').hidden = true;
   if (expired) toast('Kode panitia sudah tidak berlaku. Masuk lagi.', 'warn', 5000);
@@ -2701,7 +2745,13 @@ function removePhoto(id){
 /* ================= NAVIGASI ================= */
 let firstRoute = true;
 function route(){
-  const h = location.hash.slice(1);
+  let h = location.hash.slice(1);
+  const link = /^admin[=/](.+)$/.exec(h);
+  if (link) {   // link masuk panitia (#admin=KODE): kode disimpan, lalu dihapus dari alamat & riwayat browser
+    try { ADM.linkKey = decodeURIComponent(link[1]); } catch(e) { ADM.linkKey = link[1]; }
+    history.replaceState(null, '', location.pathname + location.search + '#admin');
+    h = 'admin';
+  }
   const live = h === 'live';
   $('app').hidden = live; $('viewLive').hidden = !live;
   if (live) return startLive();
@@ -2801,13 +2851,14 @@ $('saveGo').onclick = async () => {
   finally { btn.disabled = false; }
 };
 $('lbShare').hidden = !CAN_SHARE_FILES;
-$('copyLink').onclick = async () => {
-  try { await navigator.clipboard.writeText(ALBUM_URL); toast('Link album disalin'); }
+async function salinTeks(teks, pesanOk){
+  try { await navigator.clipboard.writeText(teks); toast(pesanOk); }
   catch(e) {
-    try { const t = document.createElement('textarea'); t.value = ALBUM_URL; t.style.cssText = 'position:fixed;left:-999px'; document.body.appendChild(t); t.select(); const ok = document.execCommand('copy'); t.remove(); toast(ok ? 'Link album disalin' : ALBUM_URL, ok ? 'ok' : 'warn', 6000); }
-    catch(e2) { toast(ALBUM_URL, 'warn', 6000); }
+    try { const t = document.createElement('textarea'); t.value = teks; t.style.cssText = 'position:fixed;left:-999px'; document.body.appendChild(t); t.select(); const ok = document.execCommand('copy'); t.remove(); toast(ok ? pesanOk : teks, ok ? 'ok' : 'warn', 6000); }
+    catch(e2) { toast(teks, 'warn', 6000); }
   }
-};
+}
+$('copyLink').onclick = () => salinTeks(ALBUM_URL, 'Link album disalin');
 $('fAll').onclick = () => setFilter('all');
 $('fMine').onclick = () => setFilter('mine');
 $('lbX').onclick = () => closeDialog();
