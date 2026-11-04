@@ -1678,11 +1678,16 @@ async function renderPreview(){
       }
     } else {
       const fc = await filtered(cur.raw, cur.filter);
-      url = marked(fc, guest.name).toDataURL('image/jpeg', 0.82);
-      if (tok === cur.tok) { cur.fc = fc; cur.prep = null; }
+      const mk = marked(fc, guest.name);
+      url = mk.toDataURL('image/jpeg', 0.82);
+      mk.width = mk.height = 0;                               // salinan sementara: lepas memorinya segera
+      if (tok === cur.tok) { const lama = cur.fc; cur.fc = fc; cur.prep = null; if (lama && lama !== fc) lama.width = lama.height = 0; }
+      else fc.width = fc.height = 0;
     }
     if (tok !== cur.tok || S.current !== cur) return;
     cur.dataUrl = url; img.src = url;
+  } catch(e) {
+    if (S.current === cur) throw e;                           // kanvas sudah dilepas karena sheet ditutup → abaikan
   } finally {
     if (tok === cur.tok) { img.style.opacity = ''; $('send').disabled = $('pvSave').disabled = false; }
   }
@@ -1722,7 +1727,7 @@ function openSheet(trigger){
   $('toast').hidden = true;
   $('cardSend').hidden = false; $('cardSave').hidden = true;
   $('sheet').setAttribute('aria-labelledby', 'sheetTitle');
-  openDialog($('sheet'), $('send'), () => { S.current = null; });
+  openDialog($('sheet'), $('send'), () => { const c = S.current; S.current = null; lepasKanvas(c); });
   D.last = trigger;
 }
 
@@ -1800,6 +1805,15 @@ async function onPick(e, source, trigger){
   } finally { busy(false); }
 }
 
+/** Lepas memori kanvas foto yang sheet-nya sudah ditutup (Safari iOS lambat melepasnya sendiri).
+    Ditunda 2 dtk supaya pekerjaan latar (menyiapkan file simpan) sempat selesai. Kartu booth: frames tidak disentuh (masih dipakai "ulangi"). */
+function lepasKanvas(cur){
+  if (!cur) return;
+  setTimeout(() => {
+    ['raw', 'fc'].forEach(k => { const c = cur[k]; if (c) { c.width = c.height = 0; cur[k] = null; } });
+  }, 2000);
+}
+
 function savePending(){
   const list = S.items.filter(i => i.state !== 'done' && i.dataUrl).map(i => ({ id: i.id, uid: i.uid, dataUrl: i.dataUrl, source: i.source }));
   if (!store.set(PKEY, list)) store.set(PKEY, list.slice(-2));
@@ -1815,7 +1829,10 @@ async function send(){
   const it = { id: 'tmp-' + Date.now(), uid: uid(), state: 'up', dataUrl: cur.dataUrl, source, src: source };   // uid sama di tiap kirim ulang → server tidak menyimpan dobel
   S.local[it.id] = cur.dataUrl;
   if (cur.fc) it.cleanUrl = cur.fc.toDataURL('image/jpeg', 0.9);   // versi tanpa tanda foto, untuk "Simpan sebagai" dari album (hanya di memori)
-  S.items.push(it); S.pending++; render();
+  lepasKanvas(cur);
+  S.items.push(it); S.pending++;
+  S.items.filter(x => x.cleanUrl).slice(0, -5).forEach(x => { delete x.cleanUrl; });   // simpan versi bersih untuk 5 foto terakhir saja; sisanya diambil dari album
+  render();
   await upload(it);
 }
 
@@ -1910,7 +1927,7 @@ function showWelcome(){
 
 /* ================= PHOTO BOOTH ================= */
 /* redo = indeks foto yang sedang diulang (null = lanjut foto berikutnya). fromCard = dibuka dari "Kartu kamu jadi!". */
-const B = { stream: null, facing: 'user', frames: [], running: false, cancel: false, manual: false, trigger: null, redo: null, fromCard: false };
+const B = { sid: 0, starting: false, stream: null, facing: 'user', frames: [], running: false, cancel: false, manual: false, trigger: null, redo: null, fromCard: false };
 
 /** Foto yang akan diambil berikutnya (indeks 0..2). */
 const boothIdx = () => B.redo != null ? B.redo : Math.min(2, B.frames.length);
@@ -1955,6 +1972,7 @@ function boothMsg(text){
 }
 
 function stopStream(){
+  B.sid++; B.starting = false;   // membatalkan startStream yang masih menunggu izin/kamera
   if (B.stream) { B.stream.getTracks().forEach(t => t.stop()); B.stream = null; }
   $('bv').srcObject = null;
   $('bZoom').hidden = true;
@@ -2007,7 +2025,7 @@ async function readZoomCaps(){
   }
 }
 async function setZoom(z){
-  if (B.running || !B.stream) return;
+  if (B.running || B.starting || !B.stream) return;
   const prev = Z.level;
   Z.level = z;
   try {
@@ -2052,25 +2070,33 @@ function setManual(text){
 
 async function startStream(){
   stopStream(); boothMsg('');
+  const sid = B.sid, basi = () => sid !== B.sid;   // panggilan lebih baru / booth ditutup → yang ini batal
+  B.starting = true;
   $('boothStart').setAttribute('aria-disabled', 'true');
+  $('boothFlip').disabled = true;
   $('bStatus').textContent = 'Membuka kamera…';
   try {
     // resolusi tinggi supaya zoom digital tetap tajam di kartu
     const vid = Z.useUW && Z.uwId ? { deviceId: { exact: Z.uwId }, width: { ideal: 1920 }, height: { ideal: 1440 } }
                                   : { facingMode: { ideal: B.facing }, width: { ideal: 1920 }, height: { ideal: 1440 } };
     const s = await navigator.mediaDevices.getUserMedia({ audio: false, video: vid });
-    if ($('booth').hidden) { s.getTracks().forEach(t => t.stop()); return; }
+    if ($('booth').hidden || basi()) { s.getTracks().forEach(t => t.stop()); if (!basi()) B.starting = false; return; }
     B.stream = s;
     const v = $('bv'); v.srcObject = s;
     try { await v.play(); } catch(e){}
     await readZoomCaps();
+    if (basi()) return;
     if (!Z.useUW && Z.level !== 1 && Z.hw) { try { const hz = Math.max(Z.hw.min, Math.min(Z.hw.max, Z.level)); await s.getVideoTracks()[0].applyConstraints({ advanced: [{ zoom: hz }] }); Z.digital = Math.max(1, Z.level / hz); } catch(e){} }
     else if (!Z.useUW && Z.level !== 1) Z.digital = Math.max(1, Z.level);
+    if (basi()) return;
+    B.starting = false; $('boothFlip').disabled = false;
     videoTransform(); renderZoom();
     $('boothStart').removeAttribute('aria-disabled'); boothLabel();
     $('bStatus').textContent = B.redo != null ? 'Foto ' + (B.redo + 1) + ' akan diulang. Ketuk tombol di bawah, lalu bergaya lagi.'
       : B.frames.length ? 'Ketuk lagi untuk foto ' + (B.frames.length + 1) + '.' : BOOTH_READY;
   } catch(err) {
+    if (basi()) return;   // kegagalan panggilan lama jangan menimpa panggilan baru
+    B.starting = false; $('boothFlip').disabled = false;
     const denied = err && (err.name === 'NotAllowedError' || err.name === 'SecurityError');
     setManual(denied
       ? 'Izin kamera belum diberikan. Kamu tetap bisa ambil 3 foto satu per satu.'
@@ -2163,6 +2189,12 @@ async function onBoothFile(e){
 /* ================= SIMPAN KE HP ================= */
 const READY = new Map();   // id → Blob siap simpan
 const WAIT = new Map();    // id → Promise<Blob>
+const READY_MAX = 12;      // simpan paling banyak 12 foto 1600 px di memori (yang terlama dibuang)
+function simpanReady(id, b){
+  READY.delete(id); READY.set(id, b);
+  while (READY.size > READY_MAX) READY.delete(READY.keys().next().value);
+  return b;
+}
 function b64ToBlob(b64, type){
   const bin = atob(b64), a = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i);
@@ -2183,14 +2215,14 @@ async function fetchViaApi(id){
 }
 function prefetch(id){
   if (S.local[id] || READY.has(id) || WAIT.has(id)) return;
-  const p = fetchDirect(id).then(b => { READY.set(id, b); return b; });
+  const p = fetchDirect(id).then(b => simpanReady(id, b));
   WAIT.set(id, p); p.catch(() => {}).finally(() => WAIT.delete(id));
 }
 function readyBlob(id){ return S.local[id] ? dataUrlToBlob(S.local[id]) : (READY.get(id) || null); }
 async function getBlob(id){
   const r = readyBlob(id); if (r) return r;
-  try { const b = await (WAIT.get(id) || fetchDirect(id)); READY.set(id, b); return b; } catch(e){}
-  const b = await fetchViaApi(id); READY.set(id, b); return b;
+  try { const b = await (WAIT.get(id) || fetchDirect(id)); return simpanReady(id, b); } catch(e){}
+  return simpanReady(id, await fetchViaApi(id));
 }
 function fileName(name, t, strip, style){
   const slug = s => String(s || '').normalize('NFKD').replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-');
@@ -2288,7 +2320,7 @@ async function lbSaveAs(){
   S.current = { kind: 'photo', fc, polosBlob, saveOnly: true, name: it.name, t: it.t };
   closeDialog(true);
   document.querySelectorAll('input[name="saveStyle"]').forEach(i => i.checked = i.value === pref.saveStyle);
-  openDialog($('sheet'), $('saveGo'), () => { S.current = null; openLb(back.list, Math.min(back.idx, back.list.length - 1), back.admin); });
+  openDialog($('sheet'), $('saveGo'), () => { const c = S.current; S.current = null; lepasKanvas(c); openLb(back.list, Math.min(back.idx, back.list.length - 1), back.admin); });
   showSaveCard(true);
 }
 
@@ -2808,6 +2840,7 @@ $('inBooth').onchange = onBoothFile;
 $('boothStart').onclick = runBooth;
 $('boothX').onclick = () => closeDialog();
 $('boothFlip').onclick = () => {
+  if (B.starting || B.running) return;
   B.facing = B.facing === 'user' ? 'environment' : 'user';
   $('boothFlip').setAttribute('aria-label', B.facing === 'user' ? 'Ganti ke kamera belakang' : 'Ganti ke kamera depan');
   Object.assign(Z, { level: 1, digital: 1, useUW: false });
