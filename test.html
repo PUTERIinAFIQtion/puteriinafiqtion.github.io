@@ -762,7 +762,7 @@
           </div>
         </div>
       </section>
-      <p class="ver" id="ver" hidden>Versi halaman 5 Nov 2026 · aman</p>
+      <p class="ver" id="ver" hidden>Versi halaman 4 Nov 2026 · aman 2</p>
     </main>
   </div>
 
@@ -1275,6 +1275,10 @@ function render(){
       d.setAttribute('aria-label', what + (it.wait ? ' menunggu giliran dikirim' : ' sedang dikirim'));
       d.insertAdjacentHTML('beforeend', '<span class="badge ' + (it.wait ? 'wait' : 'up') + '"><span class="spin-sm" aria-hidden="true"></span>' + (it.wait ? 'Antre' : 'Mengirim') + '</span>');
       d.disabled = true;
+    } else if (it.state === 'fail' && it.simpan){
+      d.setAttribute('aria-label', what + ' belum terkirim ke album. Ketuk untuk simpan ke HP');
+      d.insertAdjacentHTML('beforeend', '<span class="badge">' + icon('download', 'ic-sm') + 'Simpan</span>');
+      d.onclick = () => simpanLokal(it);
     } else if (it.state === 'fail'){
       d.setAttribute('aria-label', what + ' gagal terkirim. Ketuk untuk kirim ulang');
       d.insertAdjacentHTML('beforeend', '<span class="badge">' + icon('retry', 'ic-sm') + 'Kirim ulang</span>');
@@ -1938,7 +1942,7 @@ function lepasKanvas(cur){
 }
 
 function savePending(){
-  const list = S.items.filter(i => i.state !== 'done' && !i.tolak && i.dataUrl).map(i => ({ id: i.id, uid: i.uid || uid(), dataUrl: i.dataUrl, source: i.source }));
+  const list = S.items.filter(i => i.state !== 'done' && (!i.tolak || i.simpan) && i.dataUrl).map(i => ({ id: i.id, uid: i.uid || uid(), dataUrl: i.dataUrl, source: i.source }));
   // IndexedDB muat banyak foto; localStorage (±5 MB) hanya cadangan kalau IndexedDB tidak tersedia
   IDB.tulis(list).then(() => { try { localStorage.removeItem(PKEY); } catch(e){} })
     .catch(() => { if (!store.set(PKEY, list)) store.set(PKEY, list.slice(-2)); });
@@ -1989,9 +1993,9 @@ async function upload(it){
     toast(it.src === 'booth' ? 'Kartu photo booth tersimpan di album' : 'Foto tersimpan di album');
     A.dirty = true;
   } else if (res && (res.reason === 'habis' || res.reason === 'tutup')){
-    S.items = S.items.filter(x => x !== it); delete S.local[it.id];
+    it.state = 'fail'; it.tolak = true; it.simpan = true;   // fotonya tidak dibuang: tetap di HP, bisa disimpan ke galeri
     if (res.reason === 'habis') S.used = C.maxShots;
-    toast(res.reason === 'habis' ? 'Roll kamu sudah habis.' : 'Kamera sudah ditutup.', 'warn');
+    toast((res.reason === 'habis' ? 'Roll kamu sudah habis.' : 'Kamera sudah ditutup.') + ' Fotomu tidak hilang: ketuk fotonya untuk simpan ke HP.', 'warn', 9000);
   } else if (res && res.reason === 'penuh'){
     it.state = 'fail';
     toast('Album sudah penuh. Kabari panitia ya.', 'warn', 6000);
@@ -2007,6 +2011,13 @@ async function upload(it){
   savePending(); render();
 }
 
+/** Foto yang tidak bisa masuk album lagi (kamera tutup / jatah habis): disimpan langsung dari HP. */
+function simpanLokal(it){
+  const u = it.dataUrl || S.local[it.id]; if (!u) return;
+  const a = document.createElement('a'); a.href = u; a.download = fileName(guest.name, Date.now(), isStrip(it));
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('Foto disimpan ke HP.');
+}
 function retry(it){
   if (it.state !== 'fail') return;
   if (left() <= 0) return toast('Roll kamu sudah habis.', 'warn');
@@ -2727,6 +2738,7 @@ async function nyalakanLayar(){   // laptop/TV venue jangan sampai tidur di teng
 }
 function startLive(){
   if (L.started) return; L.started = true;
+  if (/[?&]qr=0/.test(location.search)) document.querySelector('.live-qr').hidden = true;   // layar ikut di-livestream → QR (berisi kunci) disembunyikan
   muatQr().then(q => {
     const qr = q(0, 'M'); qr.addData(linkHalaman()); qr.make();
     $('liveQr').innerHTML = qr.createSvgTag({ cellSize: 6, margin: 0, scalable: true, alt: 'QR untuk membuka Kamera Tamu' });
@@ -2750,7 +2762,7 @@ const ADM = { key: '', role: '', nama: '', ok: false, tab: 'album', items: [], o
               tOffset: 0, tDone: false, tLoading: false };
 
 async function adminPost(op, extra){
-  const r = await apiPost(Object.assign({ action: 'admin', key: ADM.key, op: op }, extra || {}));
+  const r = await apiPost(Object.assign({ action: 'admin', key: ADM.key, sesi: ADM.sesi || '', op: op }, extra || {}));
   if (r && r.reason === 'admin') { admLogout(ADM.ok); throw Object.assign(new Error(r.error || 'Kode panitia salah.'), { server: true, reason: 'admin' }); }
   if (!r || r.ok === false) throw Object.assign(new Error((r && r.error) || 'Gagal. Coba lagi.'), { server: true, reason: r && r.reason });
   return r;
@@ -2761,11 +2773,11 @@ function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.c
 
 function showAdmin(){
   if (ADM.linkKey) {            // dibuka dari link masuk: langsung masuk tanpa mengetik
-    const k = ADM.linkKey; ADM.linkKey = ''; ADM.ok = false;
+    const k = ADM.linkKey; ADM.linkKey = ''; ADM.ok = false; ADM.sesi = '';
     $('admPanel').hidden = true; $('admLogin').hidden = false; $('admKey').value = k;
     return admEnter(k, false);
   }
-  if (!ADM.key) { const s = store.get(AKEY); if (s && s.key) ADM.key = s.key; }
+  if (!ADM.key) { const s = store.get(AKEY); if (s && s.key) { ADM.key = s.key; ADM.sesi = s.sesi || ''; } }
   if (!ADM.key) { $('admLogin').hidden = false; $('admPanel').hidden = true; return; }
   if (ADM.ok) { $('admLogin').hidden = true; $('admPanel').hidden = false; admTab(ADM.tab); return; }
   admEnter(ADM.key, true);
@@ -2775,8 +2787,8 @@ async function admEnter(key, silent){
   const btn = $('admGo'); btn.disabled = true;
   try {
     const r = await adminPost('masuk');
-    Object.assign(ADM, { ok: true, role: r.role, nama: r.nama });
-    store.set(AKEY, { key: key });
+    Object.assign(ADM, { ok: true, role: r.role, nama: r.nama, sesi: r.sesi || ADM.sesi || '' });
+    store.set(AKEY, { key: key, sesi: ADM.sesi });
     $('admKey').value = ''; $('admErr').hidden = true;
     $('admLogin').hidden = true; $('admPanel').hidden = false;
     $('admName').textContent = r.nama + (r.role === 'owner' ? ' (pemilik)' : '');
@@ -2853,6 +2865,7 @@ async function admCekSehat(){
     if (h.ruang) { const gb = v => (v / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' GB';
       tulis('Sisa Google Drive', gb(h.ruang.sisa) + ' dari ' + gb(h.ruang.batas), h.ruang.sisa < 5e9); }
     if (h.belumDibagikan) tulis('Foto belum terbuka', h.belumDibagikan + ' foto (dicoba ulang otomatis)', true);
+    if (typeof h.tamuBaru10m === 'number') tulis('Tamu baru 10 menit ini', h.tamuBaru10m + ' dari batas ' + p.maxNew, h.tamuBaru10m > p.maxNew * 0.8);
     tulis('Kamera tutup', tgl(p.closeAt));
     tulis('Mulai acara', tgl(p.acaraMulai));
     tulis('Jatah per tamu', String(p.maxShots));
@@ -2888,7 +2901,7 @@ async function admAkses(){
   } catch(e) { ul.textContent = ''; ul.append(el('li', 'small', e.server ? e.message : 'Sinyal tersendat. Buka lagi nanti.')); }
 }
 function admLogout(expired){
-  Object.assign(ADM, { key: '', role: '', nama: '', ok: false, items: [], offset: 0, total: 0, done: false });
+  Object.assign(ADM, { key: '', sesi: '', role: '', nama: '', ok: false, items: [], offset: 0, total: 0, done: false });
   store.set(AKEY, null);
   $('admAkses').hidden = true; $('admAksesList').textContent = ''; $('admName').textContent = '';
   $('admTamu').hidden = true; $('admSehat').hidden = true; $('admTamuLink').textContent = ''; ADM.linkTamu = '';
