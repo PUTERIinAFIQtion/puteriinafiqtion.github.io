@@ -2871,6 +2871,9 @@ async function admCekSehat(){
     tulis('Jatah per tamu', String(p.maxShots));
     tulis('Link rahasia', p.kunciWajib ? 'Wajib' : 'Belum wajib', !p.kunciWajib);
     tulis('Tahan slideshow', p.liveTahan + ' detik');
+    if (h.pemilikAktif) tulis('Pemilik (baris 1 tab Panitia)', h.pemilikAktif, h.pemilikAktif !== 'Afiq');
+    if (h.adminKeyProperty) tulis('Kode pemilik cadangan', 'Ada di Script Property ADMIN_KEY (pintu di luar Sheet). Hapus kalau tidak dipakai.', true);
+    if (h.kodeLemah && h.kodeLemah.length) tulis('Kode panitia lemah', h.kodeLemah.join(', ') + ': ganti ke kode buatan sistem (huruf + angka 8 karakter)', true);
     if (p.salahIsi && p.salahIsi.length) tulis('Isian Sheet salah', p.salahIsi.join(', ') + ' (dipakai nilai bawaan)', true);
     tulis('Error terakhir', h.error.length ? h.error.length + ' catatan, terbaru ' + tgl(h.error[0].t) + ': ' + h.error[0].di : 'Tidak ada', !!h.error.length);
   } catch(e) { dl.textContent = ''; tulis('Status', e.server ? e.message : 'Sinyal tersendat.', true); }
