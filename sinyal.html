@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tes Sinyal · Kamera Tamu</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://script.google.com/macros/s/AKfycbz8z5HBpc8z-E1PzBBujwInBFF6iZ6FPbsHrvVoWa65LIX_yu15v4Tu_eW8foVn1haWqg/exec https://script.googleusercontent.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#FFF9EA">
+<style>
+  :root{--maroon:#6B1D2A;--butter:#FFF9EA;--butter2:#F6E7A1;--peri:#8FA2E0;--ink:#2B1A1D;--muted:#6E5A5E;--ok:#2F7A4B;--warn:#A86400;--bad:#B3261E}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--butter);color:var(--ink);line-height:1.45}
+  main{max-width:480px;margin:0 auto;padding:20px 18px 40px}
+  h1{font-size:22px;color:var(--maroon);margin:4px 0 6px}
+  p{margin:6px 0}
+  .muted{color:var(--muted);font-size:15px}
+  label{display:block;font-weight:600;margin:16px 0 6px}
+  input{width:100%;font-size:18px;padding:12px;border:2px solid #D9C7A0;border-radius:12px;background:#fff}
+  button{width:100%;font-size:19px;font-weight:700;padding:16px;border:0;border-radius:14px;background:var(--maroon);color:#fff;margin-top:14px;min-height:56px}
+  button:disabled{opacity:.55}
+  .hasil{margin-top:18px;background:#fff;border-radius:16px;padding:6px 14px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .baris{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #F0E6CF;font-size:16px}
+  .baris:last-child{border-bottom:0}
+  .baris b{text-align:right}
+  .vonis{margin-top:16px;padding:14px;border-radius:14px;font-weight:700;font-size:17px}
+  .ok{background:#E3F2E7;color:var(--ok)} .warn{background:#FFF0D6;color:var(--warn)} .bad{background:#FBE3E1;color:var(--bad)}
+  .riwayat{margin-top:22px;font-size:14px}
+  .riwayat li{margin:4px 0}
+  .peringatan{background:#FBE3E1;color:var(--bad);padding:12px;border-radius:12px;margin-top:12px;font-weight:600}
+</style>
+</head>
+<body>
+<main>
+  <h1>Tes sinyal di gedung</h1>
+  <p class="muted">Untuk panitia. Berdiri di titik yang mau dicek (meja tamu, dekat pelaminan, photo booth), ketuk tombol, tunggu ±1 menit. Hasilnya tercatat di Sheet "Kamera Tamu — Log", tab "Tes Sinyal".</p>
+  <div id="tanpaKunci" class="peringatan" hidden>HP ini belum pernah membuka link tamu. Buka dulu link undangan / scan QR kamera sekali di HP ini (saat ada sinyal), lalu kembali ke halaman ini.</div>
+  <label for="lokasi">Lokasi &amp; operator</label>
+  <input id="lokasi" maxlength="60" placeholder="mis. Telkomsel, meja 12 dekat jendela" autocomplete="off">
+  <button id="mulai" type="button">Mulai tes</button>
+  <p id="tahap" class="muted" role="status" aria-live="polite"></p>
+  <div class="hasil" id="hasil" hidden>
+    <div class="baris"><span>Jaringan menurut HP</span><b id="hJenis">–</b></div>
+    <div class="baris"><span>Waktu jawab server</span><b id="hPing">–</b></div>
+    <div class="baris"><span>Kecepatan unduh</span><b id="hUnduh">–</b></div>
+    <div class="baris"><span>Kecepatan kirim</span><b id="hUnggah">–</b></div>
+    <div class="baris"><span>1 foto (±600 KB) terkirim dalam</span><b id="hFoto">–</b></div>
+    <div class="baris"><span>Kamera bisa dibuka tanpa sinyal di HP ini</span><b id="hOffline">–</b></div>
+  </div>
+  <div id="vonis" class="vonis" hidden></div>
+  <div class="riwayat" id="riwayatBox" hidden><b>Tes sebelumnya di HP ini</b><ul id="riwayat"></ul></div>
+</main>
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbz8z5HBpc8z-E1PzBBujwInBFF6iZ6FPbsHrvVoWa65LIX_yu15v4Tu_eW8foVn1haWqg/exec';
+const $ = id => document.getElementById(id);
+const KUNCI = (() => {
+  const q = String(new URLSearchParams(location.search).get('k') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (q.length >= 8) return q;
+  try { return localStorage.getItem('kamera_tamu_afiq_puteri_kunci') || ''; } catch (e) { return ''; }
+})();
+if (!KUNCI) $('tanpaKunci').hidden = false;
+const RKEY = 'kamera_tamu_tes_sinyal';
+const riwayat = () => { try { return JSON.parse(localStorage.getItem(RKEY)) || []; } catch (e) { return []; } };
+function tampilRiwayat(){
+  const r = riwayat(); $('riwayatBox').hidden = !r.length; const ul = $('riwayat'); ul.textContent = '';
+  r.slice(-8).reverse().forEach(x => { const li = document.createElement('li'); li.textContent = x; ul.appendChild(li); });
+}
+tampilRiwayat();
+try { $('lokasi').value = localStorage.getItem(RKEY + '_lokasi') || ''; } catch (e) {}
+
+async function waktuIni(fn, batas){
+  const ctl = window.AbortController ? new AbortController() : null;
+  const t = ctl ? setTimeout(() => ctl.abort(), batas) : 0;
+  const t0 = performance.now();
+  try { const hasil = await fn(ctl ? ctl.signal : undefined); return { ms: performance.now() - t0, hasil }; }
+  finally { clearTimeout(t); }
+}
+const kbps = (byte, ms) => Math.round(byte * 8 / ms);   // byte/ms × 8 = kbit/s
+const median = a => a.slice().sort((x, y) => x - y)[Math.floor(a.length / 2)];
+const tahap = s => { $('tahap').textContent = s; };
+
+async function tes(){
+  $('mulai').disabled = true; $('hasil').hidden = false; $('vonis').hidden = true;
+  ['hJenis','hPing','hUnduh','hUnggah','hFoto','hOffline'].forEach(id => $(id).textContent = '…');
+  const label = $('lokasi').value.trim().slice(0, 60);
+  try { localStorage.setItem(RKEY + '_lokasi', label); } catch (e) {}
+  const k = navigator.connection;
+  const jenis = !navigator.onLine ? 'offline' : k && k.effectiveType ? k.effectiveType + (k.downlink ? ' (~' + k.downlink + ' Mbps)' : '') : 'tidak diketahui';
+  $('hJenis').textContent = jenis;
+  const r = { label, jenis: k && k.effectiveType ? k.effectiveType : (navigator.onLine ? '?' : 'offline'), ping: null, unduh: null, unggah: null, detikFoto: null, offline: false };
+
+  // halaman kamera tersimpan untuk dibuka tanpa sinyal?
+  try { r.offline = !!(window.caches && await caches.match(new URL('index.html', location.href).href)); } catch (e) {}
+  $('hOffline').textContent = r.offline ? 'Ya' : 'Belum (buka link kamera sekali saat ada sinyal)';
+
+  try {
+    tahap('1/3 Mengukur waktu jawab server…');
+    const p = [];
+    for (let i = 0; i < 3; i++) {
+      const w = await waktuIni(s => fetch(API + '?api=ping&_=' + Date.now(), { credentials: 'omit', cache: 'no-store', signal: s }).then(x => x.json()), 20000);
+      p.push(w.ms);
+    }
+    r.ping = Math.round(median(p)); $('hPing').textContent = (r.ping / 1000).toFixed(1) + ' detik';
+  } catch (e) { $('hPing').textContent = 'gagal'; }
+
+  try {
+    tahap('2/3 Mengukur kecepatan unduh…');
+    let byte = 0;
+    const w = await waktuIni(s => fetch('aset/afiq_sticker.png?x=' + Date.now(), { cache: 'no-store', signal: s }).then(x => x.arrayBuffer()).then(b => { byte = b.byteLength; }), 60000);
+    r.unduh = kbps(byte, w.ms); $('hUnduh').textContent = r.unduh.toLocaleString('id-ID') + ' kbps';
+  } catch (e) { $('hUnduh').textContent = 'gagal / terlalu lambat'; }
+
+  try {
+    tahap('3/3 Mengukur kecepatan kirim (seperti mengirim 1 foto)…');
+    const isi = 'A'.repeat(300 * 1024);
+    const w = await waktuIni(s => fetch(API, { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, signal: s,
+      body: JSON.stringify({ action: 'ukur', k: KUNCI, isi }) }).then(x => x.json()).then(j => { if (!j || !j.ok) throw new Error(j && j.reason || 'gagal'); return j; }), 180000);
+    // waktu kirim − waktu jawab server = waktu yang dipakai sinyal untuk 300 KB
+    const bersih = Math.max(200, w.ms - (r.ping || 0));
+    r.unggah = kbps(isi.length, bersih);
+    r.detikFoto = Math.round(((800 * 1024) / isi.length) * bersih / 1000 + (r.ping || 0) / 1000);   // foto 600 KB = ±800 KB setelah base64
+    $('hUnggah').textContent = r.unggah.toLocaleString('id-ID') + ' kbps';
+    $('hFoto').textContent = '±' + r.detikFoto + ' detik';
+  } catch (e) {
+    $('hUnggah').textContent = e && e.message === 'kunci' ? 'ditolak (link tamu belum dibuka di HP ini)' : 'gagal / terlalu lambat';
+    $('hFoto').textContent = '> 3 menit';
+  }
+
+  const v = $('vonis'); v.hidden = false;
+  if (r.detikFoto != null && r.detikFoto <= 20) { v.className = 'vonis ok'; v.textContent = 'Bagus. Foto terkirim langsung.'; }
+  else if (r.detikFoto != null && r.detikFoto <= 90) { v.className = 'vonis warn'; v.textContent = 'Lambat tapi jalan. Foto terkirim satu per satu, tamu sebaiknya membiarkan halaman terbuka.'; }
+  else { v.className = 'vonis bad'; v.textContent = 'Sangat lemah / tidak ada sinyal. Foto akan menunggu di HP tamu dan terkirim saat sinyal ada (atau dari rumah).'; }
+
+  tahap('Menyimpan hasil ke Sheet…');
+  try {
+    const j = await fetch(API, { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'ukur', k: KUNCI, catat: r }) }).then(x => x.json());
+    tahap(j && j.ok ? 'Selesai. Hasil tercatat di tab "Tes Sinyal".' : 'Selesai, tapi hasil belum tercatat di Sheet (' + ((j && j.reason) || 'gagal') + '). Catatan di HP ini tetap ada.');
+  } catch (e) { tahap('Selesai. Hasil belum tercatat di Sheet (tidak ada sinyal). Catatan di HP ini tetap ada.'); }
+  const jam = new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }).format(new Date());
+  const ringkas = jam + ' · ' + (label || 'tanpa lokasi') + ' · ' + (r.detikFoto != null ? '1 foto ±' + r.detikFoto + ' dtk' : 'kirim gagal') + (r.ping ? ' · server ' + (r.ping / 1000).toFixed(1) + ' dtk' : '');
+  try { localStorage.setItem(RKEY, JSON.stringify(riwayat().concat(ringkas).slice(-30))); } catch (e) {}
+  tampilRiwayat();
+  $('mulai').disabled = false; $('mulai').textContent = 'Tes lagi';
+}
+$('mulai').onclick = tes;
+// halaman ini juga disimpan service worker (bisa dibuka lagi tanpa sinyal untuk melihat riwayat)
+if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
