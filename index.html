@@ -763,7 +763,7 @@
           </div>
         </div>
       </section>
-      <p class="ver" id="ver" hidden>Versi halaman 16 Nov 2026 · antrean 1</p>
+      <p class="ver" id="ver" hidden>Versi halaman 19 Nov 2026 · antrean 2 (sinyal)</p>
     </main>
   </div>
 
@@ -914,6 +914,8 @@ const C = {   // nilai awal; sebagian diperbarui dari server (Code.gs → CONFIG
   couple: 'Afiq & Puteri', dateLabel: 'Ahad, 17 Januari 2027', stampDate: '17-01-2027', dateDots: '17.01.2027',
   boothTitle: 'WEDDING DAY', hashtag: '#PUTERIinAFIQtion',   // tulisan di kartu photo booth
   maxShots: 20, allowGallery: true, closeAt: Date.parse('2027-01-18T08:00:00+07:00'), revealAt: 0, skew: 0,
+  // foto yang DIAMBIL sebelum kamera tutup tapi nyangkut di HP (sinyal gedung jelek) masih diterima server sampai jam ini
+  kirimTutup: Date.parse('2027-01-20T23:59:00+07:00'),
   liveTahan: 60000   // slideshow layar besar menahan foto baru 1 menit (panitia sempat hapus foto iseng); dari server
 };
 const BINGKAI_IDS = ['maroon', 'mentega', 'klasik'];
@@ -1045,9 +1047,11 @@ async function api(query){
 }
 async function apiPost(body){
   if (DRY && body && body.action === 'upload') { await sleep(1200); return { ok: true, id: 'dry-' + Date.now(), used: S.used + 1, max: C.maxShots }; }
-  // batas longgar (2 menit): kiriman foto di sinyal lemah memang lama; yang benar-benar macet dicoba ulang oleh upload()
+  // Batas waktu menyesuaikan ukuran: foto ±600 KB di sinyal lemah (±3 KB/detik) butuh ±4 menit. Dulu tetap 2 menit →
+  // di sinyal gedung foto tidak pernah selesai terkirim, diulang dari awal terus. Yang benar-benar macet dicoba ulang oleh upload().
   if (body && body.action !== 'admin' && TAMU.kunci) body = Object.assign({ k: TAMU.kunci }, body);
-  const r = await fetchT(API, { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }, 120000);
+  const besar = body && typeof body.dataUrl === 'string' ? body.dataUrl.length : 0;
+  const r = await fetchT(API, { method: 'POST', credentials: 'omit', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }, Math.min(300000, Math.max(120000, 60000 + besar / 3)));
   const j = await r.json();
   if (j && j.reason === 'kunci') gerbang();
   return j;
@@ -1064,6 +1068,18 @@ store.set(KEY, guest);
    QR meja & link undangan memuat ?k=KUNCI. Kunci disimpan di HP, jadi dibuka lagi dari riwayat/layar utama tetap jalan.
    Server menolak (reason 'kunci') kalau kunci wajib dan tidak cocok → tampil gerbang "scan QR". */
 const KKEY = KEY + '_kunci';
+// Pengaturan & jatah terakhir dari server: dipakai kalau halaman dibuka tanpa sinyal (dari salinan di HP, lihat sw.js)
+const CFGKEY = KEY + '_cfg', ROLLKEY = KEY + '_roll';
+{
+  const cf = store.get(CFGKEY);
+  if (cf && typeof cf === 'object') {
+    if (cf.maxShots > 0) C.maxShots = cf.maxShots;
+    if (cf.closeAt > 0) C.closeAt = cf.closeAt;
+    if (cf.kirimTutup > 0) C.kirimTutup = cf.kirimTutup;
+    if (typeof cf.allowGallery === 'boolean') C.allowGallery = cf.allowGallery;
+    if (typeof cf.liveTahan === 'number') C.liveTahan = cf.liveTahan;
+  }
+}
 const TAMU = { kunci: '', ditolak: false, dariLink: false, cadangan: '' };
 {
   const q = String(new URLSearchParams(location.search).get('k') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -1127,6 +1143,8 @@ if (!FILTERS.some(f => f.id === pref.filter)) pref.filter = 'cerah';
 if (!BINGKAI_IDS.includes(pref.bingkai)) pref.bingkai = 'maroon';
 const savePref = () => store.set(FKEY, pref);
 const S = { used: 0, pending: 0, items: [], local: {}, current: null, rapuh: false };
+{ const rc = store.get(ROLLKEY); if (rc && rc.gid === guest.id && rc.used > 0) S.used = rc.used; }   // jatah terpakai terakhir (dibuka tanpa sinyal)
+const simpanJatah = () => store.set(ROLLKEY, { gid: guest.id, used: S.used, t: Date.now() });
 const closed = () => now() > C.closeAt;
 // Foto gagal yang masih menunggu kirim ulang tetap memegang jatahnya (kalau tidak, tamu bisa menjepret melebihi sisa dan
 // kelebihannya pasti ditolak server).
@@ -1271,13 +1289,22 @@ function render(){
   $('btnGal').hidden = !C.allowGallery;
 
   const sending = S.items.filter(i => i.state === 'up').length, antre = S.items.some(i => i.state === 'up' && i.wait);
-  $('sendBar').hidden = !sending;
-  $('sbTitle').textContent = antre ? 'Server sedang ramai, ' + sending + ' foto antre' : 'Mengirim ' + sending + ' foto…';
-  $('sbSub').textContent = S.rapuh ? 'Penyimpanan HP penuh. Jangan tutup halaman ini sampai fotonya terkirim.'
-    : antre ? 'Fotomu aman di HP ini dan terkirim otomatis. Jangan tutup halaman ini ya.' : 'Biarkan halaman ini terbuka.';
+  const tertunda = S.items.filter(i => i.state === 'fail' && !i.tolak).length;
+  const batas = 'sampai ' + new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'Asia/Jakarta' }).format(new Date(C.kirimTutup));
+  $('sendBar').hidden = !sending && !tertunda;
+  if (sending) {
+    $('sbTitle').textContent = antre ? 'Sinyal lemah / server ramai, ' + sending + ' foto antre' : sending > 1 ? 'Mengirim ' + sending + ' foto, satu per satu…' : 'Mengirim 1 foto…';
+    $('sbSub').textContent = S.rapuh ? 'Penyimpanan HP penuh. Jangan tutup halaman ini sampai fotonya terkirim.'
+      : antre ? 'Fotomu aman di HP ini dan terkirim otomatis. Jangan tutup halaman ini ya.' : 'Biarkan halaman ini terbuka.';
+  } else {
+    $('sbTitle').textContent = tertunda + ' foto belum terkirim';
+    $('sbSub').textContent = S.rapuh ? 'Penyimpanan HP penuh. Jangan tutup halaman ini sampai fotonya terkirim.'
+      : 'Fotonya aman di HP ini. Terkirim sendiri begitu ada sinyal. Kalau halaman ini ditutup, buka lagi link yang sama nanti (' + batas + ').';
+  }
 
   const note = $('note'); note.classList.remove('warn');
-  if (closed()) note.textContent = 'Kamera sudah ditutup. Terima kasih sudah motret! Fotonya bisa dilihat di Album.';
+  if (closed() && tertunda) note.textContent = 'Kamera sudah ditutup. ' + tertunda + ' foto yang kamu ambil tadi masih bisa dikirim ' + batas + '.';
+  else if (closed()) note.textContent = 'Kamera sudah ditutup. Terima kasih sudah motret! Fotonya bisa dilihat di Album.';
   else if (l <= 0 && S.pending === 0 && S.items.some(i => i.state === 'fail' && !i.tolak)) note.textContent = 'Masih ada foto yang belum terkirim. Dikirim ulang otomatis selama halaman ini terbuka.';
   else if (l <= 0 && S.pending === 0) note.textContent = 'Jatah jepretanmu sudah habis. Terima kasih sudah jadi fotografer kami.';
   else if (l <= 3 && l > 0) { note.textContent = 'Tinggal ' + l + ' jepretan. Pilih momen terbaik!'; note.classList.add('warn'); }
@@ -1295,8 +1322,9 @@ function render(){
     d.appendChild(img);
     const what = isStrip(it) ? 'Kartu photo booth' : 'Foto';
     if (it.state === 'up'){
-      d.setAttribute('aria-label', what + (it.wait ? ' menunggu giliran dikirim' : ' sedang dikirim'));
-      d.insertAdjacentHTML('beforeend', '<span class="badge ' + (it.wait ? 'wait' : 'up') + '"><span class="spin-sm" aria-hidden="true"></span>' + (it.wait ? 'Antre' : 'Mengirim') + '</span>');
+      const tunggu = it.wait || it.giliran;
+      d.setAttribute('aria-label', what + (tunggu ? ' menunggu giliran dikirim' : ' sedang dikirim'));
+      d.insertAdjacentHTML('beforeend', '<span class="badge ' + (tunggu ? 'wait' : 'up') + '"><span class="spin-sm" aria-hidden="true"></span>' + (tunggu ? 'Antre' : 'Mengirim') + '</span>');
       d.disabled = true;
     } else if (it.state === 'fail' && it.simpan){
       d.setAttribute('aria-label', what + ' belum terkirim ke album. Ketuk untuk simpan ke HP');
@@ -1968,7 +1996,9 @@ function lepasKanvas(cur){
    '' belum / sudah dihapus, 'a' antre kirim, 't' ditolak server tapi disimpan supaya bisa diunduh ke HP. */
 function savePending(){
   const perlu = i => i.state !== 'done' && (!i.tolak || i.simpan) && !!i.dataUrl;
-  const rek = i => ({ id: i.id, uid: i.uid, dataUrl: i.dataUrl, source: i.source, tolak: !!i.tolak, simpan: !!i.simpan });
+  // gid/name/k/diambil ikut disimpan: service worker (sw.js) mengirim catatan ini sendiri saat halaman sudah ditutup
+  const rek = i => ({ id: i.id, uid: i.uid, dataUrl: i.dataUrl, source: i.source, tolak: !!i.tolak, simpan: !!i.simpan,
+    gid: guest.id, name: guest.name, k: TAMU.kunci || '', diambil: i.diambil || 0 });
   const kerja = [], kena = [];
   S.items.forEach(i => {
     const mau = perlu(i) ? (i.tolak ? 't' : 'a') : '';
@@ -1979,7 +2009,7 @@ function savePending(){
   });
   if (!kerja.length) return;
   // IndexedDB muat banyak foto; localStorage (±5 MB) hanya cadangan kalau IndexedDB tidak tersedia / penuh
-  Promise.all(kerja).then(() => { try { localStorage.removeItem(PKEY); } catch(e){} if (S.rapuh) { S.rapuh = false; render(); } })
+  Promise.all(kerja).then(() => { try { localStorage.removeItem(PKEY); } catch(e){} if (S.rapuh) { S.rapuh = false; render(); } daftarKirimLatar(); })
     .catch(() => {
       kena.forEach(([i, lama]) => { i.idb = lama; });  // dicoba lagi di penyimpanan berikutnya
       const list = S.items.filter(perlu).map(rek);
@@ -1995,7 +2025,7 @@ async function send(){
   (cur.kind === 'strip' ? $('btnBooth') : $('btnCam')).focus({ preventScroll: true });
   flash();
   const source = cur.kind === 'strip' ? 'booth' : cur.source;
-  const it = { id: 'tmp-' + Date.now(), uid: uid(), state: 'up', dataUrl: cur.dataUrl, source, src: source };   // uid sama di tiap kirim ulang → server tidak menyimpan dobel
+  const it = { id: 'tmp-' + Date.now(), uid: uid(), state: 'up', dataUrl: cur.dataUrl, source, src: source, diambil: now() };   // uid sama di tiap kirim ulang → server tidak menyimpan dobel
   S.local[it.id] = cur.dataUrl;
   if (cur.fc) it.cleanUrl = cur.fc.toDataURL('image/jpeg', 0.9);   // versi tanpa tanda foto, untuk "Simpan sebagai" dari album (hanya di memori)
   lepasKanvas(cur);
@@ -2008,16 +2038,21 @@ async function send(){
 async function upload(it){
   savePending();
   if (!it.uid) it.uid = uid();
-  const payload = { action: 'upload', guestId: guest.id, name: guest.name, source: it.source, dataUrl: it.dataUrl, uploadId: it.uid };
   // Saat ramai server menolak sebagian kiriman; coba lagi dengan jeda makin panjang (± 3 menit total)
   const waits = [2000, 4000, 8000, 15000, 30000, 45000, 60000];
   let res = null;
   it.wait = false;
   for (let i = 0; i <= waits.length; i++){
+    if (it.state === 'done') break;               // sudah dikirim service worker selagi halaman di belakang
+    await ambilGiliran(it);
     try {
+      const payload = { action: 'upload', guestId: guest.id, name: guest.name, source: it.source, dataUrl: it.dataUrl, uploadId: it.uid, diambil: it.diambil || 0 };
       const r = await apiPost(payload);
       if (r && (r.ok || r.reason)) { res = r; break; }
-    } catch(e) { /* jaringan / server sibuk → coba lagi */ }
+    } catch(e) {
+      // Batas waktu habis = sinyal sangat lambat → kirim versi lebih ringan (ukuran gambar sama, kompresi JPEG lebih rapat)
+      if (e && e.name === 'AbortError') await ringankan(it);
+    } finally { lepasGiliran(); }
     if (i < waits.length) {
       if (!it.wait) { it.wait = true; render(); }
       await sleep(waits[i] * (0.8 + Math.random() * 0.4));
@@ -2025,11 +2060,13 @@ async function upload(it){
   }
   it.wait = false;
   S.pending = Math.max(0, S.pending - 1);
+  if (it.state === 'done' && !(res && res.ok)) { savePending(); render(); return; }
   if (res && res.ok){
     S.local[res.id] = it.dataUrl; delete S.local[it.id];
     it.id = res.id; it.state = 'done'; it.t = Date.now(); delete it.dataUrl;
     S.used = Math.max(S.used + 1, res.used || 0);
     if (res.max) C.maxShots = res.max;
+    simpanJatah();
     toast(it.src === 'booth' ? 'Kartu photo booth tersimpan di album' : 'Foto tersimpan di album');
     A.dirty = true;
   } else if (res && (res.reason === 'habis' || res.reason === 'tutup')){
@@ -2049,6 +2086,73 @@ async function upload(it){
     toast('Server sedang ramai. Fotomu dikirim ulang otomatis selama halaman ini terbuka.', 'warn', 8000);
   }
   savePending(); render();
+}
+
+/* Sinyal lemah: kiriman paralel saling berebut sinyal sehingga semuanya lambat dan sama-sama habis waktu. Jadi foto
+   dikirim satu per satu (dua sekaligus kalau HP melaporkan jaringan 4G). Giliran dipegang hanya selama mengirim, tidak
+   selama menunggu jeda coba-lagi. */
+const GILIRAN = { jalan: 0, antre: [] };
+const batasGiliran = () => { const k = navigator.connection; return k && k.effectiveType === '4g' && !k.saveData ? 2 : 1; };
+async function ambilGiliran(it){
+  while (GILIRAN.jalan >= batasGiliran()) {
+    if (!it.giliran) { it.giliran = true; render(); }
+    await new Promise(r => GILIRAN.antre.push(r));
+  }
+  if (it.giliran) { it.giliran = false; render(); }
+  GILIRAN.jalan++;
+}
+function lepasGiliran(){ GILIRAN.jalan = Math.max(0, GILIRAN.jalan - 1); const r = GILIRAN.antre.shift(); if (r) r(); }
+
+/** Sekali per foto: ukuran (px) tetap, kualitas JPEG 0,70 (umumnya 30–40% lebih kecil, beda mata sulit terlihat).
+    Hanya dipakai kalau kiriman benar-benar habis waktu, bukan untuk semua foto. */
+async function ringankan(it){
+  if (it.ringan || !it.dataUrl || it.dataUrl.length < 300000) return;
+  it.ringan = true;
+  try {
+    const im = await loadImg(it.dataUrl);
+    const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight;
+    c.getContext('2d').drawImage(im, 0, 0);
+    const baru = c.toDataURL('image/jpeg', 0.7);
+    c.width = c.height = 0;
+    if (baru.length > it.dataUrl.length * 0.85) return;            // tidak banyak menghemat → kirim yang asli
+    it.dataUrl = baru;
+    if (S.local[it.id]) S.local[it.id] = baru;
+    it.idb = ''; savePending();                                      // salinan di HP ikut diganti (sw.js mengirim yang ringan)
+  } catch(e) {}
+}
+
+/** Service worker: halaman bisa dibuka tanpa sinyal + kirim di belakang layar (lihat sw.js). */
+const SW = { reg: null };
+if ('serviceWorker' in navigator && window.isSecureContext && !/[?&]sw=0/.test(location.search)) {
+  navigator.serviceWorker.register('sw.js').then(r => { SW.reg = r; }).catch(() => {});
+}
+/** Minta browser mengirim antrean saat sinyal kembali walau halaman ini sudah ditutup (Chrome/Android). */
+function daftarKirimLatar(){
+  if (!S.items.some(i => i.state !== 'done' && !i.tolak && i.dataUrl)) return;
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.ready.then(r => r.sync && r.sync.register('kirim-foto')).catch(() => {});
+}
+/** Hasil kiriman service worker selama halaman di belakang: foto terkirim / ditolak. */
+async function cocokkanLatar(){
+  let list = [];
+  try { list = await IDB.baca(); } catch(e) { return; }
+  let ubah = false;
+  list.forEach(p => {
+    const it = S.items.find(x => x.uid === p.uid);
+    if (p.terkirim) {
+      if (it && it.state !== 'done') {
+        S.local[p.id] = it.dataUrl || S.local[it.id]; delete S.local[it.id];
+        it.id = p.id; it.state = 'done'; it.t = p.t; delete it.dataUrl; it.idb = 'x';
+        S.used = Math.max(S.used, p.used || 0); if (p.max) C.maxShots = p.max;
+        ubah = true;
+      }
+      if (!it || it.state === 'done') { if (it) it.idb = ''; IDB.hapus(p.uid).catch(() => {}); }
+    } else if (p.tolak && it && it.state !== 'done' && !it.tolak && it.state !== 'up') {
+      it.state = 'fail'; it.tolak = true; it.simpan = true; it.idb = 't'; ubah = true;
+      if (p.alasan === 'habis') S.used = C.maxShots;
+    }
+  });
+  if (ubah) { simpanJatah(); A.dirty = true; render(); }
 }
 
 /** Foto yang tidak bisa masuk album lagi (kamera tutup / jatah habis): disimpan langsung dari HP. */
@@ -2072,17 +2176,19 @@ function applyRoll(r){
   const ada = new Set(r.items.map(x => x.id));
   const pend = S.items.filter(x => x.state !== 'done');
   // foto yang baru terkirim dari halaman ini tapi belum masuk daftar server (indeks album telat ±15 dtk sampai beberapa menit)
-  const baru = S.items.filter(x => x.state === 'done' && !ada.has(x.id) && S.local[x.id] && x.t && Date.now() - x.t < 600000);
+  const baru = S.items.filter(x => x.state === 'done' && !ada.has(x.id) && (S.local[x.id] || x.latar) && x.t && Date.now() - x.t < 600000);
   S.items = r.items.map(x => ({ id: x.id, state: 'done', t: x.t, src: x.src })).concat(baru, pend);
   S.used = baru.length ? Math.max(r.used, S.used) : r.used; if (r.max) C.maxShots = r.max;
-  render();
+  simpanJatah(); render();
 }
 function applyCfg(cfg){
   C.couple = cfg.couple || C.couple;   // dateLabel & stamp dari server sengaja diabaikan (sumber: frontend)
   C.maxShots = cfg.maxShots || C.maxShots; C.allowGallery = cfg.allowGallery !== false;
   C.closeAt = cfg.closeAt || C.closeAt; C.revealAt = cfg.revealAt || 0;
+  C.kirimTutup = cfg.kirimTutup || Math.max(C.kirimTutup, C.closeAt);
   if (typeof cfg.liveTahan === 'number') C.liveTahan = cfg.liveTahan;
   if (cfg.now) C.skew = cfg.now - Date.now();
+  store.set(CFGKEY, { maxShots: C.maxShots, closeAt: C.closeAt, kirimTutup: C.kirimTutup, allowGallery: C.allowGallery, liveTahan: C.liveTahan });
   applyConfig(); render();
 }
 function applyStats(s){
@@ -2096,6 +2202,7 @@ async function boot(coba){
   BOOT.jalan = true;
   try {
     for (let i = 0; i < (coba || 4); i++){
+      if (TAMU.ditolak) return;                    // server menolak kuncinya → gerbang; jangan terus mengetuk tanpa kunci sah
       try {
         const r = await api('api=boot&gid=' + encodeURIComponent(guest.id));
         if (r && r.config) { BOOT.ok = true; applyCfg(r.config); if (r.roll) applyRoll(r.roll); applyStats(r.stats); return; }
@@ -3303,7 +3410,11 @@ const retryFailed = n => S.items.filter(i => i.state === 'fail' && !i.tolak).sli
 setInterval(() => { if (document.visibilityState === 'visible') { retryFailed(2); boot(1); } }, 60000);
 // sinyal kembali: semua HP di Wi-Fi yang sama menerima kejadian ini bersamaan → jeda acak supaya server tidak diserbu serentak
 window.addEventListener('online', () => { setTimeout(() => { retryFailed(2); boot(2); if (!$('viewAlbum').hidden && A.fails) albumMore(); }, Math.random() * 10000); });
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') boot(1); });
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') { cocokkanLatar().then(() => { boot(1); retryFailed(2); }); }
+  else daftarKirimLatar();                        // HP dikunci / pindah aplikasi: serahkan antrean ke service worker
+});
+window.addEventListener('pagehide', daftarKirimLatar);
 window.addEventListener('hashchange', route);
 
 if (guest.name) showCam(); else showWelcome();
@@ -3348,9 +3459,15 @@ function closeCover(){
   lama.forEach(p => { if (p && p.dataUrl && !list.some(x => x.uid && x.uid === p.uid)) list.push(p); });
   const kirim = [];
   list.forEach(p => {
+    if (p && p.terkirim) {                          // dikirim service worker saat halaman tertutup: sudah di album
+      if (!S.items.some(x => x.id === p.id)) S.items.unshift({ id: p.id, state: 'done', t: p.t, src: p.source || 'kamera', latar: true });
+      S.used = Math.max(S.used, p.used || 0); if (p.max) C.maxShots = p.max;
+      IDB.hapus(p.uid).catch(() => {});
+      return;
+    }
     if (!p || !p.dataUrl || S.items.some(x => x.uid && x.uid === p.uid)) return;
     const src = p.source || 'kamera';
-    const it = { id: p.id || ('tmp-' + Math.random()), uid: p.uid || uid(), state: 'up', dataUrl: p.dataUrl, source: src, src, idb: p.dariIdb ? (p.tolak ? 't' : 'a') : '' };
+    const it = { id: p.id || ('tmp-' + Math.random()), uid: p.uid || uid(), state: 'up', dataUrl: p.dataUrl, source: src, src, diambil: p.diambil || 0, idb: p.dariIdb ? (p.tolak ? 't' : 'a') : '' };
     S.local[it.id] = it.dataUrl; S.items.push(it);
     // sudah ditolak server (jatah habis / kamera tutup / isi ditolak): tetap bisa disimpan ke HP, TIDAK diunggah ulang tiap halaman dibuka
     if (p.tolak) { it.state = 'fail'; it.tolak = true; it.simpan = p.simpan !== false; }
