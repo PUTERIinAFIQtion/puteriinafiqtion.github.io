@@ -2202,6 +2202,7 @@ async function boot(coba){
   BOOT.jalan = true;
   try {
     for (let i = 0; i < (coba || 4); i++){
+      if (TAMU.ditolak) return;                    // server menolak kuncinya → gerbang; jangan terus mengetuk tanpa kunci sah
       try {
         const r = await api('api=boot&gid=' + encodeURIComponent(guest.id));
         if (r && r.config) { BOOT.ok = true; applyCfg(r.config); if (r.roll) applyRoll(r.roll); applyStats(r.stats); return; }
