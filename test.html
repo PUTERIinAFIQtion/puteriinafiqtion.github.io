@@ -590,8 +590,8 @@
     <p class="label">Kamera Tamu</p>
     <h1 class="couple js-couple" id="gerbangJudul" tabindex="-1">Afiq <span class="amp">&amp;</span> Puteri</h1>
     <p class="gerbang-t">Halaman ini khusus tamu undangan.</p>
-    <p class="gerbang-s">Scan QR di meja penerima tamu, atau buka lagi link dari undangan WhatsApp.</p>
-    <button class="btn btn-ghost" id="gerbangLagi" type="button">Coba lagi</button>
+    <p class="gerbang-s" id="gerbangSaran">Buka link dari undangan WhatsApp, atau scan QR di meja penerima tamu.</p>
+    <button class="btn btn-ghost" id="gerbangLagi" type="button" hidden>Coba lagi</button>
     <a class="link-btn" href="#admin">Saya panitia</a>
   </div>
 </section>
@@ -736,6 +736,16 @@
             </div>
             <div class="row"><button class="btn btn-ghost btn-sm" id="admGanti" type="button">Ganti kunci…</button></div>
           </details>
+          <details class="adm-akses" id="admJatah" hidden>
+            <summary>Jatah jepretan &amp; reset (go ahead)</summary>
+            <p class="small" id="admJatahInfo">Memuat…</p>
+            <p class="small">Tekan sekali saat uji coba selesai dan undangan siap dikirim. Semua jatah kembali nol, foto uji sebelum tombol ditekan disembunyikan dari album (file tetap di Drive). Sebelum hari H tiap tamu dapat jatah awal; sisanya terbuka saat acara mulai.</p>
+            <div class="adm-tanya" id="admResetTanya" hidden>
+              <p>Reset jatah semua tamu sekarang? Foto yang sudah ada sebelum ini tidak tampil lagi di album.</p>
+              <div class="row"><button class="btn btn-ghost btn-sm" id="admResetBatal" type="button">Batal</button><button class="btn btn-primary btn-sm" id="admResetYa" type="button">Ya, reset jatah</button></div>
+            </div>
+            <div class="row"><button class="btn btn-ghost btn-sm" id="admReset" type="button">Reset jatah…</button></div>
+          </details>
           <details class="adm-akses" id="admSehat" hidden>
             <summary>Kesehatan sistem</summary>
             <dl class="sehat" id="admSehatIsi"></dl>
@@ -763,7 +773,7 @@
           </div>
         </div>
       </section>
-      <p class="ver" id="ver" hidden>Versi halaman 19 Nov 2026 · antrean 2 (sinyal)</p>
+      <p class="ver" id="ver" hidden>Versi halaman 20 Nov 2026 · jatah hari H</p>
     </main>
   </div>
 
@@ -1074,6 +1084,8 @@ const CFGKEY = KEY + '_cfg', ROLLKEY = KEY + '_roll';
   const cf = store.get(CFGKEY);
   if (cf && typeof cf === 'object') {
     if (cf.maxShots > 0) C.maxShots = cf.maxShots;
+    if (cf.maxTotal > 0) C.maxTotal = cf.maxTotal;
+    if (cf.acaraMulai > 0) C.acaraMulai = cf.acaraMulai;
     if (cf.closeAt > 0) C.closeAt = cf.closeAt;
     if (cf.kirimTutup > 0) C.kirimTutup = cf.kirimTutup;
     if (typeof cf.allowGallery === 'boolean') C.allowGallery = cf.allowGallery;
@@ -1105,6 +1117,12 @@ function gerbang(){
   // Kunci tersimpan TIDAK dihapus: satu jawaban "kunci" (mis. tepat saat pemilik mengganti kunci) tidak boleh mengunci HP ini
   // selamanya. Muat ulang / "Coba lagi" memakai kunci tersimpan; kalau memang sudah diganti, scan QR baru menggantinya.
   TAMU.ditolak = true;
+  // Tanpa kunci sama sekali (buka alamat polos), "Coba lagi" tidak ada gunanya: yang dibutuhkan link undangan.
+  const adaKunci = !!TAMU.kunci;
+  $('gerbangLagi').hidden = !adaKunci;
+  $('gerbangSaran').textContent = adaKunci
+    ? 'Link di HP ini tidak diterima: mungkin sudah diganti, atau server sedang sibuk. Coba lagi sebentar, atau buka link terbaru dari undangan WhatsApp / scan QR di meja.'
+    : 'Buka link dari undangan WhatsApp, atau scan QR di meja penerima tamu.';
   route();
 }
 
@@ -1148,6 +1166,11 @@ const simpanJatah = () => store.set(ROLLKEY, { gid: guest.id, used: S.used, t: D
 const closed = () => now() > C.closeAt;
 // Foto gagal yang masih menunggu kirim ulang tetap memegang jatahnya (kalau tidak, tamu bisa menjepret melebihi sisa dan
 // kelebihannya pasti ditolak server).
+/** Jatah sebelum hari H (mis. 5 dari 20): begitu jam acara tiba, jatah penuh terbuka walau server belum sempat ditanya. */
+function cekHariH(){
+  if (C.maxTotal > C.maxShots && C.acaraMulai && Date.now() + (C.skew || 0) >= C.acaraMulai) C.maxShots = C.maxTotal;
+}
+const praHariH = () => C.maxTotal > C.maxShots && C.acaraMulai > Date.now() + (C.skew || 0);
 const sisaKirim = () => C.maxShots - S.used - S.pending;
 const left = () => Math.max(0, sisaKirim() - S.items.filter(i => i.state === 'fail' && !i.tolak).length);
 
@@ -1279,11 +1302,12 @@ function setHead(){
 }
 
 function render(){
+  cekHariH();
   const l = left();
   $('left').textContent = l;
   $('leftUp').textContent = l > 0 && l < C.maxShots ? l + 1 : '';
   $('leftDn').textContent = l > 0 ? l - 1 : '';
-  $('leftLabel').textContent = l + ' dari ' + C.maxShots + ' jepretan tersisa';
+  $('leftLabel').textContent = l + ' dari ' + C.maxShots + ' jepretan tersisa' + (praHariH() ? ' · ' + (C.maxTotal - C.maxShots) + ' lagi dibuka di hari H' : '');
   const off = closed() || l <= 0;
   ['btnCam','btnSelfie','btnGal','btnBooth'].forEach(id => $(id).disabled = off);
   $('btnGal').hidden = !C.allowGallery;
@@ -2072,7 +2096,7 @@ async function upload(it){
   } else if (res && (res.reason === 'habis' || res.reason === 'tutup')){
     it.state = 'fail'; it.tolak = true; it.simpan = true;   // fotonya tidak dibuang: tetap di HP, bisa disimpan ke galeri
     if (res.reason === 'habis') S.used = C.maxShots;
-    toast((res.reason === 'habis' ? 'Roll kamu sudah habis.' : 'Kamera sudah ditutup.') + ' Fotomu tidak hilang: ketuk fotonya untuk simpan ke HP.', 'warn', 9000);
+    toast((res.reason === 'habis' ? (praHariH() ? 'Jatah sebelum hari H habis. ' + (C.maxTotal - C.maxShots) + ' jepretan lagi dibuka saat acara.' : 'Roll kamu sudah habis.') : 'Kamera sudah ditutup.') + ' Fotomu tidak hilang: ketuk fotonya untuk simpan ke HP.', 'warn', 9000);
   } else if (res && res.reason === 'penuh'){
     it.state = 'fail';
     toast('Album sudah penuh. Kabari panitia ya.', 'warn', 6000);
@@ -2183,12 +2207,12 @@ function applyRoll(r){
 }
 function applyCfg(cfg){
   C.couple = cfg.couple || C.couple;   // dateLabel & stamp dari server sengaja diabaikan (sumber: frontend)
-  C.maxShots = cfg.maxShots || C.maxShots; C.allowGallery = cfg.allowGallery !== false;
+  C.maxShots = cfg.maxShots || C.maxShots; C.maxTotal = cfg.maxTotal || 0; C.acaraMulai = cfg.acaraMulai || 0; C.allowGallery = cfg.allowGallery !== false;
   C.closeAt = cfg.closeAt || C.closeAt; C.revealAt = cfg.revealAt || 0;
   C.kirimTutup = cfg.kirimTutup || Math.max(C.kirimTutup, C.closeAt);
   if (typeof cfg.liveTahan === 'number') C.liveTahan = cfg.liveTahan;
   if (cfg.now) C.skew = cfg.now - Date.now();
-  store.set(CFGKEY, { maxShots: C.maxShots, closeAt: C.closeAt, kirimTutup: C.kirimTutup, allowGallery: C.allowGallery, liveTahan: C.liveTahan });
+  store.set(CFGKEY, { maxShots: C.maxShots, maxTotal: C.maxTotal, acaraMulai: C.acaraMulai, closeAt: C.closeAt, kirimTutup: C.kirimTutup, allowGallery: C.allowGallery, liveTahan: C.liveTahan });
   applyConfig(); render();
 }
 function applyStats(s){
@@ -2959,7 +2983,7 @@ async function admEnter(key, silent){
     admTab(ADM.tab);
     admStats();
     admAkses();
-    admTamu();
+    admTamu(); admJatah();
     $('admSehat').hidden = r.role !== 'owner';
   } catch(e) {
     $('admLogin').hidden = false; $('admPanel').hidden = true;
@@ -2971,6 +2995,32 @@ async function admEnter(key, silent){
   } finally { btn.disabled = false; }
 }
 /** Khusus pemilik: link rahasia tamu (QR meja & undangan), unduh QR, ganti kunci. */
+const tglWib = ms => ms ? new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Jakarta' }).format(new Date(ms)) + ' WIB' : '';
+/** Khusus pemilik: status jatah + tombol reset (go ahead). */
+async function admJatah(){
+  const box = $('admJatah');
+  box.hidden = ADM.role !== 'owner'; if (box.hidden) return;
+  $('admJatahInfo').textContent = 'Memuat…';
+  try {
+    const j = await adminPost('jatah');
+    $('admJatahInfo').textContent = (j.reset ? 'Sudah direset ' + tglWib(j.reset) + '. ' : 'Belum pernah direset (masih masa uji). ')
+      + 'Jatah sekarang ' + j.batas + ' per tamu'
+      + (j.reset && j.pra < j.total ? ' (' + j.pra + ' sebelum hari H, total ' + j.total + ' mulai ' + tglWib(j.acaraMulai) + ').' : '.');
+  } catch(e) { $('admJatahInfo').textContent = e.server ? e.message : 'Sinyal tersendat. Buka lagi nanti.'; }
+}
+async function admResetJatah(){
+  const b = $('admResetYa'); b.disabled = true;
+  try {
+    await adminPost('resetJatah', { yakin: true });
+    $('admResetTanya').hidden = true; admJatah();
+    toastAksi('Jatah semua tamu sudah direset.', 'Urungkan', async () => {
+      try { await adminPost('batalReset'); toast('Reset dibatalkan.', 'ok'); }
+      catch(e) { toast(e.server ? e.message : 'Sinyal tersendat. Coba lagi.', 'warn'); }
+      admJatah();
+    }, 15000);
+  } catch(e) { toast(e.server ? e.message : 'Sinyal tersendat. Coba lagi.', 'warn'); }
+  finally { b.disabled = false; }
+}
 async function admTamu(){
   const box = $('admTamu');
   box.hidden = ADM.role !== 'owner'; if (box.hidden) return;
@@ -3072,7 +3122,7 @@ function admLogout(expired){
   Object.assign(ADM, { key: '', sesi: '', role: '', nama: '', ok: false, items: [], offset: 0, total: 0, done: false });
   store.set(AKEY, null);
   $('admAkses').hidden = true; $('admAksesList').textContent = ''; $('admName').textContent = '';
-  $('admTamu').hidden = true; $('admSehat').hidden = true; $('admTamuLink').textContent = ''; ADM.linkTamu = '';
+  $('admTamu').hidden = true; $('admJatah').hidden = true; $('admSehat').hidden = true; $('admTamuLink').textContent = ''; ADM.linkTamu = '';
   $('admGrid').innerHTML = ''; $('admTrashList').innerHTML = '';
   $('admLogin').hidden = false; $('admPanel').hidden = true;
   if (expired) toast('Kode panitia sudah tidak berlaku. Masuk lagi.', 'warn', 5000);
@@ -3372,6 +3422,9 @@ $('admTamuQr').onclick = admUnduhQr;
 $('admGanti').onclick = () => { $('admGantiTanya').hidden = false; $('admGantiBatal').focus(); };
 $('admGantiBatal').onclick = () => { $('admGantiTanya').hidden = true; $('admGanti').focus(); };
 $('admGantiYa').onclick = admGantiKunci;
+$('admReset').onclick = () => { $('admResetTanya').hidden = false; $('admResetBatal').focus(); };
+$('admResetBatal').onclick = () => { $('admResetTanya').hidden = true; $('admReset').focus(); };
+$('admResetYa').onclick = admResetJatah;
 $('admSehatCek').onclick = admCekSehat;
 $('admSehat').addEventListener('toggle', () => { if ($('admSehat').open && !$('admSehatIsi').children.length) admCekSehat(); });
 $('boothReset').onclick = () => {
