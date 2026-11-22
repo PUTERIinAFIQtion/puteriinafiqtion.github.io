@@ -1804,9 +1804,10 @@ async function composeStory(frames, f, byName, key){
   // monogram bulat
   ctx.fillStyle = t.chip; ctx.beginPath(); ctx.arc(108, 162, 50, 0, Math.PI * 2); ctx.fill();
   ctx.font = '600 54px ' + FR; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-  const wA = ctx.measureText('A').width, wP = ctx.measureText('P').width, x0 = 108 - (wA + wP - 9) / 2, by0 = 162 + 54 * .33;
-  ctx.fillStyle = t.monoA; ctx.fillText('A', x0, by0 - 5);
-  ctx.fillStyle = t.monoP; ctx.fillText('P', x0 + wA - 9, by0 + 7);
+  // urutan inisial mengikuti nama: P (mempelai wanita) dulu, lalu A. Warna per posisi tetap (monoA = huruf depan).
+  const m1 = 'P', m2 = 'A', w1 = ctx.measureText(m1).width, w2 = ctx.measureText(m2).width, x0 = 108 - (w1 + w2 - 9) / 2, by0 = 162 + 54 * .33;
+  ctx.fillStyle = t.monoA; ctx.fillText(m1, x0, by0 - 5);
+  ctx.fillStyle = t.monoP; ctx.fillText(m2, x0 + w1 - 9, by0 + 7);
 
   // nama pasangan + tanggal
   ctx.textAlign = 'center'; ctx.fillStyle = t.title;
@@ -1830,8 +1831,8 @@ async function composeStory(frames, f, byName, key){
     const h = w * img.naturalHeight / img.naturalWidth;
     ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.rotate(deg * Math.PI / 180); ctx.drawImage(img, -w / 2, -h / 2, w, h); ctx.restore();
   };
-  stick(stkA, 4, 262, 206, -8);
-  stick(stkP, 862, 1420, 212, 7);
+  stick(stkP, 4, 262, 206, -8);     // Puteri di atas (nama mempelai wanita dulu), Afiq di bawah
+  stick(stkA, 862, 1420, 212, 7);
 
   // hati kecil
   ctx.save(); ctx.translate(176 + 28, 236 + 25); ctx.rotate(-10 * Math.PI / 180); ctx.translate(-28, -25);
